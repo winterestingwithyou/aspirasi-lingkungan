@@ -18,12 +18,12 @@ export default function Navbar({ onOpenLogin }: { onOpenLogin: () => void }) {
             <li className="nav-item"><NavLink className="nav-link" to="/">Beranda</NavLink></li>
             <li className="nav-item"><NavLink className="nav-link" to="/report">Laporkan Masalah</NavLink></li>
             <li className="nav-item">
-              <button className="nav-link btn btn-link p-0" onClick={onOpenLogin}>Dashboard</button>
+              <button className="nav-link" onClick={onOpenLogin}>Dashboard</button>
             </li>
             <li className="nav-item"><a className="nav-link" href="#">Tentang</a></li>
             <li className="nav-item"><a className="nav-link" href="#">Kontak</a></li>
             <li className="nav-item">
-              <button className="nav-link btn btn-link p-0" onClick={onOpenLogin}>
+              <button className="nav-link" onClick={onOpenLogin}>
                 <i className="bi bi-person-circle" /> Masuk
               </button>
             </li>

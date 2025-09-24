@@ -1,29 +1,84 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
+import { Modal } from "bootstrap";
 
 type Role = "citizen" | "government" | null;
-export default function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+
+export default function LoginModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const [role, setRole] = useState<Role>(null);
   const nav = useNavigate();
 
-  useEffect(() => { if (!open) setRole(null); }, [open]);
-  if (!open) return null;
+  const modalElRef = useRef<HTMLDivElement>(null);
+  const modalInstanceRef = useRef<Modal | null>(null);
+
+  useEffect(() => {
+    if (!modalElRef.current) return;
+
+    const instance = Modal.getOrCreateInstance(modalElRef.current, {
+      backdrop: true,
+      focus: true,
+      keyboard: true,
+    });
+    modalInstanceRef.current = instance;
+
+    const handleHidden = () => setRole(null);
+    modalElRef.current.addEventListener("hidden.bs.modal", handleHidden);
+
+    return () => {
+      modalElRef.current?.removeEventListener("hidden.bs.modal", handleHidden);
+      instance.dispose();
+      modalInstanceRef.current = null;
+    };
+  }, []);
+
+  // Sinkronkan prop `open` → show/hide
+  useEffect(() => {
+    const inst = modalInstanceRef.current;
+    if (!inst) return;
+    open ? inst.show() : inst.hide();
+  }, [open]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!role) return alert("Silakan pilih role terlebih dahulu");
-    onClose();
+
+    onClose();                    
+    modalInstanceRef.current?.hide();
     nav(role === "citizen" ? "/dashboard/citizen" : "/dashboard/government");
   };
 
   return (
-    <div className="modal fade show d-block" tabIndex={-1} aria-modal="true" role="dialog">
+    <div
+      ref={modalElRef}
+      className="modal login-modal fade"
+      id="loginModal"
+      tabIndex={-1}
+      aria-labelledby="loginModalLabel"
+      aria-hidden="true"
+    >
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content login-modal">
-          <div className="modal-header" style={{ backgroundColor: "var(--primary-color)", color: "#fff" }}>
-            <h5 className="modal-title">Login ke Dashboard</h5>
-            <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
+        <div className="modal-content">
+          <div
+            className="modal-header"
+            style={{ backgroundColor: "var(--primary-color)", color: "#fff" }}
+          >
+            <h5 className="modal-title" id="loginModalLabel">Login ke Dashboard</h5>
+            {/* biar animasi & backdrop di-handle Bootstrap; sinkronkan state parent juga */}
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              onClick={onClose}
+            />
           </div>
+
           <div className="modal-body">
             <form onSubmit={submit}>
               <div className="mb-3">
@@ -47,7 +102,9 @@ export default function LoginModal({ open, onClose }: { open: boolean; onClose: 
                       key={key}
                       onClick={() => setRole(key as Role)}
                       className={`flex-fill border rounded-3 p-3 text-center ${
-                        role === key ? "border-success bg-success bg-opacity-10" : "border-secondary"
+                        role === key
+                          ? "border-success bg-success bg-opacity-10"
+                          : "border-secondary"
                       }`}
                       style={{ minWidth: 160 }}
                     >
@@ -63,9 +120,9 @@ export default function LoginModal({ open, onClose }: { open: boolean; onClose: 
               </div>
             </form>
           </div>
+
         </div>
       </div>
-      <div className="modal-backdrop fade show" onClick={onClose} />
     </div>
   );
 }
