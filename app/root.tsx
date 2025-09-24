@@ -10,7 +10,6 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js"; 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 export const links: Route.LinksFunction = () => [
