@@ -1,35 +1,32 @@
-import { Link, NavLink } from "react-router";
+import { NavLink, Link } from "react-router";
+import Navbar from "react-bootstrap/Navbar";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
 
-export default function Navbar({ onOpenLogin }: { onOpenLogin: () => void }) {
+export default function Topbar({ onOpenLogin }: { onOpenLogin: () => void }) {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark sticky-top">
-      <div className="container">
-        <Link className="navbar-brand" to="/">
+    <Navbar expand="lg" bg="#2E8B57" data-bs-theme="dark" sticky="top">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
           <i className="bi bi-tree-fill me-2" />
           Lingkungan Bersih
-        </Link>
+        </Navbar.Brand>
 
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span className="navbar-toggler-icon" />
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item"><NavLink className="nav-link" to="/">Beranda</NavLink></li>
-            <li className="nav-item"><NavLink className="nav-link" to="/report">Laporkan Masalah</NavLink></li>
-            <li className="nav-item">
-              <button className="nav-link" onClick={onOpenLogin}>Dashboard</button>
-            </li>
-            <li className="nav-item"><a className="nav-link" href="#">Tentang</a></li>
-            <li className="nav-item"><a className="nav-link" href="#">Kontak</a></li>
-            <li className="nav-item">
-              <button className="nav-link" onClick={onOpenLogin}>
-                <i className="bi bi-person-circle" /> Masuk
-              </button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+        <Navbar.Toggle aria-controls="mainnav" />
+        <Navbar.Collapse id="mainnav">
+          <Nav className="ms-auto">
+            <Nav.Link as={NavLink} to="/" end>Beranda</Nav.Link>
+            <Nav.Link as={NavLink} to="/report">Laporkan Masalah</Nav.Link>
+            <Nav.Link as={buttonLink} onClick={onOpenLogin}>Dashboard</Nav.Link>
+            <Nav.Link href="#">Tentang</Nav.Link>
+            <Nav.Link href="#">Kontak</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
+}
+
+function buttonLink(props: React.ComponentProps<"button">) {
+  return <button className="nav-link btn btn-link p-0" {...props} />;
 }
