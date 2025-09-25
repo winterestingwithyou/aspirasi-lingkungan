@@ -1,21 +1,16 @@
 import { Outlet } from "react-router";
-import { useState } from "react";
-import Navbar from "~/components/navbar";
 import Footer from "~/components/footer";
-import LoginModal from "~/components/login-modal";
-import SuccessModal from "~/components/success-modal";
+import LoginModalProvider from "~/components/login-modal-provider";
+import NavbarTop from "~/components/navbar-top";
 
-export default function App() {
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [successOpen, setSuccessOpen] = useState(false);
-
+export default function App() { 
   return (
-    <>
-      <Navbar onOpenLogin={() => setLoginOpen(true)} />
-      <Outlet context={{ openSuccess: () => setSuccessOpen(true) }} />
+    <LoginModalProvider>
+      <NavbarTop />
+      <main>
+        <Outlet />
+      </main>
       <Footer />
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
-      <SuccessModal open={successOpen} onClose={() => setSuccessOpen(false)} />
-    </>
+    </LoginModalProvider>
   );
 }

@@ -59,25 +59,6 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.feature-card {
-    background-color: white;
-    border-radius: 10px;
-    padding: 30px;
-    height: 100%;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-10px);
-}
-
-.feature-icon {
-    font-size: 3rem;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-}
-
 .section-title {
     font-weight: 700;
     margin-bottom: 20px;
@@ -311,16 +292,51 @@ footer {
     color: #bbb;
 }
 
-/* Page specific styling */
-.page-section {
-    padding: 60px 0;
+.guide-step {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.guide-step:hover {
+    transform: translateY(-10px);
+}
+
+.guide-step-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.report-list-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.report-list-card:hover {
+    transform: translateY(-5px);
+}
+
+.report-list-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.report-list-card-body {
+    padding: 20px;
 }
 
 .hidden {
     display: none;
 }
 
-/* Login Modal */
 .login-modal .modal-content {
     border-radius: 15px;
     border: none;
@@ -341,35 +357,131 @@ footer {
     filter: brightness(0) invert(1);
 }
 
-.role-selector {
-    display: flex;
-    gap: 15px;
+.welcome-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.today-stats {
+    background-color: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.profile-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 20px;
+    display: block;
+    border: 5px solid var(--primary-color);
+}
+
+.detail-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
     margin-bottom: 20px;
 }
 
-.role-card {
-    flex: 1;
-    border: 2px solid #ddd;
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10px;
+    height: 100%;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+}
+
+.evidence-section {
+    background-color: #f8f9fa;
     border-radius: 10px;
     padding: 20px;
-    text-align: center;
-    cursor: pointer;
+    margin-top: 20px;
     transition: all 0.3s ease;
 }
 
-.role-card:hover {
-    border-color: var(--primary-color);
+.evidence-section.hidden {
+    display: none;
 }
 
-.role-card.selected {
-    border-color: var(--primary-color);
-    background-color: rgba(46, 139, 87, 0.1);
+.evidence-section.show {
+    display: block;
+    animation: fadeIn 0.5s;
 }
 
-.role-card i {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 10px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.evidence-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.evidence-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    width: calc(33.333% - 10px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.evidence-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.evidence-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    text-align: center;
 }
 
 /* Responsive adjustments */
@@ -404,10 +516,6 @@ footer {
         font-size: 1.5rem;
     }
     
-    .feature-card {
-        padding: 20px;
-    }
-    
     .form-container {
         padding: 20px;
     }
@@ -422,6 +530,10 @@ footer {
     
     .report-card {
         padding: 15px;
+    }
+    
+    .evidence-item {
+        width: 100%;
     }
 }
 
@@ -441,13 +553,5 @@ footer {
     
     .stats-number {
         font-size: 1.8rem;
-    }
-    
-    .role-selector {
-        flex-direction: column;
-    }
-    
-    .page-section {
-        padding: 40px 0;
     }
 }
