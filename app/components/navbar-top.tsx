@@ -1,6 +1,6 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
-import { NavLink } from "react-router";
-import { useLoginModal } from "./login-modal-provider";
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { NavLink } from 'react-router';
+import { useLoginModal } from './login-modal-provider';
 
 export default function NavbarTop() {
   const { open } = useLoginModal();
@@ -14,9 +14,15 @@ export default function NavbarTop() {
         <Navbar.Toggle />
         <Navbar.Collapse>
           <Nav className="ms-auto">
-            <Nav.Link as={NavLink} to="/">Beranda</Nav.Link>
-            <Nav.Link as={NavLink} to="/laporkan">Laporkan</Nav.Link>
-            <Nav.Link as={NavLink} to="/daftar-masalah">Daftar Masalah</Nav.Link>
+            <Nav.Link as={NavLink} to="/">
+              Beranda
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/laporkan">
+              Laporkan
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/daftar-masalah">
+              Daftar Masalah
+            </Nav.Link>
             <Nav.Link onClick={open}>Log In</Nav.Link>
           </Nav>
         </Navbar.Collapse>

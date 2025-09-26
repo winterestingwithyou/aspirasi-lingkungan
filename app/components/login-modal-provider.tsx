@@ -1,22 +1,26 @@
 // src/components/LoginModalProvider.tsx
-import { createContext, useContext, useState } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { createContext, useContext, useState } from 'react';
+import { Button, Form, Modal } from 'react-bootstrap';
 type Ctx = { open: () => void };
 const LoginCtx = createContext<Ctx>({ open: () => {} });
 export const useLoginModal = () => useContext(LoginCtx);
 
-export default function LoginModalProvider({ children }: { children: React.ReactNode }) {
+export default function LoginModalProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [show, setShow] = useState(false);
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    const u = String(data.get("username") || "");
-    const p = String(data.get("password") || "");
-    if (u === "admin" && p === "admin") {
+    const u = String(data.get('username') || '');
+    const p = String(data.get('password') || '');
+    if (u === 'admin' && p === 'admin') {
       setShow(false);
-      window.location.href = "/gov"; // masuk ke dashboard pemerintah
+      window.location.href = '/gov'; // masuk ke dashboard pemerintah
     } else {
-      alert("Username atau password salah!");
+      alert('Username atau password salah!');
     }
   };
   return (
@@ -38,7 +42,9 @@ export default function LoginModalProvider({ children }: { children: React.React
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" type="submit">Login</Button>
+            <Button variant="primary" type="submit">
+              Login
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>

@@ -1,9 +1,9 @@
-import { Outlet } from "react-router";
-import Footer from "~/components/footer";
-import LoginModalProvider from "~/components/login-modal-provider";
-import NavbarTop from "~/components/navbar-top";
+import { Outlet } from 'react-router';
+import Footer from '~/components/footer';
+import LoginModalProvider from '~/components/login-modal-provider';
+import NavbarTop from '~/components/navbar-top';
 
-export default function App() { 
+export default function App() {
   return (
     <LoginModalProvider>
       <NavbarTop />

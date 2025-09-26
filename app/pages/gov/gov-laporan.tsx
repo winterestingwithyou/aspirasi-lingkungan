@@ -1,4 +1,4 @@
-import { Form, Pagination } from "react-bootstrap";
+import { Form, Pagination } from 'react-bootstrap';
 
 export default function GovLaporan() {
   return (
@@ -40,21 +40,34 @@ export default function GovLaporan() {
         </div>
       </div>
 
-      {[1,2,3,4].map((id) => (
+      {[1, 2, 3, 4].map((id) => (
         <div className="report-card" key={id}>
           <div className="d-flex justify-content-between align-items-start">
             <div>
               <h5>Laporan #{id}</h5>
-              <p className="text-muted mb-2"><i className="bi bi-geo-alt-fill me-1" /> Lokasi Contoh</p>
+              <p className="text-muted mb-2">
+                <i className="bi bi-geo-alt-fill me-1" /> Lokasi Contoh
+              </p>
               <p className="mb-2">Ringkasan laporan...</p>
-              <span className={`report-status ${id%3===0 ? "status-completed" : id%2===0 ? "status-pending" : "status-progress"}`}>
-                {id%3===0 ? "Selesai" : id%2===0 ? "Menunggu Tindakan" : "Sedang Diproses"}
+              <span
+                className={`report-status ${id % 3 === 0 ? 'status-completed' : id % 2 === 0 ? 'status-pending' : 'status-progress'}`}
+              >
+                {id % 3 === 0
+                  ? 'Selesai'
+                  : id % 2 === 0
+                    ? 'Menunggu Tindakan'
+                    : 'Sedang Diproses'}
               </span>
             </div>
             <div className="text-end">
               <small className="text-muted">20 Mei 2025</small>
               <div className="mt-2">
-                <a className="btn btn-sm btn-outline-primary" href={`/gov/laporan/${id}`}>Detail</a>
+                <a
+                  className="btn btn-sm btn-outline-primary"
+                  href={`/gov/laporan/${id}`}
+                >
+                  Detail
+                </a>
               </div>
             </div>
           </div>

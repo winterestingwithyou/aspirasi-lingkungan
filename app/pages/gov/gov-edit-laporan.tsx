@@ -1,23 +1,25 @@
-import { useState } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
-import { Link, useNavigate } from "react-router";
+import { useState } from 'react';
+import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router';
 
 export default function GovEditLaporan() {
   const nav = useNavigate();
-  const [status, setStatus] = useState<"pending" | "progress" | "completed">("progress");
+  const [status, setStatus] = useState<'pending' | 'progress' | 'completed'>(
+    'progress',
+  );
   const [previewProgress, setPreviewProgress] = useState<string | null>(null);
   const [previewCompleted, setPreviewCompleted] = useState<string | null>(null);
 
   const onPreview = (file: File, setter: (s: string) => void) => {
     const reader = new FileReader();
-    reader.onload = (e) => setter(String(e.target?.result || ""));
+    reader.onload = (e) => setter(String(e.target?.result || ''));
     reader.readAsDataURL(file);
   };
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    alert("Perubahan berhasil disimpan!");
-    nav("/gov/laporan/1");
+    alert('Perubahan berhasil disimpan!');
+    nav('/gov/laporan/1');
   };
 
   const pickFileFromEvent = (e: React.ChangeEvent<any>) => {
@@ -52,7 +54,10 @@ export default function GovEditLaporan() {
             <Col xs={12}>
               <Form.Group>
                 <Form.Label>Lokasi</Form.Label>
-                <Form.Control value="Jalan Sudirman No. 123, Jakarta Pusat" readOnly />
+                <Form.Control
+                  value="Jalan Sudirman No. 123, Jakarta Pusat"
+                  readOnly
+                />
               </Form.Group>
             </Col>
             <Col xs={12}>
@@ -69,7 +74,10 @@ export default function GovEditLaporan() {
             <Col xs={12}>
               <Form.Group>
                 <Form.Label>Status</Form.Label>
-                <Form.Select value={status} onChange={(e) => setStatus(e.target.value as any)}>
+                <Form.Select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as any)}
+                >
                   <option value="pending">Menunggu Tindakan</option>
                   <option value="progress">Sedang Diproses</option>
                   <option value="completed">Selesai</option>
@@ -81,11 +89,16 @@ export default function GovEditLaporan() {
             <div
               id="progress-evidence-section"
               className={`evidence-section ${
-                status === "progress" || status === "completed" ? "show" : "hidden"
+                status === 'progress' || status === 'completed'
+                  ? 'show'
+                  : 'hidden'
               }`}
             >
               <h5>Unggah Bukti Sedang Diproses</h5>
-              <p>Unggah foto sebagai bukti bahwa masalah sedang dalam proses penanganan</p>
+              <p>
+                Unggah foto sebagai bukti bahwa masalah sedang dalam proses
+                penanganan
+              </p>
               <Form.Control
                 type="file"
                 accept="image/*"
@@ -95,17 +108,23 @@ export default function GovEditLaporan() {
                 }}
               />
               {previewProgress && (
-                <img src={previewProgress} className="image-preview d-block" alt="Progress Preview" />
+                <img
+                  src={previewProgress}
+                  className="image-preview d-block"
+                  alt="Progress Preview"
+                />
               )}
             </div>
 
             {/* Evidence - completed */}
             <div
               id="completed-evidence-section"
-              className={`evidence-section ${status === "completed" ? "show" : "hidden"}`}
+              className={`evidence-section ${status === 'completed' ? 'show' : 'hidden'}`}
             >
               <h5>Unggah Bukti Selesai</h5>
-              <p>Unggah foto sebagai bukti bahwa masalah telah selesai ditangani</p>
+              <p>
+                Unggah foto sebagai bukti bahwa masalah telah selesai ditangani
+              </p>
               <Form.Control
                 type="file"
                 accept="image/*"
@@ -115,14 +134,22 @@ export default function GovEditLaporan() {
                 }}
               />
               {previewCompleted && (
-                <img src={previewCompleted} className="image-preview d-block" alt="Completed Preview" />
+                <img
+                  src={previewCompleted}
+                  className="image-preview d-block"
+                  alt="Completed Preview"
+                />
               )}
             </div>
 
             <Col xs={12}>
               <Form.Group>
                 <Form.Label>Catatan Progress</Form.Label>
-                <Form.Control as="textarea" rows={4} defaultValue="Tim DLH sedang menuju lokasi untuk pengecekan." />
+                <Form.Control
+                  as="textarea"
+                  rows={4}
+                  defaultValue="Tim DLH sedang menuju lokasi untuk pengecekan."
+                />
               </Form.Group>
             </Col>
 

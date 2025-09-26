@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from 'react-router';
 
 export default function GovDetailLaporan() {
   return (
@@ -21,15 +21,30 @@ export default function GovDetailLaporan() {
         <div className="col-md-6">
           <div className="mb-3">
             <h5>Informasi Pelapor</h5>
-            <p><strong>Nama:</strong> Robin</p>
-            <p><strong>Kontak:</strong> robin@email.com</p>
+            <p>
+              <strong>Nama:</strong> Robin
+            </p>
+            <p>
+              <strong>Kontak:</strong> robin@email.com
+            </p>
           </div>
           <div className="mb-3">
             <h5>Informasi Masalah</h5>
-            <p><strong>Jenis Masalah:</strong> Tumpukan Sampah</p>
-            <p><strong>Lokasi:</strong> Jalan Lunjuk</p>
-            <p><strong>Tanggal Laporan:</strong> 20 Mei 2025</p>
-            <p><strong>Status:</strong> <span className="report-status status-progress">Sedang Diproses</span></p>
+            <p>
+              <strong>Jenis Masalah:</strong> Tumpukan Sampah
+            </p>
+            <p>
+              <strong>Lokasi:</strong> Jalan Lunjuk
+            </p>
+            <p>
+              <strong>Tanggal Laporan:</strong> 20 Mei 2025
+            </p>
+            <p>
+              <strong>Status:</strong>{' '}
+              <span className="report-status status-progress">
+                Sedang Diproses
+              </span>
+            </p>
           </div>
           <div className="mb-3">
             <h5>Deskripsi Masalah</h5>
@@ -42,9 +57,18 @@ export default function GovDetailLaporan() {
         <h5>Bukti Foto</h5>
         <div className="evidence-preview">
           {[
-            { src: "https://png.pngtree.com/thumb_back/fh260/background/20241008/pngtree-breathtaking-panoramic-view-of-a-summer-landscape-featuring-majestic-waterfalls-charming-image_16334134.jpg", label: "Foto Pelapor" },
-            { src: "https://images.unsplash.com/photo-1618336753974-aae8e04506b7?q=80&w=1170&auto=format&fit=crop", label: "Sedang Diproses" },
-            { src: "https://images.unsplash.com/photo-1591946614720-90a583e1912a?q=80&w=1170&auto=format&fit=crop", label: "Selesai" },
+            {
+              src: 'https://png.pngtree.com/thumb_back/fh260/background/20241008/pngtree-breathtaking-panoramic-view-of-a-summer-landscape-featuring-majestic-waterfalls-charming-image_16334134.jpg',
+              label: 'Foto Pelapor',
+            },
+            {
+              src: 'https://images.unsplash.com/photo-1618336753974-aae8e04506b7?q=80&w=1170&auto=format&fit=crop',
+              label: 'Sedang Diproses',
+            },
+            {
+              src: 'https://images.unsplash.com/photo-1591946614720-90a583e1912a?q=80&w=1170&auto=format&fit=crop',
+              label: 'Selesai',
+            },
           ].map((x, i) => (
             <div className="evidence-item" key={i}>
               <img src={x.src} alt={x.label} />

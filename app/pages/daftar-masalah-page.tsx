@@ -1,34 +1,36 @@
-import { Col, Container, Form, Pagination, Row } from "react-bootstrap";
+import { Col, Container, Form, Pagination, Row } from 'react-bootstrap';
 
 const items = [
   {
-    img: "https://images.unsplash.com/photo-1591946614720-90a583e1912a?q=80&w=1170&auto=format&fit=crop",
-    title: "Tumpukan Sampah di jalan lunjuk",
-    loc: "Jalan Lunjuk, Bukit Lama",
-    status: "progress",
-    date: "20 Mei 2025",
+    img: 'https://images.unsplash.com/photo-1591946614720-90a583e1912a?q=80&w=1170&auto=format&fit=crop',
+    title: 'Tumpukan Sampah di jalan lunjuk',
+    loc: 'Jalan Lunjuk, Bukit Lama',
+    status: 'progress',
+    date: '20 Mei 2025',
   },
   {
-    img: "https://images.unsplash.com/photo-1589556578395-3c37da9b6a49?q=80&w=1170&auto=format&fit=crop",
-    title: "Jalan Berlubang di jalan depan Halte Unsri",
-    loc: "Jl. Srijaya Negara",
-    status: "pending",
-    date: "18 Mei 2025",
+    img: 'https://images.unsplash.com/photo-1589556578395-3c37da9b6a49?q=80&w=1170&auto=format&fit=crop',
+    title: 'Jalan Berlubang di jalan depan Halte Unsri',
+    loc: 'Jl. Srijaya Negara',
+    status: 'pending',
+    date: '18 Mei 2025',
   },
   {
-    img: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1170&auto=format&fit=crop",
-    title: "Pembuangan Limbah",
-    loc: "Sungai Musi",
-    status: "completed",
-    date: "15 Mei 2025",
+    img: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1170&auto=format&fit=crop',
+    title: 'Pembuangan Limbah',
+    loc: 'Sungai Musi',
+    status: 'completed',
+    date: '15 Mei 2025',
   },
   // ...tambahkan lainnya bila perlu
 ];
 
 const badge = (s: string) =>
-  s === "pending" ? "report-status status-pending" :
-  s === "progress" ? "report-status status-progress" :
-  "report-status status-completed";
+  s === 'pending'
+    ? 'report-status status-pending'
+    : s === 'progress'
+      ? 'report-status status-progress'
+      : 'report-status status-completed';
 
 export default function DaftarMasalahPage() {
   return (
@@ -36,7 +38,9 @@ export default function DaftarMasalahPage() {
       <Container>
         <div className="text-center mb-5">
           <h2 className="section-title">Daftar Masalah</h2>
-          <p className="lead">Lihat semua masalah lingkungan yang telah dilaporkan</p>
+          <p className="lead">
+            Lihat semua masalah lingkungan yang telah dilaporkan
+          </p>
         </div>
 
         <div className="filter-section">
@@ -81,10 +85,16 @@ export default function DaftarMasalahPage() {
                 <img src={r.img} alt={r.title} />
                 <div className="report-list-card-body">
                   <h5>{r.title}</h5>
-                  <p className="text-muted mb-2"><i className="bi bi-geo-alt-fill me-1" /> {r.loc}</p>
+                  <p className="text-muted mb-2">
+                    <i className="bi bi-geo-alt-fill me-1" /> {r.loc}
+                  </p>
                   <div className="d-flex justify-content-between align-items-center">
                     <span className={badge(r.status)}>
-                      {r.status === "progress" ? "Sedang Diproses" : r.status === "pending" ? "Menunggu Tindakan" : "Selesai"}
+                      {r.status === 'progress'
+                        ? 'Sedang Diproses'
+                        : r.status === 'pending'
+                          ? 'Menunggu Tindakan'
+                          : 'Selesai'}
                     </span>
                     <small className="text-muted">{r.date}</small>
                   </div>

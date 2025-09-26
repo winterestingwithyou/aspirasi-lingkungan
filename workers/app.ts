@@ -1,13 +1,13 @@
-import { Hono } from "hono";
-import { createRequestHandler } from "react-router";
+import { Hono } from 'hono';
+import { createRequestHandler } from 'react-router';
 
 const app = new Hono();
 
 // Add more routes here
 
-app.get("*", (c) => {
+app.get('*', (c) => {
   const requestHandler = createRequestHandler(
-    () => import("virtual:react-router/server-build"),
+    () => import('virtual:react-router/server-build'),
     import.meta.env.MODE,
   );
 

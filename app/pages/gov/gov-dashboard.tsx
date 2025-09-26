@@ -49,31 +49,43 @@ export default function GovDashboard() {
       </div>
 
       <h4 className="mt-4 mb-3">Laporan Terbaru</h4>
-      {[{
-        title: "Tumpukan Sampah di Jalan Lunjuk",
-        loc: "Jalan Lunjuk, Bukit Lama",
-        status: "Sedang Diproses",
-        date: "20 Mei 2025",
-      },{
-        title: "Jalan Berlubang",
-        loc: "Perumahan Gardena",
-        status: "Menunggu Tindakan",
-        date: "18 Mei 2025",
-      }].map((r, i) => (
+      {[
+        {
+          title: 'Tumpukan Sampah di Jalan Lunjuk',
+          loc: 'Jalan Lunjuk, Bukit Lama',
+          status: 'Sedang Diproses',
+          date: '20 Mei 2025',
+        },
+        {
+          title: 'Jalan Berlubang',
+          loc: 'Perumahan Gardena',
+          status: 'Menunggu Tindakan',
+          date: '18 Mei 2025',
+        },
+      ].map((r, i) => (
         <div className="report-card" key={i}>
           <div className="d-flex justify-content-between align-items-start">
             <div>
               <h5>{r.title}</h5>
-              <p className="text-muted mb-2"><i className="bi bi-geo-alt-fill me-1" /> {r.loc}</p>
+              <p className="text-muted mb-2">
+                <i className="bi bi-geo-alt-fill me-1" /> {r.loc}
+              </p>
               <p className="mb-2">Deskripsi singkat laporan...</p>
-              <span className={`report-status ${r.status.includes("Proses") ? "status-progress" : r.status.includes("Menunggu") ? "status-pending" : "status-completed"}`}>
+              <span
+                className={`report-status ${r.status.includes('Proses') ? 'status-progress' : r.status.includes('Menunggu') ? 'status-pending' : 'status-completed'}`}
+              >
                 {r.status}
               </span>
             </div>
             <div className="text-end">
               <small className="text-muted">{r.date}</small>
               <div className="mt-2">
-                <a className="btn btn-sm btn-outline-primary" href="/gov/laporan/1">Detail</a>
+                <a
+                  className="btn btn-sm btn-outline-primary"
+                  href="/gov/laporan/1"
+                >
+                  Detail
+                </a>
               </div>
             </div>
           </div>
