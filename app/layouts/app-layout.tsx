@@ -8,7 +8,7 @@ export default function App() {
     <LoginModalProvider>
       <NavbarTop />
       <main>
-        <Outlet /> jir
+        <Outlet />
       </main>
       <Footer />
     </LoginModalProvider>

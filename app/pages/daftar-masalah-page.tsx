@@ -36,7 +36,7 @@ export default function DaftarMasalahPage() {
   return (
     <section className="page-section">
       <Container>
-        <div className="text-center mb-5">
+        <div className="text-center mb-4 mt-3">
           <h2 className="section-title">Daftar Masalah</h2>
           <p className="lead">
             Lihat semua masalah lingkungan yang telah dilaporkan

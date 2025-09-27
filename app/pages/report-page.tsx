@@ -44,14 +44,14 @@ export default function ReportPage() {
   return (
     <section className="page-section">
       <Container>
-        <div className="text-center mb-5">
+        <div className="text-center mb-5 mt-3">
           <h2 className="section-title">Form Pelaporan Masalah</h2>
           <p className="lead">Laporkan masalah lingkungan yang Anda temukan</p>
         </div>
 
         <Row className="justify-content-center">
           <Col lg={8}>
-            <div className="form-container">
+            <div className="form-container mt-0">
               <Form onSubmit={onSubmit}>
                 <Row className="g-3">
                   <Col md={6}>
@@ -62,7 +62,7 @@ export default function ReportPage() {
                   </Col>
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>Nomor Identitas (NIK, dsb)</Form.Label>
+                      <Form.Label>Nomor Whatsapp</Form.Label>
                       <Form.Control required />
                     </Form.Group>
                   </Col>
