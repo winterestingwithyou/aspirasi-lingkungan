@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Carousel } from 'react-bootstrap';
 
-const carouselStyle = {
+const carouselStyle: React.CSSProperties = {
   height: '100%',
   minHeight: 340,
   borderRadius: '12px',
   overflow: 'hidden',
 };
 
-const imgStyle = {
+const imgStyle: React.CSSProperties = {
   objectFit: 'cover',
   width: '100%',
   height: '100%',
@@ -21,7 +21,10 @@ export default function GovDetailLaporan() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Detail Laporan Masalah</h2>
         {/* Button edit: teks hanya tampil di md ke atas */}
-        <Link className="btn btn-primary d-flex align-items-center" to="/gov/laporan/1/edit">
+        <Link
+          className="btn btn-primary d-flex align-items-center"
+          to="/gov/laporan/1/edit"
+        >
           <i className="bi bi-pencil-square me-1" />
           <span className="d-none d-md-inline">Edit Laporan</span>
         </Link>
@@ -81,7 +84,9 @@ export default function GovDetailLaporan() {
             </div>
             <div>
               <strong>Deskripsi Masalah</strong>
-              <div>Tumpukan sampah sudah lebih dari seminggu tidak diangkut...</div>
+              <div>
+                Tumpukan sampah sudah lebih dari seminggu tidak diangkut...
+              </div>
             </div>
           </div>
         </div>
@@ -115,7 +120,9 @@ export default function GovDetailLaporan() {
             </div>
             <div className="fw-semibold">Laporan Diterima</div>
             <div className="text-muted small">20 Mei 2025, 10:30 WIB</div>
-            <div className="small">Laporan telah diterima dan akan segera ditindaklanjuti.</div>
+            <div className="small">
+              Laporan telah diterima dan akan segera ditindaklanjuti.
+            </div>
           </div>
           {/* Step Connector */}
           <div
@@ -159,7 +166,9 @@ export default function GovDetailLaporan() {
             </div>
             <div className="fw-semibold">Dalam Proses Penanganan</div>
             <div className="text-muted small">21 Mei 2025, 09:15 WIB</div>
-            <div className="small">Tim DLH sedang menuju lokasi untuk pengecekan.</div>
+            <div className="small">
+              Tim DLH sedang menuju lokasi untuk pengecekan.
+            </div>
           </div>
           {/* Step Connector */}
           <div
@@ -203,7 +212,9 @@ export default function GovDetailLaporan() {
             </div>
             <div className="fw-semibold">Selesai</div>
             <div className="text-muted small">22 Mei 2025, 14:00 WIB</div>
-            <div className="small">Masalah telah ditangani dan lokasi sudah bersih.</div>
+            <div className="small">
+              Masalah telah ditangani dan lokasi sudah bersih.
+            </div>
           </div>
         </div>
       </div>
