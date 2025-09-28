@@ -23,6 +23,12 @@ export default function NavbarTop() {
             <Nav.Link as={NavLink} to="/daftar-masalah">
               Daftar Masalah
             </Nav.Link>
+            <Nav.Link as={NavLink} to="/tentang-kami">
+              Tentang Kami
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/kontak">
+              Kontak
+            </Nav.Link>
             <Nav.Link onClick={open}>Log In</Nav.Link>
           </Nav>
         </Navbar.Collapse>
