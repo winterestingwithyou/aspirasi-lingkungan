@@ -2,13 +2,20 @@ import { useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router';
 
+type Proses = {
+  file?: File;
+  preview?: string;
+  catatan?: string;
+};
+
 export default function GovEditLaporan() {
   const nav = useNavigate();
-  const [status, setStatus] = useState<'pending' | 'progress' | 'completed'>(
-    'progress',
-  );
+  const [status, setStatus] = useState<'pending' | 'progress' | 'completed'>('progress');
   const [previewProgress, setPreviewProgress] = useState<string | null>(null);
   const [previewCompleted, setPreviewCompleted] = useState<string | null>(null);
+
+  // State untuk multi proses progress
+  const [prosesList, setProsesList] = useState<Proses[]>([{ catatan: '' }]);
 
   const onPreview = (file: File, setter: (s: string) => void) => {
     const reader = new FileReader();
@@ -23,9 +30,35 @@ export default function GovEditLaporan() {
   };
 
   const pickFileFromEvent = (e: React.ChangeEvent<any>) => {
-    const input = e.currentTarget as HTMLInputElement; // pastikan sebagai <input type="file">
+    const input = e.currentTarget as HTMLInputElement;
     return input.files?.[0];
   };
+
+  // Untuk upload file pada proses ke-i
+  const handleProsesFile = (idx: number, file: File) => {
+    onPreview(file, (preview) => {
+      setProsesList((prev) => {
+        const copy = [...prev];
+        copy[idx] = { ...copy[idx], file, preview };
+        return copy;
+      });
+    });
+  };
+
+  // Untuk update catatan pada proses ke-i
+  const handleProsesCatatan = (idx: number, catatan: string) => {
+    setProsesList((prev) => {
+      const copy = [...prev];
+      copy[idx] = { ...copy[idx], catatan };
+      return copy;
+    });
+  };
+
+  // Tambah proses baru
+  const addProses = () => setProsesList((prev) => [...prev, { catatan: '' }]);
+
+  // Hapus proses ke-i
+  const removeProses = (idx: number) => setProsesList((prev) => prev.filter((_, i) => i !== idx));
 
   return (
     <>
@@ -86,36 +119,60 @@ export default function GovEditLaporan() {
               </Form.Group>
             </Col>
 
-            {/* Evidence - progress */}
-            <div
-              id="progress-evidence-section"
-              className={`evidence-section ${
-                status === 'progress' || status === 'completed'
-                  ? 'show'
-                  : 'hidden'
-              }`}
-            >
-              <h5>Unggah Bukti Sedang Diproses</h5>
-              <p>
-                Unggah foto sebagai bukti bahwa masalah sedang dalam proses
-                penanganan
-              </p>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const f = pickFileFromEvent(e);
-                  if (f) onPreview(f, (s) => setPreviewProgress(s));
-                }}
-              />
-              {previewProgress && (
-                <img
-                  src={previewProgress}
-                  className="image-preview d-block"
-                  alt="Progress Preview"
-                />
-              )}
-            </div>
+            {/* Evidence - progress, multi tahap */}
+            {status === 'progress' && (
+              <Col xs={12}>
+                <div className="evidence-section show">
+                  <h5>Unggah Bukti Sedang Diproses</h5>
+                  <p>
+                    Unggah foto dan catatan untuk setiap tahap proses penanganan.
+                  </p>
+                  {prosesList.map((proses, idx) => (
+                    <div key={idx} className="mb-3 p-3 border rounded bg-light">
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Tahap Proses #{idx + 1}</strong>
+                        {prosesList.length > 1 && (
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => removeProses(idx)}
+                          >
+                            Hapus
+                          </Button>
+                        )}
+                      </div>
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleProsesFile(idx, file);
+                        }}
+                      />
+                      {proses.preview && (
+                        <img
+                          src={proses.preview}
+                          className="image-preview d-block my-2"
+                          alt={`Progress Preview ${idx + 1}`}
+                          style={{ maxWidth: 200 }}
+                        />
+                      )}
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        className="mt-2"
+                        placeholder="Catatan proses"
+                        value={proses.catatan || ''}
+                        onChange={(e) => handleProsesCatatan(idx, e.target.value)}
+                      />
+                    </div>
+                  ))}
+                  <Button variant="outline-primary" size="sm" onClick={addProses}>
+                    + Tambah Tahap Proses
+                  </Button>
+                </div>
+              </Col>
+            )}
 
             {/* Evidence - completed */}
             <div
