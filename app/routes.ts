@@ -11,6 +11,8 @@ export default [
     index('pages/landing-page.tsx'),
     route('laporkan', 'pages/report-page.tsx'),
     route('daftar-masalah', 'pages/daftar-masalah-page.tsx'),
+    route('tentang-kami', 'pages/tentang-kami-page.tsx'),
+    route('kontak', 'pages/kontak-page.tsx'),
   ]),
   layout('pages/gov/gov-layout.tsx', [
     ...prefix('gov', [
