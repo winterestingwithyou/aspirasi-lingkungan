@@ -81,6 +81,7 @@ export default function GovEditLaporan() {
                   <option value="pending">Menunggu Tindakan</option>
                   <option value="progress">Sedang Diproses</option>
                   <option value="completed">Selesai</option>
+                  <option value="completed">Laporan Palsu</option>
                 </Form.Select>
               </Form.Group>
             </Col>
