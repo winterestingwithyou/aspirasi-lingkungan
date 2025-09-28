@@ -22,6 +22,11 @@ export default function GovLayout() {
                     </NavLink>
                   </li>
                   <li>
+                    <NavLink to="/gov/riwayat" className="nav-link-aside">
+                      <i className="bi bi-file-earmark-text" /> Riwayat
+                    </NavLink>
+                  </li>
+                  <li>
                     <NavLink to="/gov/profil" className="nav-link-aside">
                       <i className="bi bi-person-circle" /> Profil
                     </NavLink>
