@@ -1,10 +1,14 @@
 import { Link } from 'react-router';
+import { Carousel } from 'react-bootstrap';
 
 export default function GovDetailLaporan() {
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Detail Laporan Masalah</h2>
+        <Link className="btn btn-primary" to="/gov/laporan">
+          <i className="bi bi-exclamation-triangle me-1" /> Tandai sebagai Palsu
+        </Link>
         <Link className="btn btn-primary" to="/gov/laporan/1/edit">
           <i className="bi bi-pencil-square me-1" /> Edit Laporan
         </Link>
@@ -12,11 +16,38 @@ export default function GovDetailLaporan() {
 
       <div className="row">
         <div className="col-md-6">
-          <img
-            src="https://png.pngtree.com/thumb_back/fh260/background/20241008/pngtree-breathtaking-panoramic-view-of-a-summer-landscape-featuring-majestic-waterfalls-charming-image_16334134.jpg"
-            alt="Detail"
-            className="detail-image"
-          />
+          <Carousel>
+            <Carousel.Item>
+              <img
+                className="d-block w-100 detail-image"
+                src="https://png.pngtree.com/thumb_back/fh260/background/20241008/pngtree-breathtaking-panoramic-view-of-a-summer-landscape-featuring-majestic-waterfalls-charming-image_16334134.jpg"
+                alt="Foto Pelapor"
+              />
+              <Carousel.Caption>
+                <strong>Foto Pelapor</strong>
+              </Carousel.Caption>
+            </Carousel.Item>
+            <Carousel.Item>
+              <img
+                className="d-block w-100 detail-image"
+                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+                alt="Sedang Ditangani"
+              />
+              <Carousel.Caption>
+                <strong>Sedang Ditangani</strong>
+              </Carousel.Caption>
+            </Carousel.Item>
+            <Carousel.Item>
+              <img
+                className="d-block w-100 detail-image"
+                src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca"
+                alt="Selesai"
+              />
+              <Carousel.Caption>
+                <strong>Selesai</strong>
+              </Carousel.Caption>
+            </Carousel.Item>
+          </Carousel>
         </div>
         <div className="col-md-6">
           <div className="mb-3">
@@ -52,32 +83,6 @@ export default function GovDetailLaporan() {
           </div>
         </div>
       </div>
-
-      <div className="mt-4">
-        <h5>Bukti Foto</h5>
-        <div className="evidence-preview">
-          {[
-            {
-              src: 'https://png.pngtree.com/thumb_back/fh260/background/20241008/pngtree-breathtaking-panoramic-view-of-a-summer-landscape-featuring-majestic-waterfalls-charming-image_16334134.jpg',
-              label: 'Foto Pelapor',
-            },
-            {
-              src: 'https://images.unsplash.com/photo-1618336753974-aae8e04506b7?q=80&w=1170&auto=format&fit=crop',
-              label: 'Sedang Diproses',
-            },
-            {
-              src: 'https://images.unsplash.com/photo-1591946614720-90a583e1912a?q=80&w=1170&auto=format&fit=crop',
-              label: 'Selesai',
-            },
-          ].map((x, i) => (
-            <div className="evidence-item" key={i}>
-              <img src={x.src} alt={x.label} />
-              <div className="evidence-label">{x.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="mt-4">
         <h5>Riwayat Penanganan</h5>
         <div className="timeline">
