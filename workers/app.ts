@@ -1,9 +1,18 @@
+import { PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
 import { createRequestHandler } from 'react-router';
 
 const app = new Hono();
+const prisma = new PrismaClient();
 
-// Add more routes here
+app.get('/reports', async (c) => {
+  const reports = await prisma.report.findMany({
+    include: {
+      problemType: true, // Sertakan data jenis masalah
+    },
+  });
+  return c.json(reports);
+});
 
 app.get('*', (c) => {
   const requestHandler = createRequestHandler(
