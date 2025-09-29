@@ -1,12 +1,12 @@
-import { PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
 import { createRequestHandler } from 'react-router';
+import prisma from './db';
 
 const app = new Hono();
-const prisma = new PrismaClient();
+const prismaClient = prisma;
 
 app.get('/reports', async (c) => {
-  const reports = await prisma.report.findMany({
+  const reports = await prismaClient.report.findMany({
     include: {
       problemType: true, // Sertakan data jenis masalah
     },

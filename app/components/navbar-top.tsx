@@ -1,5 +1,5 @@
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { useLoginModal } from './login-modal-provider';
 
 export default function NavbarTop() {
