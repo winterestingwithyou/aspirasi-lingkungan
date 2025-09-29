@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int              @id @default(autoincrement())
+  username          String           @unique
+  email             String           @unique
+  password          String // Hashing dilakukan di level aplikasi (backend Hono)
+  fullName          String           @map("full_name")
+  profilePictureUrl String?          @map("profile_picture_url")
+  departmentName    String           @map("department_name")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  // Relasi: Satu User bisa membuat banyak progress laporan
+  progressUpdates   ReportProgress[]
+
+  @@map("users")
+}
+
+// Model untuk kategori atau jenis masalah lingkungan
+model ProblemType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+
+  // Relasi: Satu jenis masalah bisa dimiliki oleh banyak laporan
+  reports     Report[]
+
+  @@map("problem_types")
+}
+
+// Model untuk laporan masalah yang dibuat oleh masyarakat
+model Report {
+  id              Int      @id @default(autoincrement())
+  reporterName    String   @map("reporter_name")
+  reporterContact String?  @map("reporter_contact")
+  description     String   @db.Text // Menggunakan tipe Text untuk deskripsi panjang
+  photoUrl        String   @map("photo_url")
+  latitude        Decimal
+  longitude       Decimal
+  status          ReportStatus @default(PENDING) // Menggunakan Enum untuk status
+  upvoteCount     Int      @default(0) @map("upvote_count")
+  isFakeReport    Boolean  @default(false) @map("is_fake_report")
+  createdAt       DateTime @default(now()) @map("created_at")
+  resolvedAt      DateTime? @map("resolved_at")
+  deletedAt       DateTime? @map("deleted_at") // Untuk soft-delete laporan palsu
+
+  // Foreign Key untuk relasi dengan ProblemType
+  problemTypeId Int          @map("problem_type_id")
+  problemType   ProblemType  @relation(fields: [problemTypeId], references: [id])
+
+  // Relasi: Satu laporan memiliki banyak update progress
+  progressUpdates ReportProgress[]
+
+  @@map("reports")
+}
+
+// Model untuk setiap update progress dari sebuah laporan
+model ReportProgress {
+  id                 Int      @id @default(autoincrement())
+  status             String // Contoh: "Verifikasi Lapangan", "Pembersihan Dimulai"
+  description        String   @db.Text
+  progressPhotoUrl   String?  @map("progress_photo_url")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  // Foreign Key untuk relasi dengan Report
+  reportId           Int      @map("report_id")
+  report             Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  // Foreign Key untuk relasi dengan User (petugas yang mengupdate)
+  userId             Int      @map("user_id")
+  user               User     @relation(fields: [userId], references: [id])
+
+  @@map("report_progress")
+}
+
+// Enum untuk status laporan utama
+enum ReportStatus {
+  PENDING      // Menunggu Tindakan
+  IN_PROGRESS  // Dalam Proses
+  COMPLETED    // Selesai
+  FAKE_REPORT  // Laporan Palsu
+}
