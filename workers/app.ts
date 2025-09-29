@@ -1,16 +1,19 @@
 import { Hono } from 'hono';
 import { createRequestHandler } from 'react-router';
-import prisma from './db';
+import { getPrisma } from './db';
 
-const app = new Hono();
-const prismaClient = prisma;
+type Env = { DATABASE_URL: string };
+
+const app = new Hono<{ Bindings: Env }>();
 
 app.get('/reports', async (c) => {
-  const reports = await prismaClient.report.findMany({
+  const prisma = getPrisma(c.env.DATABASE_URL);
+  const reports = await prisma.report.findMany({
     include: {
       problemType: true, // Sertakan data jenis masalah
     },
   });
+  await prisma.$disconnect();
   return c.json(reports);
 });
 
