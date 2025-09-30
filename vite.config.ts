@@ -9,4 +9,11 @@ export default defineConfig({
     reactRouter(),
     tsconfigPaths(),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true, // sembunyikan warning dari node_modules
+      },
+    },
+  },
 });

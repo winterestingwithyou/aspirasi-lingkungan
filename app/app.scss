@@ -1,3 +1,5 @@
+@import "bootstrap/scss/functions";
+
 $primary: #2e8b57;
 $secondary: #3cb371;
 
@@ -8,6 +10,11 @@ $btn-border-radius: 50px;
 $btn-transition: all 0.3s ease;
 $btn-color: #fff;
 $btn-primary-color: #fff;
+
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
 
 @import "bootstrap/scss/bootstrap";
 
