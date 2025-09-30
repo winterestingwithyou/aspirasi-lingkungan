@@ -20,6 +20,7 @@
     "@neondatabase/serverless": "^1.0.1",
     "@prisma/adapter-neon": "^6.16.2",
     "@prisma/client": "^6.16.2",
+    "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "hono": "^4.9.8",
