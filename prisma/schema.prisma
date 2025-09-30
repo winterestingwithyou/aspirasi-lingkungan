@@ -51,6 +51,7 @@ model Report {
   reporterContact String?  @map("reporter_contact")
   description     String   @db.Text // Menggunakan tipe Text untuk deskripsi panjang
   photoUrl        String   @map("photo_url")
+  location        String?
   latitude        Decimal
   longitude       Decimal
   status          ReportStatus @default(PENDING) // Menggunakan Enum untuk status
