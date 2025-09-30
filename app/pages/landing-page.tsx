@@ -1,17 +1,27 @@
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { useNavigate } from 'react-router';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <>
       <section className="hero-section text-white text-center">
         <Container>
-          <h1>Selamat Datang di ECO-RAPID <br></br>Platform Pelaporan Masalah Lingkungan</h1>
+          <h1>
+            Selamat Datang di ECO-RAPID <br></br>Platform Pelaporan Masalah
+            Lingkungan
+          </h1>
           <p>
             Platform pelaporan masalah lingkungan yang menghubungkan masyarakat
-            dengan pemerintah untuk menciptakan lingkungan yang lebih bersih, aman dan
-            sehat.
+            dengan pemerintah untuk menciptakan lingkungan yang lebih bersih,
+            aman dan sehat.
           </p>
-          <Button href="/laporkan" size="lg">
+          <Button
+            variant="primary"
+            onClick={() => navigate('/laporkan')}
+            size="lg"
+          >
             Laporkan Masalah
           </Button>
         </Container>

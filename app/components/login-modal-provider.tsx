@@ -42,7 +42,7 @@ export default function LoginModalProvider({
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" className="w-100">
               Login
             </Button>
           </Modal.Footer>
