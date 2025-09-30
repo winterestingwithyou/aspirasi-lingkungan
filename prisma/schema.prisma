@@ -10,6 +10,11 @@ generator client {
   output   = "../app/generated/prisma"
 }
 
+generator clientEdge {
+  provider = "prisma-client-js"
+  engineType = "edge"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

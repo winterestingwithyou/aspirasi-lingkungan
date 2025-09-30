@@ -2,40 +2,52 @@ import { Hono } from 'hono';
 import { createRequestHandler } from 'react-router';
 import { getPrisma } from './db';
 
-type Env = { DATABASE_URL: string };
+type Env = {
+  DATABASE_URL: string;
+};
 
 const app = new Hono();
 const api = new Hono<{ Bindings: Env }>();
 
-api.get('/reverse-geocode', async (c) => {
-  const lat = c.req.query('lat');
-  const lon = c.req.query('lon');
+// Query: ?limit=20&cursor=123
+api.get('/reports', async (c) => {
+  const prisma = await getPrisma(c.env.DATABASE_URL);
 
-  if (!lat || !lon) {
-    return c.json({ error: 'Parameter lat dan lon wajib diisi' }, 400);
-  }
+  // ambil query param dengan default & batasan
+  const limitRaw = c.req.query('limit') ?? '20';
+  const cursorRaw = c.req.query('cursor'); // id terakhir yang sudah diterima
+  const limit = Math.min(Math.max(parseInt(limitRaw, 10) || 20, 1), 100);
+  const cursor = cursorRaw ? Number(cursorRaw) : undefined;
 
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-      {
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'MyHonoApp/1.0 (myemail@example.com)', // wajib biar tidak diblok
-        },
+  // kalau kamu pakai soft-delete, biasanya kita sembunyikan yang deleted
+  const where = { deletedAt: null as Date | null };
+
+  // orderBy id desc supaya konsisten dengan cursor id
+  const items = await prisma.report.findMany({
+    take: limit + 1, // ambil 1 ekstra untuk tahu nextCursor
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    where,
+    orderBy: { id: 'desc' },
+    include: {
+      problemType: true,
+      progressUpdates: {
+        orderBy: { createdAt: 'desc' },
+        take: 3, // batasi biar response ringan
       },
-    );
+    },
+  });
 
-    if (!res.ok) {
-      return c.json({ error: 'Gagal request ke Nominatim' }, 500);
-    }
-
-    const data = await res.json();
-    return c.json({ display_name: data.display_name });
-  } catch (err) {
-    console.error(err);
-    return c.json({ error: 'Terjadi kesalahan server' }, 500);
+  let nextCursor: number | null = null;
+  if (items.length > limit) {
+    const next = items.pop()!;
+    nextCursor = next.id;
   }
+
+  return c.json({
+    data: items,
+    nextCursor,
+    limit,
+  });
 });
 
 // Mount the api router with /api prefix
