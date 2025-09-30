@@ -1,5 +1,5 @@
 export async function getPrisma(connectionString: string) {
-  const { PrismaClient } = await import('@prisma/client/edge');
+  const { PrismaClient } = await import('../app/generated/prisma/edge');
   const { PrismaNeonHTTP } = await import('@prisma/adapter-neon');
 
   const adapter = new PrismaNeonHTTP(connectionString, {});
