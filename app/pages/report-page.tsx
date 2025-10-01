@@ -1,8 +1,30 @@
 import { useState } from 'react';
-import { Alert, Button, Col, Container, Form, Modal, Row, Spinner } from 'react-bootstrap';
+import {
+  Alert,
+  Button,
+  Col,
+  Container,
+  Form,
+  Modal,
+  Row,
+  Spinner,
+} from 'react-bootstrap';
+import { useNavigate } from 'react-router';
+import { getAddress } from '~/services';
+import type { ApiError, CreateReportResponse, Report } from '~/types';
 
 export default function ReportPage() {
+  const navigate = useNavigate();
   const [imgUrl, setImgUrl] = useState<string | null>(null);
+
+  const [reporterName, setReporterName] = useState('');
+  const [reporterContact, setReporterContact] = useState(''); // opsional
+  const [problemTypeId, setProblemTypeId] = useState<string>(''); // disimpan string, dikirim number
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState(''); // opsional
+  const [latitude, setLatitude] = useState<string>(''); // wajib → valid number
+  const [longitude, setLongitude] = useState<string>(''); // wajib → valid number
+
   const [mapText, setMapText] = useState<string>(
     'Peta akan ditampilkan di sini setelah lokasi ditentukan',
   );
@@ -19,80 +41,99 @@ export default function ReportPage() {
     reader.readAsDataURL(f);
   };
 
-  const onGeo = () => {
-    if (!navigator.geolocation)
-      return alert('Geolocation tidak didukung browser Anda.');
+  const onGeo = async () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation tidak didukung browser Anda.');
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude.toFixed(6);
         const lon = pos.coords.longitude.toFixed(6);
-        const locationString = `Lat: ${lat}, Long: ${lon}`;
+        setLatitude(lat);
+        setLongitude(lon);
+        const locationString = await getAddress(lat, lon);
         setMapText(`Lokasi berhasil ditentukan • ${locationString}`);
-
-        // Mengisi input yang terlihat dan input tersembunyi
-        const locationInput = document.getElementById('problem-location') as HTMLInputElement;
-        if (locationInput) locationInput.value = locationString;
-
-        const latInput = document.getElementById('latitude') as HTMLInputElement;
-        if (latInput) latInput.value = lat;
-
-        const lonInput = document.getElementById('longitude') as HTMLInputElement;
-        if (lonInput) lonInput.value = lon;
+        // opsional: isi field lokasi dengan koordinat sebagai fallback
+        if (!location.trim()) setLocation(locationString);
       },
       (err) => alert('Gagal mengambil lokasi: ' + err.message),
     );
   };
+
+  const normalizeOptional = (val: string) =>
+    val.trim() === '' ? undefined : val.trim();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    // Validasi sederhana sebelum kirim (selaras dengan Zod)
+    if (!reporterName.trim()) {
+      setIsSubmitting(false);
+      return setSubmitError('Nama pelapor diperlukan');
+    }
+    if (!problemTypeId) {
+      setIsSubmitting(false);
+      return setSubmitError('Jenis masalah wajib dipilih');
+    }
+    if (!description.trim() || description.trim().length < 10) {
+      setIsSubmitting(false);
+      return setSubmitError('Deskripsi terlalu pendek (min. 10 karakter)');
+    }
+    if (!latitude || !longitude) {
+      setIsSubmitting(false);
+      return setSubmitError(
+        'Koordinat lokasi belum ditentukan. Klik "Ambil Lokasi".',
+      );
+    }
 
-    // --- PENTING: Proses Upload Gambar ---
-    // Di aplikasi nyata, Anda harus mengunggah file ke layanan storage (seperti Cloudflare R2)
-    // dan mendapatkan URL-nya kembali. Untuk sekarang, kita gunakan URL placeholder.
-    const photoUrl = 'https://via.placeholder.com/800x600.png?text=Contoh+Foto+Laporan';
+    // --- PENTING: Upload gambar seharusnya ke storage → dapatkan URL-nya ---
+    // Untuk demo gunakan placeholder:
+    const photoUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
 
     const dataToSend = {
-      reporterName: formData.get('reporterName'),
-      reporterContact: formData.get('reporterContact'),
-      problemTypeId: Number(formData.get('problemTypeId')),
-      description: formData.get('description'),
-      photoUrl: photoUrl, // Gunakan URL hasil upload di sini
-      location: formData.get('location'),
-      latitude: Number(formData.get('latitude')),
-      longitude: Number(formData.get('longitude')),
+      reporterName: reporterName.trim(),
+      reporterContact: normalizeOptional(reporterContact), // opsional → undefined/null
+      problemTypeId: Number(problemTypeId),
+      description: description.trim(),
+      photoUrl, // ganti dengan URL hasil upload nyata
+      location: normalizeOptional(location), // opsional
+      latitude: Number(latitude),
+      longitude: Number(longitude),
     };
 
     try {
       const response = await fetch('/api/reports', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
       });
 
-      const result = await response.json();
+      const result: CreateReportResponse = await response.json();
 
       if (!response.ok) {
-        // Menangkap pesan error dari validasi Zod atau error server lainnya
-        const errorMessage = result.error || (result.issues && result.issues.map((i: any) => i.message).join(', ')) || 'Terjadi kesalahan pada server.';
+        const err = result as ApiError;
+        const errorMessage =
+          err.error ||
+          (err.issues &&
+            Array.isArray(err.issues) &&
+            err.issues.map((i) => i.message).join(', ')) ||
+          'Terjadi kesalahan pada server.';
         throw new Error(errorMessage);
       }
 
-      // Jika berhasil
-      setNewReportId(result.data.id); // Simpan ID laporan baru dari respons backend
+      const success = result as { message: string; data: Report };
+      setNewReportId(success.data.id);
       setShowSuccess(true);
-      form.reset();
-      setImgUrl(null);
-      setMapText('Peta akan ditampilkan di sini setelah lokasi ditentukan');
-
-    } catch (error: any) {
-      setSubmitError(error.message || 'Gagal mengirim laporan. Silakan coba lagi.');
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : 'Gagal mengirim laporan. Silakan coba lagi.',
+      );
       console.error('Submit error:', error);
     } finally {
       setIsSubmitting(false);
@@ -114,25 +155,41 @@ export default function ReportPage() {
               <Form noValidate onSubmit={onSubmit}>
                 <Row className="g-3">
                   <Col md={6}>
-                    <Form.Group>
+                    <Form.Group controlId="reporterName">
                       <Form.Label>Nama Pelapor</Form.Label>
-                      <Form.Control name="reporterName" required />
+                      <Form.Control
+                        name="reporterName"
+                        value={reporterName}
+                        onChange={(e) => setReporterName(e.target.value)}
+                        required
+                      />
                     </Form.Group>
                   </Col>
                   <Col md={6}>
-                    <Form.Group>
-                      <Form.Label>Nomor Whatsapp</Form.Label>
-                      <Form.Control name="reporterContact" required />
+                    <Form.Group controlId="reporterContact">
+                      <Form.Label>Nomor Whatsapp (opsional)</Form.Label>
+                      <Form.Control
+                        name="reporterContact"
+                        value={reporterContact}
+                        onChange={(e) => setReporterContact(e.target.value)}
+                        placeholder="08xxxxxxxxxx"
+                      />
                     </Form.Group>
                   </Col>
+
                   <Col xs={12}>
-                    <Form.Group>
+                    <Form.Group controlId="problemTypeId">
                       <Form.Label>Jenis Masalah</Form.Label>
-                      <Form.Select name="problemTypeId" required defaultValue="">
+                      <Form.Select
+                        name="problemTypeId"
+                        value={problemTypeId}
+                        onChange={(e) => setProblemTypeId(e.target.value)}
+                        required
+                      >
                         <option value="" disabled>
                           Pilih jenis masalah
                         </option>
-                        {/* Nilai `value` harus berupa angka (ID) sesuai schema.prisma */}
+                        {/* ID numeric sesuai schema.prisma */}
                         <option value="1">Tumpukan Sampah</option>
                         <option value="2">Jalan Berlubang</option>
                         <option value="3">Penebangan Pohon Liar</option>
@@ -142,10 +199,11 @@ export default function ReportPage() {
                       </Form.Select>
                     </Form.Group>
                   </Col>
+
                   <Col xs={12}>
-                    <Form.Group>
+                    <Form.Group controlId="photoFile">
                       <Form.Label>Foto Masalah</Form.Label>
-                      {/* Input file ini tidak akan dikirim langsung, hanya untuk preview */}
+                      {/* Input file ini hanya untuk preview; upload sesungguhnya ke storage */}
                       <Form.Control
                         type="file"
                         accept="image/*"
@@ -155,33 +213,38 @@ export default function ReportPage() {
                       {imgUrl && (
                         <img
                           src={imgUrl}
-                          className="image-preview d-block"
+                          className="image-preview d-block mt-2"
                           alt="Preview"
+                          style={{ maxWidth: '100%', height: 'auto' }}
                         />
                       )}
                     </Form.Group>
                   </Col>
+
                   <Col xs={12}>
-                    <Form.Group>
+                    <Form.Group controlId="description">
                       <Form.Label>Deskripsi Masalah</Form.Label>
                       <Form.Control
                         as="textarea"
                         name="description"
                         rows={4}
                         placeholder="Jelaskan secara detail..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         required
                       />
                     </Form.Group>
                   </Col>
+
                   <Col xs={12}>
-                    <Form.Group>
-                      <Form.Label>Lokasi</Form.Label>
+                    <Form.Group controlId="location">
+                      <Form.Label>Lokasi (opsional)</Form.Label>
                       <div className="input-group">
                         <Form.Control
                           name="location"
-                          id="problem-location"
-                          placeholder="Masukkan alamat atau klik tombol di bawah"
-                          required
+                          placeholder="Masukkan alamat atau klik 'Ambil Lokasi'"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
                         />
                         <Button
                           variant="outline-secondary"
@@ -192,18 +255,59 @@ export default function ReportPage() {
                           Ambil Lokasi
                         </Button>
                       </div>
-                      {/* Input tersembunyi untuk menyimpan latitude dan longitude */}
-                      <input type="hidden" name="latitude" id="latitude" />
-                      <input type="hidden" name="longitude" id="longitude" />
-                      <div className="map-container">
+
+                      {/* Simpan lat/lon di state + kirim dalam body JSON */}
+                      <div className="mt-2">
+                        <Row className="g-2">
+                          <Col sm={6}>
+                            <Form.Group controlId="latitude">
+                              <Form.Label className="mb-1">
+                                Latitude *
+                              </Form.Label>
+                              <Form.Control
+                                name="latitude"
+                                placeholder="-6.2"
+                                value={latitude}
+                                onChange={(e) => setLatitude(e.target.value)}
+                                required
+                                inputMode="decimal"
+                              />
+                            </Form.Group>
+                          </Col>
+                          <Col sm={6}>
+                            <Form.Group controlId="longitude">
+                              <Form.Label className="mb-1">
+                                Longitude *
+                              </Form.Label>
+                              <Form.Control
+                                name="longitude"
+                                placeholder="106.8"
+                                value={longitude}
+                                onChange={(e) => setLongitude(e.target.value)}
+                                required
+                                inputMode="decimal"
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      </div>
+
+                      <div className="map-container mt-2">
                         <p className="text-muted mb-0">{mapText}</p>
                       </div>
                     </Form.Group>
                   </Col>
+
                   <Col xs={12} className="text-center mt-4">
                     <Button type="submit" size="lg" disabled={isSubmitting}>
                       {isSubmitting ? (
-                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
                       ) : (
                         'Kirim Laporan'
                       )}
@@ -239,8 +343,7 @@ export default function ReportPage() {
           <Button onClick={() => setShowSuccess(false)}>OK</Button>
           <Button
             variant="outline-primary"
-            href="/daftar-masalah"
-            onClick={() => setShowSuccess(false)}
+            onClick={() => navigate('/daftar-masalah') && setShowSuccess(false)}
           >
             Lihat Daftar Masalah
           </Button>

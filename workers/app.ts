@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
-import { z } from 'zod';
-import { zValidator } from '@hono/zod-validator';
 import { createRequestHandler } from 'react-router';
 import { getPrisma } from './db';
+import { createReportSchema } from './schemas/reports';
+import { zValidator } from '@hono/zod-validator';
+import type { NominatimResponse } from './types';
 
 type Env = {
   DATABASE_URL: string;
@@ -52,42 +53,122 @@ api.get('/reports', async (c) => {
   });
 });
 
-// Skema validasi untuk laporan baru menggunakan Zod
-const createReportSchema = z.object({
-  reporterName: z.string().min(3, 'Nama pelapor diperlukan'),
-  reporterContact: z.string().min(10, 'Nomor Whatsapp tidak valid'),
-  problemTypeId: z.coerce.number().int().positive('Jenis masalah tidak valid'),
-  description: z.string().min(10, 'Deskripsi terlalu pendek'),
-  photoUrl: z.string().url('URL foto tidak valid'),
-  location: z.string().optional(),
-  latitude: z.coerce.number(),
-  longitude: z.coerce.number(),
-});
-
 // Endpoint untuk membuat laporan baru
 api.post('/reports', zValidator('json', createReportSchema), async (c) => {
   const prisma = await getPrisma(c.env.DATABASE_URL);
-  const reportData = c.req.valid('json');
+  const body = c.req.valid('json');
 
   try {
     const newReport = await prisma.report.create({
       data: {
-        ...reportData,
-        // Prisma akan menangani konversi tipe data Decimal secara otomatis
+        // kolom yang WAJIB (non-null) di schema
+        reporterName: body.reporterName,
+        description: body.description,
+        photoUrl: body.photoUrl,
+        latitude: body.latitude, // Prisma Decimal akan menerima number
+        longitude: body.longitude,
+        problemTypeId: body.problemTypeId,
+
+        // kolom OPSIONAL (nullable di DB)
+        reporterContact: body.reporterContact ?? null,
+        location: body.location ?? null,
+
+        // kolom lain mengikuti default di schema Prisma:
+        // status        -> default PENDING
+        // upvoteCount   -> default 0
+        // isFakeReport  -> default false
+        // createdAt     -> default now()
+        // resolvedAt    -> null
+        // deletedAt     -> null
       },
     });
 
-    return c.json(
-      {
-        message: 'Laporan berhasil dibuat',
-        data: newReport,
-      },
-      201,
-    ); // 201 Created
+    return c.json({ message: 'Laporan berhasil dibuat', data: newReport }, 201);
   } catch (error) {
     console.error('Gagal menyimpan laporan:', error);
     return c.json({ error: 'Gagal menyimpan laporan ke database' }, 500);
   }
+});
+
+api.get('/reverse-geocode', async (c) => {
+  const latStr = c.req.query('lat');
+  const lonStr = c.req.query('lon');
+
+  // Validasi sederhana
+  const lat = Number(latStr);
+  const lon = Number(lonStr);
+  if (
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lon) ||
+    lat < -90 ||
+    lat > 90 ||
+    lon < -180 ||
+    lon > 180
+  ) {
+    return c.json({ error: 'Parameter lat/lon tidak valid' }, 400);
+  }
+
+  // Caching ringan 60 detik (di edge cache)
+  const cacheKey = new Request(c.req.url, { method: 'GET' });
+  const cache = (c.env as any)?.caches?.default as Cache | undefined;
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      // propagate hit dengan header tanda
+      const hit = new Response(cached.body, cached);
+      hit.headers.set('X-Cache', 'HIT');
+      return hit;
+    }
+  }
+
+  const userAgent = 'MyReactApp/1.0 (myemail@example.com)';
+
+  const url = new URL('https://nominatim.openstreetmap.org/reverse');
+  url.searchParams.set('lat', String(lat));
+  url.searchParams.set('lon', String(lon));
+  url.searchParams.set('format', 'json'); // atau 'jsonv2'
+  // url.searchParams.set('addressdetails', '1');
+
+  const upstream = await fetch(url.toString(), {
+    headers: {
+      'User-Agent': userAgent,
+      Accept: 'application/json',
+    },
+    method: 'GET',
+  });
+
+  if (!upstream.ok) {
+    const text = await upstream.text().catch(() => '');
+    return c.json(
+      {
+        error: `Upstream Nominatim error (${upstream.status})`,
+        detail: text?.slice(0, 300),
+      },
+      502,
+    );
+  }
+
+  const data = (await upstream.json()) as NominatimResponse;
+
+  // Normalisasi respons minimal
+  const body = JSON.stringify({
+    display_name: data.display_name ?? null,
+    error: data.error ?? null,
+    raw: data, // kalau tidak mau berat, hilangkan baris ini
+  });
+
+  // Simpan ke cache 60 detik (opsional)
+  const resp = new Response(body, {
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'public, max-age=60',
+      'X-Cache': 'MISS',
+    },
+    status: 200,
+  });
+
+  if (cache) await cache.put(cacheKey, resp.clone());
+  return resp;
 });
 
 // Mount the api router with /api prefix

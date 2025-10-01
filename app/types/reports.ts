@@ -1,3 +1,5 @@
+import type { ApiError } from './api';
+
 // Status enum dari backend
 export type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 
@@ -43,3 +45,7 @@ export interface ReportsResponse {
   nextCursor: number | null;
   limit: number;
 }
+
+export type CreateReportResponse =
+  | { message: string; data: Report } // sukses
+  | ApiError; // gagal
