@@ -12,7 +12,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        silenceDeprecations: ['import'], // sembunyikan warning dari bootstrap
+        silenceDeprecations: ['import', 'global-builtin', 'color-functions'], // sembunyikan warning dari bootstrap
         quietDeps: true, // sembunyikan warning dari node_modules
       },
     },

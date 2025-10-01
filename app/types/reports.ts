@@ -1,0 +1,45 @@
+// Status enum dari backend
+export type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+
+// Relasi problem type sederhana
+export interface ProblemType {
+  id: number;
+  name: string;
+}
+
+// Relasi progress update
+export interface ReportProgress {
+  id: number;
+  status: ReportStatus;
+  note: string | null;
+  createdAt: string; // ISO string
+  reportId: number;
+}
+
+// Bentuk report seperti di-return backend /api/reports
+export interface Report {
+  id: number;
+  reporterName: string;
+  reporterContact?: string | null;
+  description: string;
+  photoUrl: string;
+  latitude: string; // Prisma Decimal -> dikirim sebagai string
+  longitude: string; // Prisma Decimal -> dikirim sebagai string
+  location?: string | null;
+  status: ReportStatus;
+  upvoteCount: number;
+  isFakeReport: boolean;
+  createdAt: string; // ISO string
+  resolvedAt?: string | null;
+  deletedAt?: string | null;
+
+  problemType: ProblemType;
+  progressUpdates: ReportProgress[];
+}
+
+// Bentuk response dari endpoint /api/reports
+export interface ReportsResponse {
+  data: Report[];
+  nextCursor: number | null;
+  limit: number;
+}
