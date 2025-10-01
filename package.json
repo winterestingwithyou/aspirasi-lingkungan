@@ -48,7 +48,7 @@
     "jiti": "^2.6.0",
     "prettier": "3.6.2",
     "prisma": "^6.16.2",
-    "sass": "^1.93.2",
+    "sass": "1.78.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "5.8.3",
@@ -63,7 +63,9 @@
     "deploy": "npm run build && wrangler deploy",
     "dev": "react-router dev",
     "preview": "npm run build && vite preview",
-    "typecheck": "npm run cf-typegen && react-router typegen && tsc -b"
+    "typecheck": "npm run cf-typegen && react-router typegen && tsc -b",
+    "dev:css": "sass --watch --load-path=node_modules styles/bootstrap.scss app/bootstrap.css --no-source-map",
+    "build:css": "sass --style=compressed --load-path=node_modules styles/bootstrap.scss app/bootstrap.css --no-source-map"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

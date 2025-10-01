@@ -9,12 +9,4 @@ export default defineConfig({
     reactRouter(),
     tsconfigPaths(),
   ],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        silenceDeprecations: ['import', 'global-builtin', 'color-functions'], // sembunyikan warning dari bootstrap
-        quietDeps: true, // sembunyikan warning dari node_modules
-      },
-    },
-  },
 });
