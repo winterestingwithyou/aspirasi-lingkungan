@@ -1,4 +1,6 @@
 import { Hono } from 'hono';
+import { z } from 'zod';
+import { zValidator } from '@hono/zod-validator';
 import { createRequestHandler } from 'react-router';
 import { getPrisma } from './db';
 
@@ -48,6 +50,44 @@ api.get('/reports', async (c) => {
     nextCursor,
     limit,
   });
+});
+
+// Skema validasi untuk laporan baru menggunakan Zod
+const createReportSchema = z.object({
+  reporterName: z.string().min(3, 'Nama pelapor diperlukan'),
+  reporterContact: z.string().min(10, 'Nomor Whatsapp tidak valid'),
+  problemTypeId: z.coerce.number().int().positive('Jenis masalah tidak valid'),
+  description: z.string().min(10, 'Deskripsi terlalu pendek'),
+  photoUrl: z.string().url('URL foto tidak valid'),
+  location: z.string().optional(),
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
+});
+
+// Endpoint untuk membuat laporan baru
+api.post('/reports', zValidator('json', createReportSchema), async (c) => {
+  const prisma = await getPrisma(c.env.DATABASE_URL);
+  const reportData = c.req.valid('json');
+
+  try {
+    const newReport = await prisma.report.create({
+      data: {
+        ...reportData,
+        // Prisma akan menangani konversi tipe data Decimal secara otomatis
+      },
+    });
+
+    return c.json(
+      {
+        message: 'Laporan berhasil dibuat',
+        data: newReport,
+      },
+      201,
+    ); // 201 Created
+  } catch (error) {
+    console.error('Gagal menyimpan laporan:', error);
+    return c.json({ error: 'Gagal menyimpan laporan ke database' }, 500);
+  }
 });
 
 // Mount the api router with /api prefix
