@@ -1,38 +1,51 @@
+import { useMemo } from 'react';
 import { Col, Container, Form, Pagination, Row } from 'react-bootstrap';
-
-const items = [
-  {
-    img: 'https://images.unsplash.com/photo-1591946614720-90a583e1912a?q=80&w=1170&auto=format&fit=crop',
-    title: 'Tumpukan Sampah di jalan lunjuk',
-    loc: 'Jalan Lunjuk, Bukit Lama',
-    status: 'progress',
-    date: '20 Mei 2025',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1589556578395-3c37da9b6a49?q=80&w=1170&auto=format&fit=crop',
-    title: 'Jalan Berlubang di jalan depan Halte Unsri',
-    loc: 'Jl. Srijaya Negara',
-    status: 'pending',
-    date: '18 Mei 2025',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1170&auto=format&fit=crop',
-    title: 'Pembuangan Limbah',
-    loc: 'Sungai Musi',
-    status: 'completed',
-    date: '15 Mei 2025',
-  },
-  // ...tambahkan lainnya bila perlu
-];
+import { Link } from 'react-router';
+import type { Report, ReportsResponse } from '~/types';
 
 const badge = (s: string) =>
-  s === 'pending'
+  s === 'PENDING'
     ? 'report-status status-pending'
-    : s === 'progress'
+    : s === 'IN_PROGRESS' || s === 'PROGRESS' || s === 'progress'
       ? 'report-status status-progress'
       : 'report-status status-completed';
 
-export default function DaftarMasalahPage() {
+// Format tanggal sederhana (ID)
+function formatTanggal(iso: string) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function DaftarMasalahPage({ message }: { message: ReportsResponse }) {
+  const { data, nextCursor, limit } = message;
+
+  // Map data API → tampilan kartu (fallback jika field null)
+  const items = useMemo(
+    () =>
+      data.map((r: Report) => ({
+        key: r.id,
+        img:
+          r.photoUrl ||
+          'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg',
+        title:
+          r.problemType?.name ||
+          (r.description?.slice(0, 70) || 'Laporan') +
+            (r.description?.length > 70 ? '…' : ''),
+        loc: r.location || 'Lokasi tidak tersedia',
+        status: r.status || 'PENDING',
+        date: formatTanggal(r.createdAt),
+      })),
+    [data],
+  );
+
   return (
     <section className="page-section">
       <Container>
@@ -47,6 +60,7 @@ export default function DaftarMasalahPage() {
           <Row className="g-3">
             <Col md={4}>
               <Form.Label>Pencarian Masalah</Form.Label>
+              {/* Untuk penyaringan berbasis URL, kamu bisa ubah ke <form method="get"> dan pakai name="q" */}
               <div className="input-group">
                 <Form.Control placeholder="Cari berdasarkan judul atau lokasi..." />
                 <button className="btn btn-outline-secondary" type="button">
@@ -78,9 +92,9 @@ export default function DaftarMasalahPage() {
           </Row>
         </div>
 
-        <Row className="g-4">
-          {items.map((r, i) => (
-            <Col md={6} lg={4} key={i}>
+        <Row className="g-4 mt-1">
+          {items.map((r) => (
+            <Col md={6} lg={4} key={r.key}>
               <div className="report-list-card">
                 <img src={r.img} alt={r.title} />
                 <div className="report-list-card-body">
@@ -90,9 +104,9 @@ export default function DaftarMasalahPage() {
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
                     <span className={badge(r.status)}>
-                      {r.status === 'progress'
+                      {r.status === 'IN_PROGRESS'
                         ? 'Sedang Diproses'
-                        : r.status === 'pending'
+                        : r.status === 'PENDING'
                           ? 'Menunggu Tindakan'
                           : 'Selesai'}
                     </span>
@@ -102,18 +116,33 @@ export default function DaftarMasalahPage() {
               </div>
             </Col>
           ))}
+
+          {items.length === 0 && (
+            <Col xs={12}>
+              <div className="text-center text-muted py-5">
+                Belum ada laporan.
+              </div>
+            </Col>
+          )}
         </Row>
 
+        {/* Cursor-based pagination: tombol Next saja (Prev butuh state stack cursor) */}
         <nav aria-label="Page navigation" className="mt-4">
           <Pagination className="justify-content-center">
             <Pagination.Prev disabled>Sebelumnya</Pagination.Prev>
             <Pagination.Item active>1</Pagination.Item>
-            <Pagination.Item>2</Pagination.Item>
-            <Pagination.Item>3</Pagination.Item>
-            <Pagination.Next>Selanjutnya</Pagination.Next>
+            {nextCursor ? (
+              <Link to={`?limit=${limit}&cursor=${nextCursor}`}>
+                <Pagination.Next>Selanjutnya</Pagination.Next>
+              </Link>
+            ) : (
+              <Pagination.Next disabled>Selanjutnya</Pagination.Next>
+            )}
           </Pagination>
         </nav>
       </Container>
     </section>
   );
 }
+
+export { DaftarMasalahPage };
