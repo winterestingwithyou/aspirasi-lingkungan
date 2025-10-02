@@ -554,3 +554,47 @@ footer {
     font-size: 1.8rem;
   }
 }
+
+.tech-carousel-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Memberi jarak antara tombol dan carousel */
+}
+
+.tech-carousel-container .alice-carousel {
+  flex-grow: 1;
+  min-width: 0; /* Mencegah item flex meluap dari kontainer */
+}
+
+.tech-carousel-nav-btn {
+  /* Hapus position: absolute dan properti terkait */
+  flex-shrink: 0; /* Mencegah tombol menyusut */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.tech-carousel-nav-btn:hover {
+  background-color: #f0f0f0;
+  border-color: #bbb;
+}
+  
+/* Media query untuk menyembunyikan tombol di layar sangat kecil jika perlu */
+@media (max-width: 576px) {
+  .tech-carousel-nav-btn {
+    display: none; /* Sembunyikan tombol, swipe tetap berfungsi */
+  }
+  .tech-carousel-container {
+    gap: 0; /* Hilangkan jarak jika tombol disembunyikan */
+  }
+}
