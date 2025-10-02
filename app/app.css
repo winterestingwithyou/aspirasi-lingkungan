@@ -588,6 +588,23 @@ footer {
   background-color: #f0f0f0;
   border-color: #bbb;
 }
+
+/* Efek fokus pada item carousel teknologi */
+.tech-carousel-item.side {
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
+  transform: scale(0.85); 
+  opacity: 0.6; 
+}
+
+.tech-carousel-item.center {
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
+  transform: scale(1);
+  opacity: 1;
+}
   
 /* Media query untuk menyembunyikan tombol di layar sangat kecil jika perlu */
 @media (max-width: 576px) {
