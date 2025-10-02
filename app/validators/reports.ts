@@ -1,12 +1,5 @@
 import { z } from 'zod';
 
-/** Util: ubah '' -> undefined */
-const optionalize = z
-  .string()
-  .transform((v) => v.trim())
-  .pipe(z.string())
-  .transform((v) => (v === '' ? undefined : v));
-
 /** WA Indonesia (longgar): 08xxxxxxxxxx atau +62xxxxxxxxxx, opsional */
 const waRegex = /^(?:\+62|62|0)8[1-9][0-9]{6,11}$/;
 
@@ -16,8 +9,9 @@ export const createReportSchema = z.object({
     .trim()
     .min(1, 'Nama pelapor diperlukan'),
 
-  reporterContact: optionalize
-    .optional()
+  reporterContact: z
+    .string()
+    .min(11, 'Nomor WhatsApp minimal 11 digit')
     .refine(
       (v) => !v || waRegex.test(v),
       'Nomor WhatsApp tidak valid (contoh: 08xxxxxxxxxx atau +628xxxxxxxx)',
@@ -32,12 +26,11 @@ export const createReportSchema = z.object({
   description: z
     .string({ required_error: 'Deskripsi diperlukan' })
     .trim()
-    .min(10, 'Deskripsi terlalu pendek (min. 10 karakter)'),
+    .min(10, 'Deskripsi terlalu pendek'),
 
-  // URL hasil upload ke Cloudinary; boleh null
-  photoUrl: z.string().url().nullable().optional(),
+  photoUrl: z.string().url('URL tidak valid').nullable(),
 
-  location: optionalize.optional(),
+  location: z.string().min(1, 'Lokasi diperlukan'),
 
   // dari input text → number
   latitude: z
@@ -56,4 +49,4 @@ export const createReportSchema = z.object({
     ),
 });
 
-export type CreateReportInput = z.infer<typeof createReportSchema>;
+export type CreateReportInput = z.input<typeof createReportSchema>;

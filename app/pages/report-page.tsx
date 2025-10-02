@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -10,9 +10,12 @@ import {
   Spinner,
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import { getAddress } from '~/services';
-import { uploadToCloudinary } from '~/services/cloudinary';
+import { getAddress, uploadToCloudinary } from '~/services';
 import type { ApiError, CreateReportResponse, Report } from '~/types';
+import {
+  createReportSchema,
+  type CreateReportInput,
+} from '~/validators/reports';
 
 export function ReportPage({ initialMessage }: { initialMessage: string }) {
   const navigate = useNavigate();
@@ -64,49 +67,34 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
     );
   };
 
-  const normalizeOptional = (val: string) =>
-    val.trim() === '' ? undefined : val.trim();
-
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
 
-    if (!reporterName.trim()) {
-      setIsSubmitting(false);
-      return setSubmitError('Nama pelapor diperlukan');
-    }
-    if (!problemTypeId) {
-      setIsSubmitting(false);
-      return setSubmitError('Jenis masalah wajib dipilih');
-    }
-    if (!description.trim() || description.trim().length < 10) {
-      setIsSubmitting(false);
-      return setSubmitError('Deskripsi terlalu pendek (min. 10 karakter)');
-    }
-    if (!latitude || !longitude) {
-      setIsSubmitting(false);
-      return setSubmitError('Koordinat lokasi belum ditentukan.');
-    }
-
-    let photoUrl: string | null = null;
-
-    if (photoFile) {
-      photoUrl = await uploadToCloudinary(photoFile);
-    } else {
-      photoUrl = null;
-    }
-
-    const dataToSend = {
-      reporterName: reporterName.trim(),
-      reporterContact: normalizeOptional(reporterContact),
-      problemTypeId: Number(problemTypeId),
-      description: description.trim(),
-      photoUrl,
-      location: normalizeOptional(location),
-      latitude: Number(latitude),
-      longitude: Number(longitude),
+    const basePayload: CreateReportInput = {
+      reporterName,
+      reporterContact,
+      problemTypeId,
+      description,
+      photoUrl: null as string | null, // upload belakangan
+      location,
+      latitude,
+      longitude,
     };
+
+    const parsed = createReportSchema.safeParse(basePayload);
+    if (!parsed.success) {
+      setIsSubmitting(false);
+      setSubmitError(parsed.error.issues.map((i) => i.message).join(', '));
+      return;
+    }
+
+    let dataToSend = parsed.data;
+    if (photoFile) {
+      const uploadedUrl = await uploadToCloudinary(photoFile);
+      dataToSend = { ...dataToSend, photoUrl: uploadedUrl };
+    }
 
     try {
       const response = await fetch('/api/reports', {
@@ -143,6 +131,12 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
     }
   };
 
+  useEffect(() => {
+    if (submitError) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [submitError]);
+
   // --- Render ---
   return (
     <section className="page-section">
@@ -171,7 +165,7 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
                   </Col>
                   <Col md={6}>
                     <Form.Group controlId="reporterContact">
-                      <Form.Label>Nomor Whatsapp (opsional)</Form.Label>
+                      <Form.Label>Nomor Whatsapp</Form.Label>
                       <Form.Control
                         name="reporterContact"
                         value={reporterContact}
@@ -242,7 +236,7 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
 
                   <Col xs={12}>
                     <Form.Group controlId="location">
-                      <Form.Label>Lokasi (opsional)</Form.Label>
+                      <Form.Label>Lokasi </Form.Label>
                       <div className="input-group">
                         <Form.Control
                           name="location"
