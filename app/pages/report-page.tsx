@@ -11,11 +11,13 @@ import {
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import { getAddress } from '~/services';
+import { uploadToCloudinary } from '~/services/cloudinary';
 import type { ApiError, CreateReportResponse, Report } from '~/types';
 
 export function ReportPage({ initialMessage }: { initialMessage: string }) {
   const navigate = useNavigate();
   const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const [reporterName, setReporterName] = useState('');
   const [reporterContact, setReporterContact] = useState('');
@@ -37,6 +39,7 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
   const onFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
+    setPhotoFile(f); // <— penting
     const reader = new FileReader();
     reader.onload = (ev) => setImgUrl(String(ev.target?.result || ''));
     reader.readAsDataURL(f);
@@ -86,8 +89,13 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
       return setSubmitError('Koordinat lokasi belum ditentukan.');
     }
 
-    const photoUrl =
-      'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
+    let photoUrl: string | null = null;
+
+    if (photoFile) {
+      photoUrl = await uploadToCloudinary(photoFile);
+    } else {
+      photoUrl = null;
+    }
 
     const dataToSend = {
       reporterName: reporterName.trim(),

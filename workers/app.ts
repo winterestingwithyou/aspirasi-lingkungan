@@ -4,9 +4,14 @@ import { getPrisma } from './db';
 import { createReportSchema } from './schemas/reports';
 import { zValidator } from '@hono/zod-validator';
 import type { NominatimResponse } from './types';
+import { sha1Hex } from './helpers/sha1';
 
 type Env = {
   DATABASE_URL: string;
+  CLOUDINARY_CLOUD_NAME: string;
+  CLOUDINARY_API_KEY: string;
+  CLOUDINARY_API_SECRET: string;
+  CLOUDINARY_FOLDER?: string;
 };
 
 const app = new Hono();
@@ -61,7 +66,7 @@ api.post('/reports', zValidator('json', createReportSchema), async (c) => {
   try {
     const newReport = await prisma.report.create({
       data: {
-        // kolom yang WAJIB (non-null) di schema
+        // kolom yang WAJIB di schema
         reporterName: body.reporterName,
         description: body.description,
         photoUrl: body.photoUrl,
@@ -69,7 +74,7 @@ api.post('/reports', zValidator('json', createReportSchema), async (c) => {
         longitude: body.longitude,
         problemTypeId: body.problemTypeId,
 
-        // kolom OPSIONAL (nullable di DB)
+        // kolom OPSIONAL
         reporterContact: body.reporterContact ?? null,
         location: body.location ?? null,
 
@@ -88,6 +93,34 @@ api.post('/reports', zValidator('json', createReportSchema), async (c) => {
     console.error('Gagal menyimpan laporan:', error);
     return c.json({ error: 'Gagal menyimpan laporan ke database' }, 500);
   }
+});
+
+api.get('/cloudinary/sign', async (c) => {
+  const cloudName = c.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = c.env.CLOUDINARY_API_KEY;
+  const apiSecret = c.env.CLOUDINARY_API_SECRET;
+  const folder = c.env.CLOUDINARY_FOLDER ?? 'uploads';
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  const params: Record<string, string | number> = {
+    folder,
+    timestamp,
+  };
+
+  console.log('Cloudinary params:', params);
+
+  const toSign = Object.keys(params)
+    .sort()
+    .map((k) => `${k}=${params[k]}`)
+    .join('&');
+
+  console.log('String to Sign:', toSign);
+
+  const signature = await sha1Hex(toSign + apiSecret);
+
+  console.log('Cloudinary signature:', signature);
+
+  return c.json({ cloudName, apiKey, folder, timestamp, signature, toSign });
 });
 
 api.get('/reverse-geocode', async (c) => {

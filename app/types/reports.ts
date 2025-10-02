@@ -1,16 +1,16 @@
 import type { ApiError } from './api';
 
 // Status enum dari backend
-export type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 
 // Relasi problem type sederhana
-export interface ProblemType {
+interface ProblemType {
   id: number;
   name: string;
 }
 
 // Relasi progress update
-export interface ReportProgress {
+interface ReportProgress {
   id: number;
   status: ReportStatus;
   note: string | null;
@@ -19,7 +19,7 @@ export interface ReportProgress {
 }
 
 // Bentuk report seperti di-return backend /api/reports
-export interface Report {
+interface Report {
   id: number;
   reporterName: string;
   reporterContact?: string | null;
@@ -40,12 +40,21 @@ export interface Report {
 }
 
 // Bentuk response dari endpoint /api/reports
-export interface ReportsResponse {
+interface ReportsResponse {
   data: Report[];
   nextCursor: number | null;
   limit: number;
 }
 
-export type CreateReportResponse =
+type CreateReportResponse =
   | { message: string; data: Report } // sukses
   | ApiError; // gagal
+
+export type {
+  Report,
+  ReportsResponse,
+  CreateReportResponse,
+  ReportStatus,
+  ProblemType,
+  ReportProgress,
+};
