@@ -2,7 +2,7 @@ import type { NominatimResponse } from '~/types';
 
 async function getAddress(lat: string, lon: string): Promise<string> {
   try {
-    const url = `/api/reverse-geocode?lat=${lat}&lon=${lon}`;
+    const url = `/api/nominatim/reverse?lat=${lat}&lon=${lon}`;
     const res = await fetch(url, {
       method: 'GET',
       headers: {
