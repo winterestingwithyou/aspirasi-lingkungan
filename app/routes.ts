@@ -9,7 +9,7 @@ import {
 export default [
   layout('layouts/app-layout.tsx', [
     index('pages/landing-page.tsx'),
-    route('laporkan', 'pages/report-page.tsx'),
+    route('laporkan', 'routes/report.tsx'),
     route('daftar-masalah', 'routes/daftar-masalah.tsx'),
     route('tentang-kami', 'pages/tentang-kami-page.tsx'),
     route('kontak', 'pages/kontak-page.tsx'),

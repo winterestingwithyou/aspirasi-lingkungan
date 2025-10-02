@@ -13,17 +13,17 @@ import { useNavigate } from 'react-router';
 import { getAddress } from '~/services';
 import type { ApiError, CreateReportResponse, Report } from '~/types';
 
-export default function ReportPage() {
+export function ReportPage({ initialMessage }: { initialMessage: string }) {
   const navigate = useNavigate();
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const [reporterName, setReporterName] = useState('');
-  const [reporterContact, setReporterContact] = useState(''); // opsional
-  const [problemTypeId, setProblemTypeId] = useState<string>(''); // disimpan string, dikirim number
+  const [reporterContact, setReporterContact] = useState('');
+  const [problemTypeId, setProblemTypeId] = useState<string>('');
   const [description, setDescription] = useState('');
-  const [location, setLocation] = useState(''); // opsional
-  const [latitude, setLatitude] = useState<string>(''); // wajib → valid number
-  const [longitude, setLongitude] = useState<string>(''); // wajib → valid number
+  const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState<string>('');
+  const [longitude, setLongitude] = useState<string>('');
 
   const [mapText, setMapText] = useState<string>(
     'Peta akan ditampilkan di sini setelah lokasi ditentukan',
@@ -33,6 +33,7 @@ export default function ReportPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [newReportId, setNewReportId] = useState<number | null>(null);
 
+  // --- Handlers & helpers ---
   const onFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -54,7 +55,6 @@ export default function ReportPage() {
         setLongitude(lon);
         const locationString = await getAddress(lat, lon);
         setMapText(`Lokasi berhasil ditentukan • ${locationString}`);
-        // opsional: isi field lokasi dengan koordinat sebagai fallback
         if (!location.trim()) setLocation(locationString);
       },
       (err) => alert('Gagal mengambil lokasi: ' + err.message),
@@ -69,7 +69,6 @@ export default function ReportPage() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Validasi sederhana sebelum kirim (selaras dengan Zod)
     if (!reporterName.trim()) {
       setIsSubmitting(false);
       return setSubmitError('Nama pelapor diperlukan');
@@ -84,23 +83,19 @@ export default function ReportPage() {
     }
     if (!latitude || !longitude) {
       setIsSubmitting(false);
-      return setSubmitError(
-        'Koordinat lokasi belum ditentukan. Klik "Ambil Lokasi".',
-      );
+      return setSubmitError('Koordinat lokasi belum ditentukan.');
     }
 
-    // --- PENTING: Upload gambar seharusnya ke storage → dapatkan URL-nya ---
-    // Untuk demo gunakan placeholder:
     const photoUrl =
       'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
 
     const dataToSend = {
       reporterName: reporterName.trim(),
-      reporterContact: normalizeOptional(reporterContact), // opsional → undefined/null
+      reporterContact: normalizeOptional(reporterContact),
       problemTypeId: Number(problemTypeId),
       description: description.trim(),
-      photoUrl, // ganti dengan URL hasil upload nyata
-      location: normalizeOptional(location), // opsional
+      photoUrl,
+      location: normalizeOptional(location),
       latitude: Number(latitude),
       longitude: Number(longitude),
     };
@@ -140,12 +135,13 @@ export default function ReportPage() {
     }
   };
 
+  // --- Render ---
   return (
     <section className="page-section">
       <Container>
         <div className="text-center mb-5 mt-3">
           <h2 className="section-title">Form Pelaporan Masalah</h2>
-          <p className="lead">Laporkan masalah lingkungan yang Anda temukan</p>
+          <p className="lead">{initialMessage}</p>
         </div>
 
         <Row className="justify-content-center">
