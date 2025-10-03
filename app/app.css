@@ -589,29 +589,21 @@ footer {
   border-color: #bbb;
 }
 
-/* Efek fokus pada item carousel teknologi */
-.tech-carousel-item.side {
-  transition:
-    transform 0.4s ease,
-    opacity 0.4s ease;
-  transform: scale(0.85); 
-  opacity: 0.6; 
-}
-
-.tech-carousel-item.center {
-  transition:
-    transform 0.4s ease,
-    opacity 0.4s ease;
-  transform: scale(1);
-  opacity: 1;
-}
-  
-/* Media query untuk menyembunyikan tombol di layar sangat kecil jika perlu */
-@media (max-width: 576px) {
-  .tech-carousel-nav-btn {
-    display: none; /* Sembunyikan tombol, swipe tetap berfungsi */
+/* Efek fokus pada item carousel teknologi hanya untuk layar besar (tampilan 3 item) */
+@media (min-width: 992px) {
+  .tech-carousel-item.side {
+    transition:
+      transform 0.4s ease,
+      opacity 0.4s ease;
+    transform: scale(0.75);
+    opacity: 0.6;
   }
-  .tech-carousel-container {
-    gap: 0; /* Hilangkan jarak jika tombol disembunyikan */
+
+  .tech-carousel-item.center {
+    transition:
+      transform 0.4s ease,
+      opacity 0.4s ease;
+    transform: scale(1);
+    opacity: 1;
   }
 }

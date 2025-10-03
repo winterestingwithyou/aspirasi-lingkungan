@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Carousel } from 'react-bootstrap';
+import { Carousel, Col, Row } from 'react-bootstrap';
 
 const carouselStyle: React.CSSProperties = {
   height: '100%',
@@ -94,128 +94,100 @@ export default function GovDetailLaporan() {
 
       <div className="mt-4">
         <h5>Riwayat Penanganan</h5>
-        {/* Responsive multistep: horizontal on md+, vertical on sm */}
-        <div
-          className="d-flex flex-column flex-md-row gap-4 justify-content-start align-items-start mt-3"
-          style={{ width: '100%' }}
-        >
-          {/* Step 1 */}
-          <div className="text-center" style={{ minWidth: 180 }}>
-            <div
-              className="mx-auto mb-2"
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: '#198754',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontWeight: 600,
-                fontSize: 16,
-              }}
-            >
-              1
-            </div>
-            <div className="fw-semibold">Laporan Diterima</div>
-            <div className="text-muted small">20 Mei 2025, 10:30 WIB</div>
-            <div className="small">
-              Laporan telah diterima dan akan segera ditindaklanjuti.
-            </div>
-          </div>
-          {/* Step Connector */}
-          <div
-            className="d-none d-md-block"
-            style={{
-              alignSelf: 'center',
-              width: 40,
-              height: 4,
-              background: '#dee2e6',
-              borderRadius: 2,
-            }}
-          ></div>
-          <div
-            className="d-block d-md-none"
-            style={{
-              alignSelf: 'center',
-              width: 4,
-              height: 40,
-              background: '#dee2e6',
-              borderRadius: 2,
-            }}
-          ></div>
-          {/* Step 2 */}
-          <div className="text-center" style={{ minWidth: 180 }}>
-            <div
-              className="mx-auto mb-2"
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: '#0d6efd',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontWeight: 600,
-                fontSize: 16,
-              }}
-            >
-              2
-            </div>
-            <div className="fw-semibold">Dalam Proses Penanganan</div>
-            <div className="text-muted small">21 Mei 2025, 09:15 WIB</div>
-            <div className="small">
-              Tim DLH sedang menuju lokasi untuk pengecekan.
-            </div>
-          </div>
-          {/* Step Connector */}
-          <div
-            className="d-none d-md-block"
-            style={{
-              alignSelf: 'center',
-              width: 40,
-              height: 4,
-              background: '#dee2e6',
-              borderRadius: 2,
-            }}
-          ></div>
-          <div
-            className="d-block d-md-none"
-            style={{
-              alignSelf: 'center',
-              width: 4,
-              height: 40,
-              background: '#dee2e6',
-              borderRadius: 2,
-            }}
-          ></div>
-          {/* Step 3 */}
-          <div className="text-center" style={{ minWidth: 180 }}>
-            <div
-              className="mx-auto mb-2"
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: '#6c757d',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontWeight: 600,
-                fontSize: 16,
-              }}
-            >
-              3
-            </div>
-            <div className="fw-semibold">Selesai</div>
-            <div className="text-muted small">22 Mei 2025, 14:00 WIB</div>
-            <div className="small">
-              Masalah telah ditangani dan lokasi sudah bersih.
-            </div>
-          </div>
+        <div className="mt-3 border rounded p-3">
+          {/* Header Tabel */}
+          <Row className="fw-bold border-bottom pb-2 mb-2 d-none d-md-flex">
+            <Col md={3} className="text-center">Status</Col>
+            <Col md={6} className="text-center">Deskripsi</Col>
+            <Col md={3} className="text-center">Waktu</Col>
+          </Row>
+
+          {/* Baris Riwayat 1 */}
+          <Row className="py-2 border-bottom">
+            <Col md={3}>
+              <div className="d-flex align-items-center justify-content-center justify-content-md-start">
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    background: '#198754',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    marginRight: '10px',
+                    flexShrink: 0,
+                  }}
+                >
+                  1
+                </div>
+                <span className="fw-semibold">Laporan Diterima</span>
+              </div>
+            </Col>
+            <Col md={6} className="small text-center my-auto">Laporan telah diterima dan akan segera ditindaklanjuti.</Col>
+            <Col md={3} className="text-muted small text-center my-auto">20 Mei 2025, 10:30 WIB</Col>
+          </Row>
+
+          {/* Baris Riwayat 2 */}
+          <Row className="py-2 border-bottom">
+            <Col md={3}>
+              <div className="d-flex align-items-center justify-content-center justify-content-md-start">
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    background: '#0d6efd',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    marginRight: '10px',
+                    flexShrink: 0,
+                  }}
+                >
+                  2
+                </div>
+                <span className="fw-semibold">Dalam Proses</span>
+              </div>
+            </Col>
+            <Col md={6} className="small text-center my-auto">Tim DLH sedang menuju lokasi untuk pengecekan.</Col>
+            <Col md={3} className="text-muted small text-center my-auto">21 Mei 2025, 09:15 WIB</Col>
+          </Row>
+
+          {/* Baris Riwayat 3 */}
+          <Row className="py-2">
+            <Col md={3}>
+              <div className="d-flex align-items-center justify-content-center justify-content-md-start">
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    background: '#6c757d',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    marginRight: '10px',
+                    flexShrink: 0,
+                  }}
+                >
+                  3
+                </div>
+                <span className="fw-semibold">Selesai</span>
+              </div>
+            </Col>
+            <Col md={6} className="small text-center my-auto">Masalah telah ditangani dan lokasi sudah bersih.</Col>
+            <Col md={3} className="text-muted small text-center my-auto">22 Mei 2025, 14:00 WIB</Col>
+          </Row>
         </div>
       </div>
     </div>
