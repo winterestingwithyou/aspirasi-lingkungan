@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { Card, Col, Container, Image, Row } from 'react-bootstrap';
+import { useRef, useState } from 'react';
+import { Card, Col, Container, Row, Image } from 'react-bootstrap';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
 
@@ -64,31 +64,32 @@ const teknologi = [
 // Data Developer
 const developers = [
   {
-    photo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
+    photo:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
     name: 'Rafly Alamsyach',
     id: '09010282327055',
     role: 'Front-End Developer',
-    description:
-      'Kata-kata hari ini',
+    description: 'Kata-kata hari ini',
   },
   {
-    photo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
+    photo:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
     name: 'M. Adam Yudhistira',
     id: '09010182327064',
     role: 'Back-End Developer',
-    description:
-      'Kata-kata hari ini',
+    description: 'Kata-kata hari ini',
   },
 ];
 
 export default function TentangKamiPage() {
   const carouselRef = useRef<AliceCarousel>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <section className="page-section">
       <Container>
         {/* Bagian 1: Tentang Aplikasi */}
-        <Row className="align-items-center mb-5">
+        <Row className="align-items-center mb-5 mt-3">
           <Col md={4} className="text-center mb-4 mb-md-0">
             <Image
               src="" // logo aplikasi
@@ -100,18 +101,18 @@ export default function TentangKamiPage() {
           <Col md={8}>
             <h2 className="section-title">Tentang ECO-RAPID</h2>
             <p className="lead">
-              ECO-RAPID adalah platform inovatif yang dirancang untuk menjembatani
-              komunikasi antara masyarakat dan pemerintah dalam menangani
-              masalah lingkungan.
+              ECO-RAPID adalah platform inovatif yang dirancang untuk
+              menjembatani komunikasi antara masyarakat dan pemerintah dalam
+              menangani masalah lingkungan.
             </p>
             <p>
               Kami percaya bahwa partisipasi aktif dari masyarakat adalah kunci
               untuk menciptakan lingkungan yang lebih bersih, aman, dan sehat.
               Dengan ECO-RAPID, melaporkan masalah seperti tumpukan sampah,
               saluran air tersumbat, atau penebangan liar menjadi lebih mudah
-              dan transparan. Setiap laporan dapat dipantau status
-              penanganannya secara real-time, memastikan akuntabilitas dan
-              penyelesaian yang cepat.
+              dan transparan. Setiap laporan dapat dipantau status penanganannya
+              secara real-time, memastikan akuntabilitas dan penyelesaian yang
+              cepat.
             </p>
           </Col>
         </Row>
@@ -135,23 +136,35 @@ export default function TentangKamiPage() {
           <AliceCarousel
             ref={carouselRef}
             mouseTracking
+            infinite
             disableDotsControls
             disableButtonsControls // Menonaktifkan tombol bawaan
-            items={teknologi.map((tech, index) => (
-              <div key={index} className="tech-carousel-item text-center p-4">
-                <img
-                  src={tech.logo}
-                  alt={`${tech.name} logo`}
-                  style={{
-                    height: '80px',
-                    objectFit: 'contain',
-                    marginBottom: '1rem',
-                  }}
-                />
-                <h5>{tech.name}</h5>
-                <p className="small">{tech.description}</p>
-              </div>
-            ))}
+            onSlideChanged={(e) => setActiveIndex(e.item)}
+            items={teknologi.map((tech, index) => {
+              // Tentukan apakah item ini adalah item tengah
+              // Menggunakan modulus (%) untuk menangani perputaran (looping)
+              const centerIndex = (activeIndex + 1) % teknologi.length;
+              const isCenter = index === centerIndex;
+              const itemClass = isCenter
+                ? 'tech-carousel-item center'
+                : 'tech-carousel-item side';
+
+              return (
+                <div key={index} className={`${itemClass} text-center p-4`}>
+                  <img
+                    src={tech.logo}
+                    alt={`${tech.name} logo`}
+                    style={{
+                      height: '80px',
+                      objectFit: 'contain',
+                      marginBottom: '1rem',
+                    }}
+                  />
+                  <h5>{tech.name}</h5>
+                  <p className="small">{tech.description}</p>
+                </div>
+              );
+            })}
             responsive={{
               0: { items: 1, itemsFit: 'contain' },
               576: { items: 2, itemsFit: 'contain' },
@@ -169,7 +182,9 @@ export default function TentangKamiPage() {
         {/* Bagian 3: Tim Pengembang */}
         <div className="text-center mb-5 mt-5 pt-4">
           <h2 className="section-title">Tim Pengembang</h2>
-          <p className="lead">Orang-orang di balik pengembangan aplikasi ini.</p>
+          <p className="lead">
+            Orang-orang di balik pengembangan aplikasi ini.
+          </p>
         </div>
         <Row className="justify-content-center g-4">
           {developers.map((dev, index) => (

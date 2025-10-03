@@ -40,10 +40,10 @@ export default function Footer() {
                 <a href="/daftar-masalah">Daftar Masalah</a>
               </li>
               <li>
-                <a href="#">Tentang Kami</a>
+                <a href="/tentang-kami">Tentang Kami</a>
               </li>
               <li>
-                <a href="#">Kontak</a>
+                <a href="/kontak">Kontak</a>
               </li>
             </ul>
           </Col>
