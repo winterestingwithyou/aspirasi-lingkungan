@@ -3,4 +3,7 @@
     "wrangler.json": "jsonc"
   },
   "typescript.preferences.quoteStyle": "single",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true
 }
