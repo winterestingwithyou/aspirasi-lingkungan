@@ -3,7 +3,7 @@ import { Carousel } from 'react-bootstrap';
 
 const carouselStyle: React.CSSProperties = {
   height: '100%',
-  minHeight: 340,
+  minHeight: 300,
   borderRadius: '12px',
   overflow: 'hidden',
 };
@@ -12,7 +12,7 @@ const imgStyle: React.CSSProperties = {
   objectFit: 'cover',
   width: '100%',
   height: '100%',
-  minHeight: 340,
+  minHeight: 300,
 };
 
 export default function GovDetailLaporan() {
@@ -31,7 +31,7 @@ export default function GovDetailLaporan() {
       </div>
 
       <div className="row align-items-stretch">
-        <div className="col-md-6 d-flex" style={{ minHeight: 340 }}>
+        <div className="col-md-6 d-flex" style={{ minHeight: 300 }}>
           <Carousel style={carouselStyle} className="w-100">
             <Carousel.Item>
               <img

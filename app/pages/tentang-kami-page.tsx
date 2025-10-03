@@ -89,7 +89,7 @@ export default function TentangKamiPage() {
     <section className="page-section">
       <Container>
         {/* Bagian 1: Tentang Aplikasi */}
-        <Row className="align-items-center mb-5">
+        <Row className="align-items-center mb-5 mt-3">
           <Col md={4} className="text-center mb-4 mb-md-0">
             <Image
               src="" // logo aplikasi
