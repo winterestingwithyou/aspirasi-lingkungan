@@ -1,7 +1,8 @@
-import { Col, Container, Nav } from 'react-bootstrap';
-import { NavLink, Outlet } from 'react-router';
+import type { PropsWithChildren } from 'react';
+import { Col, Container } from 'react-bootstrap';
+import { NavLink } from 'react-router';
 
-export default function GovLayout() {
+export default function GovLayout({ children }: PropsWithChildren) {
   return (
     <>
       <div className="page-section">
@@ -40,9 +41,7 @@ export default function GovLayout() {
               </div>
             </Col>
             <Col lg={9}>
-              <div className="dashboard-content">
-                <Outlet />
-              </div>
+              <div className="dashboard-content">{children}</div>
             </Col>
           </div>
         </Container>

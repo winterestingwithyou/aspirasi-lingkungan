@@ -7,20 +7,20 @@ import {
 } from '@react-router/dev/routes';
 
 export default [
-  layout('layouts/app-layout.tsx', [
-    index('pages/landing-page.tsx'),
-    route('laporkan', 'routes/report.tsx'),
+  layout('routes/app.tsx', [
+    index('routes/index.tsx'),
+    route('laporkan', 'routes/laporkan.tsx'),
     route('daftar-masalah', 'routes/daftar-masalah.tsx'),
-    route('tentang-kami', 'pages/tentang-kami-page.tsx'),
-    route('kontak', 'pages/kontak-page.tsx'),
+    route('tentang-kami', 'routes/tentang.tsx'),
+    route('kontak', 'routes/kontak.tsx'),
   ]),
-  layout('pages/gov/gov-layout.tsx', [
+  layout('routes/gov.tsx', [
     ...prefix('gov', [
-      index('pages/gov/gov-dashboard.tsx'),
-      route('laporan', 'pages/gov/gov-laporan.tsx'),
-      route('laporan/:id', 'pages/gov/gov-detail-laporan.tsx'),
-      route('laporan/:id/edit', 'pages/gov/gov-edit-laporan.tsx'),
-      route('profil', 'pages/gov/gov-profil.tsx'),
+      index('routes/gov-dashboard.tsx'),
+      route('laporan', 'routes/gov-laporan.tsx'),
+      route('laporan/:id', 'routes/gov-detail-laporan.tsx'),
+      route('laporan/:id/edit', 'routes/gov-edit-laporan.tsx'),
+      route('profil', 'routes/gov-profil.tsx'),
     ]),
   ]),
 ] satisfies RouteConfig;

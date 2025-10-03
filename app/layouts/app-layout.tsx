@@ -1,16 +1,16 @@
-import { Outlet } from 'react-router';
+import type { PropsWithChildren } from 'react';
 import Footer from '~/components/footer';
 import LoginModalProvider from '~/components/login-modal-provider';
 import NavbarTop from '~/components/navbar-top';
 
-export default function App() {
+function AppLayout({ children }: PropsWithChildren) {
   return (
     <LoginModalProvider>
       <NavbarTop />
-      <main>
-        <Outlet />
-      </main>
+      <main>{children}</main>
       <Footer />
     </LoginModalProvider>
   );
 }
+
+export { AppLayout };
