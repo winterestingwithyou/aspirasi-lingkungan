@@ -1,4 +1,4 @@
-import type { Route } from './+types/report';
+import type { Route } from './+types/laporkan';
 import { ReportPage } from '~/pages/report-page';
 import { getProblemTypes } from '~/services';
 import type { ProblemType } from '~/types';
