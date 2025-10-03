@@ -6,6 +6,7 @@ startTransition(async () => {
   await import('bootstrap-icons/font/bootstrap-icons.css');
   await import('./app.css');
   await import('./bootstrap.css');
+  await import('leaflet/dist/leaflet.css');
 
   hydrateRoot(
     document,

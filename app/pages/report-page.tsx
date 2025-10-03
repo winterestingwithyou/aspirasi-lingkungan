@@ -1,5 +1,4 @@
-// app/pages/report-page.tsx
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -23,7 +22,6 @@ import {
   type CreateReportInput,
 } from '~/validators/reports';
 
-// ⬇️ props baru: problemTypes & ptError dari loader
 export function ReportPage({
   problemTypes,
   ptError,
@@ -46,10 +44,23 @@ export function ReportPage({
   const [mapText, setMapText] = useState<string>(
     'Peta akan ditampilkan di sini setelah lokasi ditentukan',
   );
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  const leafletRef = useRef<typeof import('leaflet') | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [newReportId, setNewReportId] = useState<number | null>(null);
+
+  const toNum = (v: string) => (v.trim() === '' ? NaN : Number(v));
+
+  const updateAddressFrom = async (latNum: number, lonNum: number) => {
+    const addr = await getAddress(latNum, lonNum);
+    setLocation((prev) => (prev.trim() === '' ? addr : addr)); // isi/override lokasi
+    setMapText(`Lokasi dipilih • ${addr}`);
+  };
 
   const onFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0];
@@ -67,13 +78,16 @@ export function ReportPage({
     }
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = pos.coords.latitude.toFixed(6);
-        const lon = pos.coords.longitude.toFixed(6);
-        setLatitude(lat);
-        setLongitude(lon);
-        const locationString = await getAddress(lat, lon);
-        setMapText(`Lokasi berhasil ditentukan • ${locationString}`);
-        if (!location.trim()) setLocation(locationString);
+        const lat = Number(pos.coords.latitude.toFixed(6));
+        const lon = Number(pos.coords.longitude.toFixed(6));
+        setLatitude(lat.toFixed(6));
+        setLongitude(lon.toFixed(6));
+        await updateAddressFrom(lat, lon);
+
+        if (mapRef.current && markerRef.current) {
+          markerRef.current.setLatLng([lat, lon]);
+          mapRef.current.setView([lat, lon], 17);
+        }
       },
       (err) => alert('Gagal mengambil lokasi: ' + err.message),
     );
@@ -148,6 +162,87 @@ export function ReportPage({
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [submitError]);
+
+  useEffect(() => {
+    (async () => {
+      if (mapRef.current || !mapContainerRef.current) return;
+
+      const L = await import('leaflet');
+      leafletRef.current = L;
+
+      const latNum = toNum(latitude);
+      const lonNum = toNum(longitude);
+      const start: [number, number] =
+        Number.isFinite(latNum) && Number.isFinite(lonNum)
+          ? [latNum, lonNum]
+          : [-2.5, 118.0];
+
+      const map = L.map(mapContainerRef.current, {
+        center: start,
+        zoom: Number.isFinite(latNum) ? 16 : 5,
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // marker draggable
+      const marker = L.marker(start, { draggable: true }).addTo(map);
+
+      // klik pada map
+      map.on('click', async (e: L.LeafletMouseEvent) => {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        setLatitude(lat.toFixed(6));
+        setLongitude(lng.toFixed(6));
+        await updateAddressFrom(lat, lng);
+      });
+
+      // drag marker selesai
+      marker.on('dragend', async () => {
+        const { lat, lng } = marker.getLatLng();
+        setLatitude(lat.toFixed(6));
+        setLongitude(lng.toFixed(6));
+        await updateAddressFrom(lat, lng);
+      });
+
+      mapRef.current = map;
+      markerRef.current = marker;
+
+      if (Number.isFinite(latNum) && Number.isFinite(lonNum)) {
+        await updateAddressFrom(latNum, lonNum);
+      } else {
+        setMapText('Klik peta untuk memilih lokasi.');
+      }
+    })();
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Jika user mengubah input latitude/longitude manual, pan & update marker
+  useEffect(() => {
+    const L = leafletRef.current;
+    if (!L || !mapRef.current || !markerRef.current) return;
+
+    const latNum = toNum(latitude);
+    const lonNum = toNum(longitude);
+    if (!Number.isFinite(latNum) || !Number.isFinite(lonNum)) return;
+
+    markerRef.current.setLatLng([latNum, lonNum]);
+    mapRef.current.setView(
+      [latNum, lonNum],
+      Math.max(mapRef.current.getZoom(), 16),
+    );
+    // Jangan reverse-geocode di setiap ketikan; cukup saat blur kalau mau.
+  }, [latitude, longitude]);
 
   const selectDisabled = (problemTypes?.length ?? 0) === 0;
 
@@ -227,9 +322,8 @@ export function ReportPage({
                       {imgUrl && (
                         <img
                           src={imgUrl}
-                          className="image-preview d-block mt-2"
+                          className="image-preview d-block mt-2 w-100 h-auto"
                           alt="Preview"
-                          style={{ maxWidth: '100%', height: 'auto' }}
                         />
                       )}
                     </Form.Group>
@@ -305,8 +399,20 @@ export function ReportPage({
                         </Row>
                       </div>
 
-                      <div className="map-container mt-2">
-                        <p className="text-muted mb-0">{mapText}</p>
+                      <div className="gap-2 mt-3">
+                        <div className="map-container mt-2">
+                          <div
+                            ref={mapContainerRef}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              borderRadius: 8,
+                              overflow: 'hidden',
+                            }}
+                          />
+                        </div>
+
+                        <p className="text-muted mt-2 mb-0">{mapText}</p>
                       </div>
                     </Form.Group>
                   </Col>
