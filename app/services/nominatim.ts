@@ -1,6 +1,6 @@
 import type { NominatimResponse } from '~/types';
 
-async function getAddress(lat: string, lon: string): Promise<string> {
+async function getAddress(lat: number, lon: number): Promise<string> {
   try {
     const url = `/api/nominatim/reverse?lat=${lat}&lon=${lon}`;
     const res = await fetch(url, {
