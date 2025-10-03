@@ -36,8 +36,8 @@ export default function KontakPage() {
     <section className="page-section">
       <Container>
         <div className="text-center mb-5 mt-3">
-          <h2 className="section-title">Feedback Form</h2>
-          <p className="lead">We would love to hear your thoughts</p>
+          <h2 className="section-title">Form Feedback</h2>
+          <p className="lead">Kami siap untuk mendengarkan pendapatmu</p>
         </div>
 
         <Row className="justify-content-center">
@@ -47,12 +47,12 @@ export default function KontakPage() {
                 <Row className="g-3">
                   <Col xs={12}>
                     <Form.Label as="legend" className="fw-semibold">
-                      Type<span className="text-danger">*</span>
+                      Tipe<span className="text-danger">*</span>
                     </Form.Label>
                     <div className="d-flex gap-4 mb-2">
                       <Form.Check
                         type="radio"
-                        label="Bugs"
+                        label="Bug"
                         name="type"
                         id="type-bugs"
                         value="bugs"
@@ -62,7 +62,7 @@ export default function KontakPage() {
                       />
                       <Form.Check
                         type="radio"
-                        label="Questions"
+                        label="Pertanyaan"
                         name="type"
                         id="type-questions"
                         value="questions"
@@ -72,7 +72,7 @@ export default function KontakPage() {
                       />
                       <Form.Check
                         type="radio"
-                        label="Comments"
+                        label="Komentar"
                         name="type"
                         id="type-comments"
                         value="comments"
@@ -106,7 +106,7 @@ export default function KontakPage() {
                   )}
                   <Col xs={12}>
                     <Form.Group>
-                      <Form.Label>Your feedback<span className="text-danger">*</span></Form.Label>
+                      <Form.Label>Pesan<span className="text-danger">*</span></Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={3}
@@ -118,7 +118,7 @@ export default function KontakPage() {
                   </Col>
                   <Col md={6}>
                     <Form.Group>
-                      <Form.Label>Name<span className="text-danger">*</span></Form.Label>
+                      <Form.Label>Nama<span className="text-danger">*</span></Form.Label>
                       <Form.Control
                         placeholder="First"
                         value={first}
@@ -142,7 +142,7 @@ export default function KontakPage() {
                       <Form.Label>Email<span className="text-danger">*</span></Form.Label>
                       <Form.Control
                         type="email"
-                        placeholder="john.doe@example.com"
+                        placeholder="boy.reva@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -151,7 +151,7 @@ export default function KontakPage() {
                   </Col>
                   <Col xs={12} className="text-center mt-4">
                     <Button type="submit" size="lg" variant="dark">
-                      Send Feedback
+                      Kirim Feedback
                     </Button>
                   </Col>
                 </Row>
@@ -162,7 +162,7 @@ export default function KontakPage() {
 
         <Modal show={showSuccess} onHide={() => setShowSuccess(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>Feedback Sent!</Modal.Title>
+            <Modal.Title>Feedback Terkirim!</Modal.Title>
           </Modal.Header>
           <Modal.Body className="text-center">
             <div className="mb-3">

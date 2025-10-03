@@ -1,63 +1,63 @@
 import { useRef, useState } from 'react';
-import { Card, Col, Container, Row, Image } from 'react-bootstrap';
+import { Badge, Card, Col, Container, Image, Row } from 'react-bootstrap';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
 
 // Data Teknologi yang digunakan
 const teknologi = [
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap A',
+    logo: './react.png',
+    name: 'React',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Library JavaScript yang digunakan untuk membangun antarmuka pengguna (UI) melalui pembentukan komponen yang dapat digunakan kembali.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap B',
+    logo: './react-router-v7.png',
+    name: 'React Router V7',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Mengelola navigasi di sisi klien, memfasilitasi pembuatan Single Page Application (SPA) tanpa perlu reload halaman.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap C',
+    logo: './bootstrap.png',
+    name: 'Bootstrap',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Framework CSS yang menyediakan style siap pakai dan sistem grid responsif, yang berfungsi untuk menstandarisasi dan mempercepat proses desain visual aplikasi.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap D',
+    logo: './react-bootstrap.png',
+    name: 'React-Bootstrap',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Integrasi yang menyediakan komponen-komponen Bootstrap sebagai komponen React, yang menyederhanakan proses styling dan mempercepat pengembangan UI.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap E',
+    logo: './prisma.png',
+    name: 'Prisma',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Object-Relational Mapper (ORM) yang digunakan sebagai lapisan abstraksi antara aplikasi dan database. Berperan untuk mempermudah interaksi dengan data melalui kode yang intuitif, tanpa memerlukan penulisan query SQL secara langsung.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap F',
+    logo: './postgresql.png',
+    name: 'PostgreSQL',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Sistem manajemen database relasional yang berfungsi sebagai repositori data utama, yang dikenal karena keandalan dan kekuatan dalam mengelola data terstruktur.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap G',
+    logo: './neondb.png',
+    name: 'NeonDB',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Layanan database serverless berbasis PostgreSQL, digunakan untuk menyediakan infrastruktur database yang dapat diskalakan secara otomatis dan hemat biaya.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap H',
+    logo: './cloudflare.png',
+    name: 'Cloudflare',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Platform untuk mendistribusikan aset web melalui Content Delivery Network (CDN) global, yang secara signifikan mengurangi latensi dan mempercepat waktu muat aplikasi.',
   },
   {
-    logo: 'https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png',
-    name: 'React Bootstrap I',
+    logo: './cloudinary.png',
+    name: 'Cloudinary',
     description:
-      'Mempercepat pengembangan dengan menyediakan komponen antarmuka yang siap pakai, konsisten, dan sepenuhnya responsif di berbagai perangkat.',
+      'Platform manajemen media cloud. Berfungsi untuk mengurangi beban server dan memastikan pengiriman konten media yang cepat dan efisien.',
   },
 ];
 
@@ -67,15 +67,19 @@ const developers = [
     photo:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
     name: 'Rafly Alamsyach',
-    id: '09010282327055',
+    nim: '09010282327055',
+    prodi: 'Manajemen Informatika',
+    univ: 'Universitas Sriwijaya',
     role: 'Front-End Developer',
     description: 'Kata-kata hari ini',
   },
   {
     photo:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
-    name: 'M. Adam Yudhistira',
-    id: '09010182327064',
+    name: 'M. Adam Yudistira',
+    nim: '09010182327064',
+    prodi: 'Manajemen Informatika',
+    univ: 'Universitas Sriwijaya',
     role: 'Back-End Developer',
     description: 'Kata-kata hari ini',
   },
@@ -89,16 +93,16 @@ export default function TentangKamiPage() {
     <section className="page-section">
       <Container>
         {/* Bagian 1: Tentang Aplikasi */}
-        <Row className="align-items-center mb-5 mt-3">
-          <Col md={4} className="text-center mb-4 mb-md-0">
+        <Row className="align-items-center justify-content-center g-5 pt-4 pt-lg-0">
+          <Col md={6} lg={4} className="text-center">
             <Image
-              src="" // logo aplikasi
+              src="./eco-rapid.png" // logo aplikasi
               alt="ECO-RAPID Logo"
-              fluid
-              style={{ maxHeight: '250px' }}
+              className="about-us-logo"
+              style={{ width: '350px', height: 'auto' }}
             />
           </Col>
-          <Col md={8}>
+          <Col md={10} lg={8}>
             <h2 className="section-title">Tentang ECO-RAPID</h2>
             <p className="lead">
               ECO-RAPID adalah platform inovatif yang dirancang untuk
@@ -118,7 +122,7 @@ export default function TentangKamiPage() {
         </Row>
 
         {/* Bagian 2: Carousel Teknologi */}
-        <div className="text-center mb-5 mt-5 pt-4">
+        <div className="text-center mb-5 mt-5">
           <h2 className="section-title">Teknologi di Balik ECO-RAPID</h2>
           <p className="lead">
             Kami menggunakan teknologi modern untuk memberikan performa dan
@@ -141,16 +145,12 @@ export default function TentangKamiPage() {
             disableButtonsControls // Menonaktifkan tombol bawaan
             onSlideChanged={(e) => setActiveIndex(e.item)}
             items={teknologi.map((tech, index) => {
-              // Tentukan apakah item ini adalah item tengah
-              // Menggunakan modulus (%) untuk menangani perputaran (looping)
               const centerIndex = (activeIndex + 1) % teknologi.length;
               const isCenter = index === centerIndex;
-              const itemClass = isCenter
-                ? 'tech-carousel-item center'
-                : 'tech-carousel-item side';
+              const itemClass = isCenter ? 'center' : 'side';
 
               return (
-                <div key={index} className={`${itemClass} text-center p-4`}>
+                <div key={index} className={`tech-carousel-item ${itemClass} text-center p-4`}>
                   <img
                     src={tech.logo}
                     alt={`${tech.name} logo`}
@@ -167,7 +167,6 @@ export default function TentangKamiPage() {
             })}
             responsive={{
               0: { items: 1, itemsFit: 'contain' },
-              576: { items: 2, itemsFit: 'contain' },
               992: { items: 3, itemsFit: 'contain' },
             }}
           />
@@ -180,7 +179,7 @@ export default function TentangKamiPage() {
         </div>
 
         {/* Bagian 3: Tim Pengembang */}
-        <div className="text-center mb-5 mt-5 pt-4">
+        <div className="text-center mb-5 mt-5">
           <h2 className="section-title">Tim Pengembang</h2>
           <p className="lead">
             Orang-orang di balik pengembangan aplikasi ini.
@@ -188,20 +187,24 @@ export default function TentangKamiPage() {
         </div>
         <Row className="justify-content-center g-4">
           {developers.map((dev, index) => (
-            <Col md={6} lg={5} key={index}>
-              <Card className="h-100">
-                <Card.Body>
-                  <Row className="align-items-center">
-                    <Col xs={4} md={3} className="text-center">
-                      <Image src={dev.photo} roundedCircle fluid />
-                    </Col>
-                    <Col xs={8} md={9}>
+            <Col md={8} lg={6} key={index}>
+              <Card className="h-100 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex align-items-center mb-3">
+                    <Image
+                      src={dev.photo}
+                      roundedCircle
+                      style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                      className="me-3"
+                    />
+                    <div>
                       <h5 className="mb-1">{dev.name}</h5>
-                      <p className="text-muted small mb-1">{dev.id}</p>
-                      <p className="fw-semibold mb-2">{dev.role}</p>
-                    </Col>
-                  </Row>
-                  <p className="mt-3 mb-0 small">{dev.description}</p>
+                      <p className="text-muted small mb-1">{dev.nim}</p>
+                      <p className="text-muted small mb-2">{`${dev.prodi}, ${dev.univ}`}</p>
+                      <Badge bg="primary">{dev.role}</Badge>
+                    </div>
+                  </div>
+                  <p className="mt-3 mb-0 fst-italic text-center">"{dev.description}"</p>
                 </Card.Body>
               </Card>
             </Col>
