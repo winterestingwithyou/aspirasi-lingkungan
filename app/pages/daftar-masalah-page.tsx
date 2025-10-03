@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Col, Container, Form, Pagination, Row } from 'react-bootstrap';
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 import type { Report, ReportsResponse } from '~/types';
 
 const badge = (s: string) =>
@@ -26,6 +26,8 @@ function formatTanggal(iso: string) {
 
 function DaftarMasalahPage({ message }: { message: ReportsResponse }) {
   const { data, nextCursor, limit } = message;
+
+  const navigate = useNavigate();
 
   // Map data API → tampilan kartu (fallback jika field null)
   const items = useMemo(
@@ -131,13 +133,16 @@ function DaftarMasalahPage({ message }: { message: ReportsResponse }) {
           <Pagination className="justify-content-center">
             <Pagination.Prev disabled>Sebelumnya</Pagination.Prev>
             <Pagination.Item active>1</Pagination.Item>
-            {nextCursor ? (
-              <Link to={`?limit=${limit}&cursor=${nextCursor}`}>
-                <Pagination.Next>Selanjutnya</Pagination.Next>
-              </Link>
-            ) : (
-              <Pagination.Next disabled>Selanjutnya</Pagination.Next>
-            )}
+
+            <Pagination.Next
+              disabled={!nextCursor}
+              onClick={() => {
+                if (nextCursor)
+                  navigate(`?limit=${limit}&cursor=${nextCursor}`);
+              }}
+            >
+              Selanjutnya
+            </Pagination.Next>
           </Pagination>
         </nav>
       </Container>
