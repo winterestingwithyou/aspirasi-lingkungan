@@ -3,6 +3,7 @@ import type { ReportsResponse } from '~/types';
 import { getReports } from '~/services';
 import { DaftarMasalahPage } from '~/pages/daftar-masalah-page';
 
+// eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
   return [
     { title: 'Daftar Masalah - Web Aspirasi Lingkungan' },

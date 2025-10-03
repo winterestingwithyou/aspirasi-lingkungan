@@ -1,8 +1,9 @@
 import type { Route } from './+types/report';
-import type { LoaderFunctionArgs } from 'react-router';
 import { ReportPage } from '~/pages/report-page';
+import { getProblemTypes } from '~/services';
+import type { ProblemType } from '~/types';
 
-// Meta ala daftar-masalah
+// eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
   return [
     { title: 'Form Pelaporan Masalah - Web Aspirasi Lingkungan' },
@@ -13,12 +14,29 @@ function meta({}: Route.MetaArgs) {
   ];
 }
 
-async function loader({}: LoaderFunctionArgs) {
-  return { initialMessage: 'Isi form untuk melaporkan masalah' };
+async function loader({ request }: Route.LoaderArgs) {
+  let problemTypes: ProblemType[] = [];
+  let ptError: string | null = null;
+
+  try {
+    problemTypes = await getProblemTypes(request);
+  } catch (err) {
+    ptError = err instanceof Error ? err.message : 'Gagal memuat jenis masalah';
+  }
+
+  return {
+    problemTypes,
+    ptError,
+  };
 }
 
 function Report({ loaderData }: Route.ComponentProps) {
-  return <ReportPage initialMessage={loaderData.initialMessage} />;
+  return (
+    <ReportPage
+      problemTypes={loaderData.problemTypes}
+      ptError={loaderData.ptError}
+    />
+  );
 }
 
 export default Report;

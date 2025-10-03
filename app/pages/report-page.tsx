@@ -1,3 +1,4 @@
+// app/pages/report-page.tsx
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -11,20 +12,32 @@ import {
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import { getAddress, uploadToCloudinary } from '~/services';
-import type { ApiError, CreateReportResponse, Report } from '~/types';
+import type {
+  ApiError,
+  CreateReportResponse,
+  ProblemType,
+  Report,
+} from '~/types';
 import {
   createReportSchema,
   type CreateReportInput,
 } from '~/validators/reports';
 
-export function ReportPage({ initialMessage }: { initialMessage: string }) {
+// ⬇️ props baru: problemTypes & ptError dari loader
+export function ReportPage({
+  problemTypes,
+  ptError,
+}: {
+  problemTypes: ProblemType[];
+  ptError?: string | null;
+}) {
   const navigate = useNavigate();
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const [reporterName, setReporterName] = useState('');
   const [reporterContact, setReporterContact] = useState('');
-  const [problemTypeId, setProblemTypeId] = useState<string>('');
+  const [problemTypeId, setProblemTypeId] = useState<string>(''); // keep string for <option> value
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [latitude, setLatitude] = useState<string>('');
@@ -38,11 +51,10 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [newReportId, setNewReportId] = useState<number | null>(null);
 
-  // --- Handlers & helpers ---
   const onFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    setPhotoFile(f); // <— penting
+    setPhotoFile(f);
     const reader = new FileReader();
     reader.onload = (ev) => setImgUrl(String(ev.target?.result || ''));
     reader.readAsDataURL(f);
@@ -77,7 +89,7 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
       reporterContact,
       problemTypeId,
       description,
-      photoUrl: null as string | null, // upload belakangan
+      photoUrl: null as string | null,
       location,
       latitude,
       longitude,
@@ -137,19 +149,22 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
     }
   }, [submitError]);
 
-  // --- Render ---
+  const selectDisabled = (problemTypes?.length ?? 0) === 0;
+
   return (
     <section className="page-section">
       <Container>
         <div className="text-center mb-5 mt-3">
           <h2 className="section-title">Form Pelaporan Masalah</h2>
-          <p className="lead">{initialMessage}</p>
+          <p className="lead">Isi form untuk melaporkan masalah</p>
         </div>
 
         <Row className="justify-content-center">
           <Col lg={8}>
             <div className="form-container mt-0">
               {submitError && <Alert variant="danger">{submitError}</Alert>}
+              {ptError && <Alert variant="warning">{ptError}</Alert>}
+
               <Form noValidate onSubmit={onSubmit}>
                 <Row className="g-3">
                   <Col md={6}>
@@ -183,17 +198,19 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
                         value={problemTypeId}
                         onChange={(e) => setProblemTypeId(e.target.value)}
                         required
+                        disabled={selectDisabled}
                       >
                         <option value="" disabled>
-                          Pilih jenis masalah
+                          {selectDisabled
+                            ? 'Memuat jenis masalah…'
+                            : 'Pilih jenis masalah'}
                         </option>
-                        {/* ID numeric sesuai schema.prisma */}
-                        <option value="1">Tumpukan Sampah</option>
-                        <option value="2">Jalan Berlubang</option>
-                        <option value="3">Penebangan Pohon Liar</option>
-                        <option value="4">Pembuangan Limbah</option>
-                        <option value="5">Genangan Air/Banjir</option>
-                        <option value="6">Lainnya</option>
+
+                        {problemTypes?.map((pt) => (
+                          <option key={pt.id} value={String(pt.id)}>
+                            {pt.name}
+                          </option>
+                        ))}
                       </Form.Select>
                     </Form.Group>
                   </Col>
@@ -201,7 +218,6 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
                   <Col xs={12}>
                     <Form.Group controlId="photoFile">
                       <Form.Label>Foto Masalah</Form.Label>
-                      {/* Input file ini hanya untuk preview; upload sesungguhnya ke storage */}
                       <Form.Control
                         type="file"
                         accept="image/*"
@@ -254,7 +270,6 @@ export function ReportPage({ initialMessage }: { initialMessage: string }) {
                         </Button>
                       </div>
 
-                      {/* Simpan lat/lon di state + kirim dalam body JSON */}
                       <div className="mt-2">
                         <Row className="g-2">
                           <Col sm={6}>
