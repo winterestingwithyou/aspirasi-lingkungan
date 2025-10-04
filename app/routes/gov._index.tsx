@@ -1,6 +1,6 @@
 import GovDashboard from '~/pages/gov/gov-dashboard';
 import type { Route } from './+types/gov-index';
-import { getReportStats, getReports } from '~/services/index'; // Pastikan path import benar
+import { getReportStats, getReports } from '~/services';
 import type { ReportsResponse } from '~/types';
 
 // eslint-disable-next-line no-empty-pattern
