@@ -1,7 +1,6 @@
 import type { Route } from './+types/laporkan';
 import { ReportPage } from '~/pages/report-page';
-import { getProblemTypes } from '~/services';
-import type { ProblemType } from '~/types';
+import { listProblemTypes } from '~/server/model/problem-types';
 
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
@@ -14,20 +13,16 @@ function meta({}: Route.MetaArgs) {
   ];
 }
 
-async function loader({ request }: Route.LoaderArgs) {
-  let problemTypes: ProblemType[] = [];
-  let ptError: string | null = null;
-
+async function loader({ context }: Route.LoaderArgs) {
   try {
-    problemTypes = await getProblemTypes(request);
-  } catch (err) {
-    ptError = err instanceof Error ? err.message : 'Gagal memuat jenis masalah';
+    const problemTypes = await listProblemTypes(
+      context.cloudflare.env.DATABASE_URL,
+    );
+    return { problemTypes, ptError: null };
+  } catch (e) {
+    console.error('Error loading problem types:', e);
+    return { problemTypes: [], ptError: 'Gagal memuat jenis masalah' };
   }
-
-  return {
-    problemTypes,
-    ptError,
-  };
 }
 
 function Report({ loaderData }: Route.ComponentProps) {
