@@ -1,4 +1,25 @@
-export default function GovDashboard() {
+import type { ReportsResponse } from '~/types';
+
+const badge = (s: string) =>
+  s === 'PENDING'
+    ? 'status-pending'
+    : s === 'IN_PROGRESS'
+      ? 'status-progress'
+      : s === 'COMPLETED'
+        ? 'status-completed'
+        : 'status-fake';
+
+const statusText = (s: string) =>
+  s === 'PENDING'
+    ? 'Menunggu Tindakan'
+    : s === 'IN_PROGRESS'
+      ? 'Sedang Diproses'
+      : s === 'COMPLETED'
+        ? 'Selesai'
+        : 'Laporan Palsu';
+
+export default function GovDashboard({ recentReports }: { recentReports: ReportsResponse }) {
+  const reports = recentReports.data;
   return (
     <>
       <div className="welcome-card mb-4">
@@ -49,40 +70,28 @@ export default function GovDashboard() {
       </div>
 
       <h4 className="mt-4 mb-3">Laporan Terbaru</h4>
-      {[
-        {
-          title: 'Tumpukan Sampah di Jalan Lunjuk',
-          loc: 'Jalan Lunjuk, Bukit Lama',
-          status: 'Sedang Diproses',
-          date: '20 Mei 2025',
-        },
-        {
-          title: 'Jalan Berlubang',
-          loc: 'Perumahan Gardena',
-          status: 'Menunggu Tindakan',
-          date: '18 Mei 2025',
-        },
-      ].map((r, i) => (
-        <div className="report-card" key={i}>
+      {reports.map((report) => (
+        <div className="report-card" key={report.id}>
           <div className="d-flex justify-content-between align-items-start">
             <div>
-              <h5>{r.title}</h5>
+              <h5>{report.problemType?.name || 'Laporan'} #{report.id}</h5>
               <p className="text-muted mb-2">
-                <i className="bi bi-geo-alt-fill me-1" /> {r.loc}
+                <i className="bi bi-geo-alt-fill me-1" />{' '}
+                {report.location || 'Lokasi tidak ada'}
               </p>
-              <p className="mb-2">Deskripsi singkat laporan...</p>
-              <span
-                className={`report-status ${r.status.includes('Proses') ? 'status-progress' : r.status.includes('Menunggu') ? 'status-pending' : 'status-completed'}`}
-              >
-                {r.status}
+              <p className="mb-2">{report.description.slice(0, 100)}...</p>
+              <span className={`report-status ${badge(report.status)}`}>
+                {statusText(report.status)}
               </span>
             </div>
             <div className="text-end">
-              <small className="text-muted">{r.date}</small>
+              <small className="text-muted">
+                {new Date(report.createdAt).toLocaleDateString('id-ID')}
+              </small>
               <div className="mt-2">
                 <a
                   className="btn btn-sm btn-outline-primary"
-                  href="/gov/laporan/1"
+                  href={`/gov/laporan/${report.id}`}
                 >
                   Detail
                 </a>
@@ -91,6 +100,12 @@ export default function GovDashboard() {
           </div>
         </div>
       ))}
+
+      {reports.length === 0 && (
+        <div className="report-card text-center text-muted">
+          Tidak ada laporan terbaru.
+        </div>
+      )}
     </>
   );
 }
