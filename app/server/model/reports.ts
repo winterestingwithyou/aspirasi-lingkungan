@@ -5,7 +5,7 @@ import type { Report, ReportsResponse } from '~/types';
 async function listReports(
   dbUrl: string,
   { limit, cursor }: { limit: number; cursor?: string | null },
-) {
+): Promise<ReportsResponse> {
   const prisma = await getPrisma(dbUrl);
 
   const take = Math.min(50, Math.max(1, Number.isFinite(limit) ? limit : 6));
