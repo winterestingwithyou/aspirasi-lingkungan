@@ -9,7 +9,6 @@ import {
   countTodayCompletedReports,
   countTodayReports,
 } from '~/server/model/reports';
-import { ReportStatus } from '@prisma/client';
 
 export const reportsRouter = new Hono<{ Bindings: Env }>();
 

@@ -10,7 +10,7 @@ import {
   Spinner,
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import { getAddress, uploadToCloudinary } from '~/services';
+import { uploadToCloudinary, getAddress } from '~/services';
 import type {
   ApiError,
   CreateReportResponse,

@@ -58,6 +58,14 @@ type ReportDetail = Prisma.ReportGetPayload<{
   };
 }>;
 
+interface ReportStats {
+  all?: number;
+  today?: number;
+  pending?: number;
+  inProgress?: number;
+  completed?: number;
+}
+
 export type {
   Report,
   ReportsResponse,
@@ -66,4 +74,5 @@ export type {
   ProblemType,
   ReportProgress,
   ReportDetail,
+  ReportStats,
 };

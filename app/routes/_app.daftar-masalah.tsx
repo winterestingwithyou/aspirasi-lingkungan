@@ -1,7 +1,7 @@
 import type { Route } from './+types/_app.daftar-masalah';
 import type { ReportsResponse } from '~/types';
-import { getReports } from '~/services';
 import { DaftarMasalahPage } from '~/pages/daftar-masalah-page';
+import { listReports } from '~/server/model/reports';
 
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
@@ -15,21 +15,25 @@ function meta({}: Route.MetaArgs) {
   ];
 }
 
-// Loader mengambil data dari Hono API: /api/reports
-async function loader({ request }: Route.LoaderArgs) {
+async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const limit = url.searchParams.get('limit') ?? '6';
-  const cursor = url.searchParams.get('cursor') ?? '';
+  const limitStr = url.searchParams.get('limit') ?? '3';
+  const cursor = url.searchParams.get('cursor');
 
   try {
-    const data = await getReports({ limit, cursor }, request);
-    return data;
+    const limit = Number(limitStr);
+    const payload = await listReports(context.cloudflare.env.DATABASE_URL, {
+      limit,
+      cursor,
+    });
+
+    return payload satisfies ReportsResponse;
   } catch (err) {
     console.error('Failed to load reports:', err);
     return {
       data: [],
       nextCursor: null,
-      limit: Number(limit),
+      limit: Number(limitStr) || 12,
     } satisfies ReportsResponse;
   }
 }

@@ -206,32 +206,23 @@ async function countTodayCompletedReports(dbUrl: string): Promise<number> {
 }
 
 /**
- * Hitung jumlah laporan per status (exclude soft-deleted).
- * Mengembalikan Map<ReportStatus, number>
+ * Hitung jumlah laporan untuk status tertentu (exclude soft-deleted).
+ * @param dbUrl - URL database
+ * @param status - Status laporan yang ingin dihitung
+ * @returns Jumlah laporan dengan status tersebut
  */
 async function countReportsByStatus(
   dbUrl: string,
-): Promise<Map<ReportStatus, number>> {
+  status: ReportStatus,
+): Promise<number> {
   const prisma = await getPrisma(dbUrl);
 
-  const rows = await prisma.report.groupBy({
-    by: ['status'],
-    where: { deletedAt: null },
-    _count: { _all: true },
+  return prisma.report.count({
+    where: {
+      deletedAt: null,
+      status: status,
+    },
   });
-
-  const map = new Map<ReportStatus, number>();
-  for (const row of rows) {
-    map.set(row.status as ReportStatus, row._count._all);
-  }
-  // Pastikan semua status ada kunci-nya (0 jika tidak ada data)
-  (
-    ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAKE_REPORT'] as ReportStatus[]
-  ).forEach((st) => {
-    if (!map.has(st)) map.set(st, 0);
-  });
-
-  return map;
 }
 
 export {
