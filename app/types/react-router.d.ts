@@ -6,7 +6,6 @@ interface CloudflareContext {
     [key: string]: string;
   };
   ctx: ExecutionContext;
-  cf: IncomingRequestCfProperties | undefined;
 }
 
 declare module 'react-router' {
