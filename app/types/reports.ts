@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import type { ApiError } from './api';
 
 type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAKE_REPORT';
@@ -44,6 +45,19 @@ type CreateReportResponse =
   | { message: string; data: Report } // sukses
   | ApiError; // gagal
 
+type ReportDetail = Prisma.ReportGetPayload<{
+  include: {
+    problemType: true;
+    progressUpdates: {
+      include: {
+        user: {
+          select: { id: true; username: true; email: true };
+        };
+      };
+    };
+  };
+}>;
+
 export type {
   Report,
   ReportsResponse,
@@ -51,4 +65,5 @@ export type {
   ReportStatus,
   ProblemType,
   ReportProgress,
+  ReportDetail,
 };

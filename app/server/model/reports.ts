@@ -1,6 +1,6 @@
 import { Prisma, ReportStatus } from '@prisma/client';
 import { getPrisma } from '~/db/prisma';
-import type { Report, ReportsResponse } from '~/types';
+import type { Report, ReportDetail, ReportsResponse } from '~/types';
 
 async function listReports(
   dbUrl: string,
@@ -90,6 +90,37 @@ async function listReports(
 }
 
 /**
+ * Mengambil detail satu laporan berdasarkan id.
+ * - Mengabaikan yang sudah soft-deleted (deletedAt != null).
+ * - Memuat relasi problemType dan progress (beserta user).
+ * - Urutkan progress berdasarkan waktu naik (chronological).
+ */
+async function getReportDetailById(
+  dbUrl: string,
+  id: number,
+): Promise<ReportDetail | null> {
+  const prisma = await getPrisma(dbUrl);
+
+  return prisma.report.findFirst({
+    where: {
+      id,
+      deletedAt: null,
+    },
+    include: {
+      problemType: true,
+      progressUpdates: {
+        include: {
+          user: {
+            select: { id: true, username: true, email: true },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+}
+
+/**
  * Hitung jumlah seluruh laporan (exclude soft-deleted).
  */
 async function countAllReports(dbUrl: string): Promise<number> {
@@ -169,6 +200,7 @@ async function countReportsByStatus(
 
 export {
   listReports,
+  getReportDetailById,
   countAllReports,
   countTodayReports,
   countReportsByStatus,
