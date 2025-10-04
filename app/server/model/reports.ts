@@ -170,6 +170,42 @@ async function countTodayReports(dbUrl: string): Promise<number> {
 }
 
 /**
+ * Hitung jumlah laporan yang SELESAI "hari ini" (Asia/Jakarta), berdasarkan resolvedAt.
+ * Menggunakan konversi batas hari Asia/Jakarta → UTC agar query efisien.
+ */
+async function countTodayCompletedReports(dbUrl: string): Promise<number> {
+  const prisma = await getPrisma(dbUrl);
+
+  // Jakarta tidak pakai DST → offset konstan +7 jam
+  const JKT_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+  const nowUtc = new Date();
+  const nowJkt = new Date(nowUtc.getTime() + JKT_OFFSET_MS);
+  const startOfDayJkt = new Date(
+    nowJkt.getFullYear(),
+    nowJkt.getMonth(),
+    nowJkt.getDate(),
+    0,
+    0,
+    0,
+    0,
+  );
+  const endOfDayJkt = new Date(startOfDayJkt.getTime() + 24 * 60 * 60 * 1000);
+
+  // Kembalikan ke UTC untuk dipakai di DB
+  const startUtc = new Date(startOfDayJkt.getTime() - JKT_OFFSET_MS);
+  const endUtc = new Date(endOfDayJkt.getTime() - JKT_OFFSET_MS);
+
+  return prisma.report.count({
+    where: {
+      deletedAt: null,
+      status: 'COMPLETED',
+      resolvedAt: { gte: startUtc, lt: endUtc },
+    },
+  });
+}
+
+/**
  * Hitung jumlah laporan per status (exclude soft-deleted).
  * Mengembalikan Map<ReportStatus, number>
  */
@@ -203,5 +239,6 @@ export {
   getReportDetailById,
   countAllReports,
   countTodayReports,
+  countTodayCompletedReports,
   countReportsByStatus,
 };

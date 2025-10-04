@@ -1,8 +1,13 @@
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
+import type { ReportStats } from '~/types';
 
-export default function LandingPage() {
+export default function LandingPage({ stats }: { stats: ReportStats | null }) {
   const navigate = useNavigate();
+  const totalLaporan =
+    (stats?.pending ?? 0) +
+    (stats?.inProgress ?? 0) +
+    (stats?.completed ?? 0);
 
   return (
     <>
@@ -76,10 +81,10 @@ export default function LandingPage() {
           </div>
           <Row className="g-4">
             {[
-              { n: 34, label: 'Total Laporan' },
-              { n: 10, label: 'Menunggu Tindakan' },
-              { n: 16, label: 'Dalam Proses' },
-              { n: 8, label: 'Terselesaikan' },
+              { n: totalLaporan, label: 'Total Laporan' },
+              { n: stats?.pending ?? 0, label: 'Menunggu Tindakan' },
+              { n: stats?.inProgress ?? 0, label: 'Dalam Proses' },
+              { n: stats?.completed ?? 0, label: 'Terselesaikan' },
             ].map((x, i) => (
               <Col md={3} xs={6} key={i}>
                 <Card className="stats-card">

@@ -3,49 +3,60 @@ import { getPrisma } from 'workers/db';
 import { createReportSchema } from 'workers/schemas/reports';
 import { zValidator } from '@hono/zod-validator';
 import type { Env } from '../types';
+import {
+  listReports,
+  countReportsByStatus,
+  countTodayCompletedReports,
+  countTodayReports,
+} from '~/server/model/reports';
+import { ReportStatus } from '@prisma/client';
 
 export const reportsRouter = new Hono<{ Bindings: Env }>();
 
 // GET /api/reports
 // Query: ?limit=20&cursor=123
 reportsRouter.get('/', async (c) => {
-  const prisma = await getPrisma(c.env.DATABASE_URL);
+  const dbUrl = c.env.DATABASE_URL;
 
   // ambil query param dengan default & batasan
   const limitRaw = c.req.query('limit') ?? '20';
   const cursorRaw = c.req.query('cursor'); // id terakhir yang sudah diterima
   const limit = Math.min(Math.max(parseInt(limitRaw, 10) || 20, 1), 100);
-  const cursor = cursorRaw ? Number(cursorRaw) : undefined;
 
-  // kalau kamu pakai soft-delete, biasanya kita sembunyikan yang deleted
-  const where = { deletedAt: null as Date | null };
-
-  // orderBy id desc supaya konsisten dengan cursor id
-  const items = await prisma.report.findMany({
-    take: limit + 1, // ambil 1 ekstra untuk tahu nextCursor
-    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-    where,
-    orderBy: { id: 'desc' },
-    include: {
-      problemType: true,
-      progressUpdates: {
-        orderBy: { createdAt: 'desc' },
-        take: 3, // batasi biar response ringan
-      },
-    },
-  });
-
-  let nextCursor: number | null = null;
-  if (items.length > limit) {
-    const next = items.pop()!;
-    nextCursor = next.id;
+  try {
+    const result = await listReports(dbUrl, { limit, cursor: cursorRaw });
+    return c.json(result);
+  } catch (error) {
+    console.error('Failed to list reports:', error);
+    return c.json({ error: 'Gagal mengambil daftar laporan' }, 500);
   }
+});
 
-  return c.json({
-    data: items,
-    nextCursor,
-    limit,
-  });
+// GET /api/reports/stats
+reportsRouter.get('/stats', async (c) => {
+  const dbUrl = c.env.DATABASE_URL;
+
+  try {
+    const [today, todayCompleted, byStatus] = await Promise.all([
+      countTodayReports(dbUrl),
+      countTodayCompletedReports(dbUrl),
+      countReportsByStatus(dbUrl),
+    ]);
+
+    const stats = {
+      today,
+      todayCompleted,
+      pending: byStatus.get('PENDING') ?? 0,
+      inProgress: byStatus.get('IN_PROGRESS') ?? 0,
+      completed: byStatus.get('COMPLETED') ?? 0,
+      fake: byStatus.get('FAKE_REPORT') ?? 0,
+    };
+
+    return c.json({ data: stats });
+  } catch (error) {
+    console.error('Failed to fetch report stats:', error);
+    return c.json({ error: 'Gagal mengambil statistik laporan' }, 500);
+  }
 });
 
 // POST /api/reports

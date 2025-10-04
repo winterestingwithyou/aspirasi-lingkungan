@@ -1,4 +1,4 @@
-import type { ReportsResponse } from '~/types';
+import type { GovDashboardLoaderData } from '~/types';
 
 const badge = (s: string) =>
   s === 'PENDING'
@@ -18,8 +18,13 @@ const statusText = (s: string) =>
         ? 'Selesai'
         : 'Laporan Palsu';
 
-export default function GovDashboard({ recentReports }: { recentReports: ReportsResponse }) {
-  const reports = recentReports.data;
+export default function GovDashboard({
+  loaderData,
+}: {
+  loaderData: GovDashboardLoaderData;
+}) {
+  const reports = loaderData.recentReports.data;
+  const stats = loaderData.stats;
   return (
     <>
       <div className="welcome-card mb-4">
@@ -32,13 +37,13 @@ export default function GovDashboard({ recentReports }: { recentReports: Reports
         <div className="row g-4">
           <div className="col-md-6">
             <div className="stats-card text-center">
-              <div className="stats-number">4</div>
+              <div className="stats-number">{stats?.today ?? 0}</div>
               <p>Laporan Masuk Hari Ini</p>
             </div>
           </div>
           <div className="col-md-6">
             <div className="stats-card text-center">
-              <div className="stats-number">2</div>
+              <div className="stats-number">{stats?.todayCompleted ?? 0}</div>
               <p>Laporan Selesai Hari Ini</p>
             </div>
           </div>
@@ -50,19 +55,19 @@ export default function GovDashboard({ recentReports }: { recentReports: Reports
         <div className="row g-4">
           <div className="col-md-4">
             <div className="stats-card text-center">
-              <div className="stats-number">8</div>
+              <div className="stats-number">{stats?.completed ?? 0}</div>
               <p>Terselesaikan</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="stats-card text-center">
-              <div className="stats-number">16</div>
+              <div className="stats-number">{stats?.inProgress ?? 0}</div>
               <p>Dalam Proses</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="stats-card text-center">
-              <div className="stats-number">10</div>
+              <div className="stats-number">{stats?.pending ?? 0}</div>
               <p>Belum Ditindak</p>
             </div>
           </div>

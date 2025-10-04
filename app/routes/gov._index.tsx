@@ -1,6 +1,6 @@
 import GovDashboard from '~/pages/gov/gov-dashboard';
-import type { Route } from './+types/gov._index';
-import { getReports } from '~/services';
+import type { Route } from './+types/gov-index';
+import { getReportStats, getReports } from '~/services/index'; // Pastikan path import benar
 import type { ReportsResponse } from '~/types';
 
 // eslint-disable-next-line no-empty-pattern
@@ -15,23 +15,34 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-// Loader untuk mengambil 3 laporan terbaru
+// Loader untuk mengambil statistik dan 3 laporan terbaru
 export async function loader({ request }: Route.LoaderArgs) {
   try {
-    // Ambil 3 laporan terbaru, tanpa cursor
-    const data = await getReports({ limit: '3', cursor: '' }, request);
-    return data;
+    // Ambil data secara paralel menggunakan request yang sama
+    const [recentReportsResponse, statsResponse] = await Promise.all([
+      getReports({ limit: '3', cursor: '' }, request),
+      getReportStats(request),
+    ]);
+
+    // Ekstrak data dari masing-masing response
+    const recentReports = recentReportsResponse;
+    const stats = statsResponse.data;
+
+    return { recentReports, stats };
   } catch (err) {
     console.error('Failed to load recent reports for dashboard:', err);
     // Jika gagal, kembalikan data kosong agar halaman tidak error
     return {
-      data: [],
-      nextCursor: null,
-      limit: 3,
-    } satisfies ReportsResponse;
+      recentReports: {
+        data: [],
+        nextCursor: null,
+        limit: 3,
+      } satisfies ReportsResponse,
+      stats: null,
+    };
   }
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  return <GovDashboard recentReports={loaderData} />;
+  return <GovDashboard loaderData={loaderData} />;
 }
