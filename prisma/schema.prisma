@@ -6,12 +6,14 @@
 
 generator client {
   provider = "prisma-client-js"
+  decimalNumberStrategy = "number"
   engineType = "wasm"
   output   = "../app/generated/prisma"
 }
 
 generator clientEdge {
   provider = "prisma-client-js"
+  decimalNumberStrategy = "number"
   engineType = "edge"
 }
 

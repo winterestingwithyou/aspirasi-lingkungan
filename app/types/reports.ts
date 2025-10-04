@@ -1,15 +1,12 @@
 import type { ApiError } from './api';
 
-// Status enum dari backend
-type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAKE_REPORT';
 
-// Relasi problem type sederhana
 interface ProblemType {
   id: number;
   name: string;
 }
 
-// Relasi progress update
 interface ReportProgress {
   id: number;
   status: ReportStatus;
@@ -18,15 +15,14 @@ interface ReportProgress {
   reportId: number;
 }
 
-// Bentuk report seperti di-return backend /api/reports
 interface Report {
   id: number;
   reporterName: string;
   reporterContact?: string | null;
   description: string;
-  photoUrl: string;
-  latitude: string; // Prisma Decimal -> dikirim sebagai string
-  longitude: string; // Prisma Decimal -> dikirim sebagai string
+  photoUrl: string | null;
+  latitude: number;
+  longitude: number;
   location?: string | null;
   status: ReportStatus;
   upvoteCount: number;
@@ -34,12 +30,10 @@ interface Report {
   createdAt: string; // ISO string
   resolvedAt?: string | null;
   deletedAt?: string | null;
-
   problemType: ProblemType;
-  progressUpdates: ReportProgress[];
+  progressUpdates?: ReportProgress[];
 }
 
-// Bentuk response dari endpoint /api/reports
 interface ReportsResponse {
   data: Report[];
   nextCursor: number | null;
