@@ -1,6 +1,28 @@
 import { Form, Pagination } from 'react-bootstrap';
+import { useNavigate } from 'react-router';
+import type { ReportsResponse } from '~/types';
 
-export default function GovLaporan() {
+const badge = (s: string) =>
+  s === 'PENDING'
+    ? 'status-pending'
+    : s === 'IN_PROGRESS'
+      ? 'status-progress'
+      : s === 'COMPLETED'
+        ? 'status-completed'
+        : 'status-fake';
+
+const statusText = (s: string) =>
+  s === 'PENDING'
+    ? 'Menunggu Tindakan'
+    : s === 'IN_PROGRESS'
+      ? 'Sedang Diproses'
+      : s === 'COMPLETED'
+        ? 'Selesai'
+        : 'Laporan Palsu';
+
+export default function GovLaporanPage({ reportsResponse }: { reportsResponse: ReportsResponse }) {
+  const { data: reports, nextCursor, limit } = reportsResponse;
+  const navigate = useNavigate();
   return (
     <>
       <h2 className="mb-4">Daftar Laporan Masalah</h2>
@@ -35,37 +57,31 @@ export default function GovLaporan() {
               <option value="pending">Menunggu Tindakan</option>
               <option value="progress">Sedang Diproses</option>
               <option value="completed">Selesai</option>
-              <option value="completed">Laporan Palsu</option>
+              <option value="fake_report">Laporan Palsu</option>
             </Form.Select>
           </div>
         </div>
       </div>
 
-      {[1, 2, 3, 4].map((id) => (
-        <div className="report-card" key={id}>
+      {reports.map((report) => (
+        <div className="report-card" key={report.id}>
           <div className="d-flex justify-content-between align-items-start">
             <div>
-              <h5>Laporan #{id}</h5>
+              <h5>{report.problemType?.name || 'Laporan'} #{report.id}</h5>
               <p className="text-muted mb-2">
-                <i className="bi bi-geo-alt-fill me-1" /> Lokasi Contoh
+                <i className="bi bi-geo-alt-fill me-1" /> {report.location || 'Lokasi tidak ada'}
               </p>
-              <p className="mb-2">Ringkasan laporan...</p>
-              <span
-                className={`report-status ${id % 3 === 0 ? 'status-completed' : id % 2 === 0 ? 'status-pending' : 'status-progress'}`}
-              >
-                {id % 3 === 0
-                  ? 'Selesai'
-                  : id % 2 === 0
-                    ? 'Menunggu Tindakan'
-                    : 'Sedang Diproses'}
+              <p className="mb-2">{report.description.slice(0, 100)}...</p>
+              <span className={`report-status ${badge(report.status)}`}>
+                {statusText(report.status)}
               </span>
             </div>
             <div className="text-end">
-              <small className="text-muted">20 Mei 2025</small>
+              <small className="text-muted">{new Date(report.createdAt).toLocaleDateString('id-ID')}</small>
               <div className="mt-2">
                 <a
                   className="btn btn-sm btn-outline-primary"
-                  href={`/gov/laporan/${id}`}
+                  href={`/gov/laporan/${report.id}`}
                 >
                   Detail
                 </a>
@@ -74,14 +90,20 @@ export default function GovLaporan() {
           </div>
         </div>
       ))}
+      {reports.length === 0 && <div className="text-center text-muted py-5">Tidak ada laporan.</div>}
 
       <nav aria-label="Page navigation" className="mt-4">
         <Pagination className="justify-content-center">
           <Pagination.Prev disabled>Sebelumnya</Pagination.Prev>
           <Pagination.Item active>1</Pagination.Item>
-          <Pagination.Item>2</Pagination.Item>
-          <Pagination.Item>3</Pagination.Item>
-          <Pagination.Next>Selanjutnya</Pagination.Next>
+          <Pagination.Next
+            disabled={!nextCursor}
+            onClick={() => {
+              if (nextCursor) navigate(`?limit=${limit}&cursor=${nextCursor}`);
+            }}
+          >
+            Selanjutnya
+          </Pagination.Next>
         </Pagination>
       </nav>
     </>
