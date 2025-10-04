@@ -1,4 +1,4 @@
-import type { ReportsResponse, Stats } from '~/types';
+import type { ReportsResponse } from '~/types';
 
 const badge = (s: string) =>
   s === 'PENDING'
@@ -32,13 +32,13 @@ export default function GovDashboard({ recentReports }: { recentReports: Reports
         <div className="row g-4">
           <div className="col-md-6">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats.today.incoming}</div>
+              <div className="stats-number">4</div>
               <p>Laporan Masuk Hari Ini</p>
             </div>
           </div>
           <div className="col-md-6">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats.today.completed}</div>
+              <div className="stats-number">2</div>
               <p>Laporan Selesai Hari Ini</p>
             </div>
           </div>
@@ -50,19 +50,19 @@ export default function GovDashboard({ recentReports }: { recentReports: Reports
         <div className="row g-4">
           <div className="col-md-4">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats.overall.completed}</div>
+              <div className="stats-number">8</div>
               <p>Terselesaikan</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats.overall.inProgress}</div>
+              <div className="stats-number">16</div>
               <p>Dalam Proses</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats.overall.pending}</div>
+              <div className="stats-number">10</div>
               <p>Belum Ditindak</p>
             </div>
           </div>
