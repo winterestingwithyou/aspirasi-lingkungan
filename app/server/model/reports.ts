@@ -1,8 +1,8 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, ReportStatus } from '@prisma/client';
 import { getPrisma } from '~/db/prisma';
 import type { Report, ReportsResponse } from '~/types';
 
-export async function listReports(
+async function listReports(
   dbUrl: string,
   { limit, cursor }: { limit: number; cursor?: string | null },
 ) {
@@ -88,3 +88,88 @@ export async function listReports(
 
   return { data, nextCursor, limit: take } satisfies ReportsResponse;
 }
+
+/**
+ * Hitung jumlah seluruh laporan (exclude soft-deleted).
+ */
+async function countAllReports(dbUrl: string): Promise<number> {
+  const prisma = await getPrisma(dbUrl);
+
+  return prisma.report.count({
+    where: { deletedAt: null },
+  });
+}
+
+/**
+ * Hitung jumlah laporan "hari ini" (Asia/Jakarta), berdasarkan createdAt.
+ * Menggunakan konversi batas hari Asia/Jakarta → UTC agar query efisien.
+ */
+async function countTodayReports(dbUrl: string): Promise<number> {
+  const prisma = await getPrisma(dbUrl);
+
+  // Jakarta tidak pakai DST → offset konstan +7 jam
+  const JKT_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+  const nowUtc = new Date();
+  const nowJkt = new Date(nowUtc.getTime() + JKT_OFFSET_MS);
+  const startOfDayJkt = new Date(
+    nowJkt.getFullYear(),
+    nowJkt.getMonth(),
+    nowJkt.getDate(),
+    0,
+    0,
+    0,
+    0,
+  );
+  const endOfDayJkt = new Date(startOfDayJkt.getTime() + 24 * 60 * 60 * 1000);
+
+  // Kembalikan ke UTC untuk dipakai di DB
+  const startUtc = new Date(startOfDayJkt.getTime() - JKT_OFFSET_MS);
+  const endUtc = new Date(endOfDayJkt.getTime() - JKT_OFFSET_MS);
+
+  return prisma.report.count({
+    where: {
+      deletedAt: null,
+      createdAt: {
+        gte: startUtc,
+        lt: endUtc,
+      },
+    },
+  });
+}
+
+/**
+ * Hitung jumlah laporan per status (exclude soft-deleted).
+ * Mengembalikan Map<ReportStatus, number>
+ */
+async function countReportsByStatus(
+  dbUrl: string,
+): Promise<Map<ReportStatus, number>> {
+  const prisma = await getPrisma(dbUrl);
+
+  const rows = await prisma.report.groupBy({
+    by: ['status'],
+    where: { deletedAt: null },
+    _count: { _all: true },
+  });
+
+  const map = new Map<ReportStatus, number>();
+  for (const row of rows) {
+    map.set(row.status as ReportStatus, row._count._all);
+  }
+  // Pastikan semua status ada kunci-nya (0 jika tidak ada data)
+  (
+    ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAKE_REPORT'] as ReportStatus[]
+  ).forEach((st) => {
+    if (!map.has(st)) map.set(st, 0);
+  });
+
+  return map;
+}
+
+export {
+  listReports,
+  countAllReports,
+  countTodayReports,
+  countReportsByStatus,
+};
