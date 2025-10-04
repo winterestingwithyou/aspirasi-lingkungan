@@ -34,5 +34,5 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function GovLaporan({ loaderData }: Route.ComponentProps) {
-  return <GovLaporanPage reportsResponse={loaderData} />;
+  return <GovLaporanPage reportsResponse={loaderData as ReportsResponse} />;
 }
