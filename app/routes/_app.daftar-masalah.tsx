@@ -1,4 +1,4 @@
-import type { Route } from './+types/daftar-masalah';
+import type { Route } from './+types/_app.daftar-masalah';
 import type { ReportsResponse } from '~/types';
 import { DaftarMasalahPage } from '~/pages/daftar-masalah-page';
 import { listReports } from '~/server/model/reports';

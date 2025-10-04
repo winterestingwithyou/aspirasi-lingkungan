@@ -1,5 +1,5 @@
 import GovDetailLaporan from '~/pages/gov/gov-detail-laporan';
-import type { Route } from './+types/gov-detail-laporan';
+import type { Route } from './+types/gov.laporan.$id';
 
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {

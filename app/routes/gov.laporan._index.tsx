@@ -1,4 +1,4 @@
-import type { Route } from './+types/gov-laporan';
+import type { Route } from './+types/gov.laporan._index';
 import type { ReportsResponse } from '~/types';
 import { getReports } from '~/services';
 import GovLaporanPage from '~/pages/gov/gov-laporan';

@@ -1,4 +1,4 @@
-import type { Route } from './+types/kontak';
+import type { Route } from './+types/_app.kontak';
 import KontakPage from '~/pages/kontak-page';
 
 // eslint-disable-next-line no-empty-pattern

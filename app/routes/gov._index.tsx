@@ -1,5 +1,5 @@
 import GovDashboard from '~/pages/gov/gov-dashboard';
-import type { Route } from './+types/gov-dashboard';
+import type { Route } from './+types/gov._index';
 import { getReports } from '~/services';
 import type { ReportsResponse } from '~/types';
 

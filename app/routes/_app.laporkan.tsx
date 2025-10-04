@@ -1,4 +1,4 @@
-import type { Route } from './+types/laporkan';
+import type { Route } from './+types/_app.laporkan';
 import { ReportPage } from '~/pages/report-page';
 import { listProblemTypes } from '~/server/model/problem-types';
 

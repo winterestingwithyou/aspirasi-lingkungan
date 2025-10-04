@@ -1,4 +1,4 @@
-import type { Route } from './+types/index';
+import type { Route } from './+types/_app._index';
 import LandingPage from '~/pages/landing-page';
 
 // eslint-disable-next-line no-empty-pattern

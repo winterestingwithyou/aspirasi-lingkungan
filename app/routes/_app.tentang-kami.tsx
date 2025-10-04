@@ -1,4 +1,4 @@
-import type { Route } from './+types/tentang';
+import type { Route } from './+types/_app.tentang-kami';
 import TentangKamiPage from '~/pages/tentang-kami-page';
 
 // eslint-disable-next-line no-empty-pattern
