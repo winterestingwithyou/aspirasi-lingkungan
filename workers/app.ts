@@ -8,7 +8,7 @@ const app = new Hono<{ Bindings: Env }>();
 app.route('/api', apiRouter);
 
 // Keep the React Router handler at root level
-app.get('*', (c) => {
+app.all('*', (c) => {
   const requestHandler = createRequestHandler(
     () => import('virtual:react-router/server-build'),
     import.meta.env.MODE,

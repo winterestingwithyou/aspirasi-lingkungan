@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,18 +9,10 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useNavigate } from 'react-router';
+import { useFetcher, useNavigate } from 'react-router';
 import { uploadToCloudinary, getAddress } from '~/services';
-import type {
-  ApiError,
-  CreateReportResponse,
-  ProblemType,
-  Report,
-} from '~/types';
-import {
-  createReportSchema,
-  type CreateReportInput,
-} from '~/validators/reports';
+import type { ProblemType, Report } from '~/types';
+import { createReportSchema } from '~/validators/reports';
 
 export function ReportPage({
   problemTypes,
@@ -30,17 +22,22 @@ export function ReportPage({
   ptError?: string | null;
 }) {
   const navigate = useNavigate();
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const fetcher = useFetcher();
 
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [reporterName, setReporterName] = useState('');
   const [reporterContact, setReporterContact] = useState('');
-  const [problemTypeId, setProblemTypeId] = useState<string>(''); // keep string for <option> value
+  const [problemTypeId, setProblemTypeId] = useState<string>('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
 
+  // --- Photo state
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // --- Map (Leaflet)
   const [mapText, setMapText] = useState<string>(
     'Peta akan ditampilkan di sini setelah lokasi ditentukan',
   );
@@ -49,26 +46,45 @@ export function ReportPage({
   const leafletRef = useRef<typeof import('leaflet') | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // --- UI state
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [newReportId, setNewReportId] = useState<number | null>(null);
 
+  // --- Fetcher derived states
+  const clientSchema = createReportSchema.omit({ photoUrl: true });
+
+  const isSubmitting =
+    fetcher.state === 'submitting' ||
+    (fetcher.state === 'loading' && !!fetcher.formData);
+
+  const actionData = fetcher.data as
+    | { ok: true; data: Report }
+    | { ok: false; error: string }
+    | undefined;
+
+  // Helper numeric
   const toNum = (v: string) => (v.trim() === '' ? NaN : Number(v));
 
-  const updateAddressFrom = async (latNum: number, lonNum: number) => {
-    const addr = await getAddress(latNum, lonNum);
-    setLocation((prev) => (prev.trim() === '' ? addr : addr)); // isi/override lokasi
-    setMapText(`Lokasi dipilih • ${addr}`);
+  // --- file preview
+  const onFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const f = e.target.files?.[0] ?? null;
+    setPhotoFile(f);
+    setSubmitError(null);
+
+    if (!f) {
+      setPhotoPreview(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => setPhotoPreview(String(ev.target?.result || ''));
+    reader.readAsDataURL(f);
   };
 
-  const onFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    setPhotoFile(f);
-    const reader = new FileReader();
-    reader.onload = (ev) => setImgUrl(String(ev.target?.result || ''));
-    reader.readAsDataURL(f);
+  // --- Geolocation helper
+  const updateAddressFrom = async (latNum: number, lonNum: number) => {
+    const addr = await getAddress(latNum, lonNum);
+    setLocation(addr);
+    setMapText(`Lokasi dipilih • ${addr}`);
   };
 
   const onGeo = async () => {
@@ -93,76 +109,26 @@ export function ReportPage({
     );
   };
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError(null);
-
-    const basePayload: CreateReportInput = {
-      reporterName,
-      reporterContact,
-      problemTypeId,
-      description,
-      photoUrl: null as string | null,
-      location,
-      latitude,
-      longitude,
-    };
-
-    const parsed = createReportSchema.safeParse(basePayload);
-    if (!parsed.success) {
-      setIsSubmitting(false);
-      setSubmitError(parsed.error.issues.map((i) => i.message).join(', '));
-      return;
-    }
-
-    let dataToSend = parsed.data;
-    if (photoFile) {
-      const uploadedUrl = await uploadToCloudinary(photoFile);
-      dataToSend = { ...dataToSend, photoUrl: uploadedUrl };
-    }
-
-    try {
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend),
-      });
-
-      const result: CreateReportResponse = await response.json();
-
-      if (!response.ok) {
-        const err = result as ApiError;
-        const errorMessage =
-          err.error ||
-          (err.issues &&
-            Array.isArray(err.issues) &&
-            err.issues.map((i) => i.message).join(', ')) ||
-          'Terjadi kesalahan pada server.';
-        throw new Error(errorMessage);
-      }
-
-      const success = result as { message: string; data: Report };
-      setNewReportId(success.data.id);
+  // --- Tanggapi hasil action
+  useEffect(() => {
+    if (!actionData) return;
+    if ('ok' in actionData && actionData.ok) {
       setShowSuccess(true);
-    } catch (error) {
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : 'Gagal mengirim laporan. Silakan coba lagi.',
-      );
-      console.error('Submit error:', error);
-    } finally {
-      setIsSubmitting(false);
+      setSubmitError(null);
+    } else if ('error' in actionData) {
+      setSubmitError(actionData.error || 'Terjadi kesalahan saat menyimpan.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
+  }, [actionData]);
 
+  // --- Scroll ke atas saat error set secara manual
   useEffect(() => {
     if (submitError) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [submitError]);
 
+  // --- Init Leaflet map
   useEffect(() => {
     (async () => {
       if (mapRef.current || !mapContainerRef.current) return;
@@ -188,10 +154,9 @@ export function ReportPage({
         maxZoom: 19,
       }).addTo(map);
 
-      // marker draggable
       const marker = L.marker(start, { draggable: true }).addTo(map);
 
-      // klik pada map
+      // click map
       map.on('click', async (e: L.LeafletMouseEvent) => {
         const { lat, lng } = e.latlng;
         marker.setLatLng([lat, lng]);
@@ -200,7 +165,7 @@ export function ReportPage({
         await updateAddressFrom(lat, lng);
       });
 
-      // drag marker selesai
+      // drag end
       marker.on('dragend', async () => {
         const { lat, lng } = marker.getLatLng();
         setLatitude(lat.toFixed(6));
@@ -227,7 +192,7 @@ export function ReportPage({
     };
   }, []);
 
-  // Jika user mengubah input latitude/longitude manual, pan & update marker
+  // Pan marker ketika lat/long input berubah manual
   useEffect(() => {
     const L = leafletRef.current;
     if (!L || !mapRef.current || !markerRef.current) return;
@@ -241,10 +206,83 @@ export function ReportPage({
       [latNum, lonNum],
       Math.max(mapRef.current.getZoom(), 16),
     );
-    // Jangan reverse-geocode di setiap ketikan; cukup saat blur kalau mau.
   }, [latitude, longitude]);
 
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (ev) => {
+    ev.preventDefault();
+    setSubmitError(null);
+
+    const raw = {
+      reporterName,
+      reporterContact: reporterContact || null,
+      problemTypeId,
+      description,
+      location: location || null,
+      latitude,
+      longitude,
+    };
+
+    const parsed = clientSchema.safeParse(raw);
+    if (!parsed.success) {
+      setSubmitError(parsed.error.issues.map((i) => i.message).join(', '));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (!photoFile) {
+      setSubmitError('Foto wajib diunggah.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    let photoUrl = '';
+    try {
+      setIsUploading(true);
+      photoUrl = await uploadToCloudinary(photoFile); // harus kembalikan URL string
+    } catch (err) {
+      console.error('Upload Cloudinary gagal:', err);
+      setSubmitError('Gagal mengunggah foto. Coba lagi.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    } finally {
+      setIsUploading(false);
+    }
+
+    const fd = new FormData();
+    fd.set('reporterName', parsed.data.reporterName);
+    if (parsed.data.reporterContact)
+      fd.set('reporterContact', parsed.data.reporterContact);
+    fd.set('problemTypeId', String(parsed.data.problemTypeId));
+    fd.set('description', parsed.data.description);
+    if (parsed.data.location) fd.set('location', parsed.data.location);
+    fd.set('latitude', String(parsed.data.latitude));
+    fd.set('longitude', String(parsed.data.longitude));
+    fd.set('photoUrl', photoUrl);
+
+    fetcher.submit(fd, {
+      method: 'post',
+      action: '/laporkan', // penting: nembak rute ini
+      encType: 'multipart/form-data',
+    });
+  };
+
   const selectDisabled = (problemTypes?.length ?? 0) === 0;
+  const submitDisabled =
+    isSubmitting ||
+    isUploading ||
+    !reporterName.trim() ||
+    !problemTypeId ||
+    !description.trim() ||
+    !latitude.trim() ||
+    !longitude.trim() ||
+    !photoFile;
+
+  const successReportId = useMemo(() => {
+    if (actionData && 'ok' in actionData && actionData.ok) {
+      return actionData.data.id;
+    }
+    return null;
+  }, [actionData]);
 
   return (
     <section className="page-section">
@@ -260,7 +298,7 @@ export function ReportPage({
               {submitError && <Alert variant="danger">{submitError}</Alert>}
               {ptError && <Alert variant="warning">{ptError}</Alert>}
 
-              <Form noValidate onSubmit={onSubmit}>
+              <Form as={fetcher.Form} noValidate onSubmit={handleSubmit}>
                 <Row className="g-3">
                   <Col md={6}>
                     <Form.Group controlId="reporterName">
@@ -300,7 +338,6 @@ export function ReportPage({
                             ? 'Memuat jenis masalah…'
                             : 'Pilih jenis masalah'}
                         </option>
-
                         {problemTypes?.map((pt) => (
                           <option key={pt.id} value={String(pt.id)}>
                             {pt.name}
@@ -319,9 +356,9 @@ export function ReportPage({
                         onChange={onFile}
                         required
                       />
-                      {imgUrl && (
+                      {photoPreview && (
                         <img
-                          src={imgUrl}
+                          src={photoPreview}
                           className="image-preview d-block mt-2 w-100 h-auto"
                           alt="Preview"
                         />
@@ -346,7 +383,7 @@ export function ReportPage({
 
                   <Col xs={12}>
                     <Form.Group controlId="location">
-                      <Form.Label>Lokasi </Form.Label>
+                      <Form.Label>Lokasi</Form.Label>
                       <div className="input-group">
                         <Form.Control
                           name="location"
@@ -411,14 +448,13 @@ export function ReportPage({
                             }}
                           />
                         </div>
-
                         <p className="text-muted mt-2 mb-0">{mapText}</p>
                       </div>
                     </Form.Group>
                   </Col>
 
                   <Col xs={12} className="text-center mt-4">
-                    <Button type="submit" size="lg" disabled={isSubmitting}>
+                    <Button type="submit" size="lg" disabled={submitDisabled}>
                       {isSubmitting ? (
                         <Spinner
                           as="span"
@@ -439,6 +475,7 @@ export function ReportPage({
         </Row>
       </Container>
 
+      {/* Modal sukses */}
       <Modal show={showSuccess} onHide={() => setShowSuccess(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Laporan Berhasil Dikirim!</Modal.Title>
@@ -454,9 +491,11 @@ export function ReportPage({
             Terima kasih telah melaporkan masalah lingkungan. Laporan Anda akan
             segera kami tindak lanjuti.
           </p>
-          <p>
-            Nomor laporan Anda: <strong>#{newReportId}</strong>
-          </p>
+          {successReportId ? (
+            <p>
+              Nomor laporan Anda: <strong>#{successReportId}</strong>
+            </p>
+          ) : null}
         </Modal.Body>
         <Modal.Footer className="justify-content-center">
           <Button onClick={() => setShowSuccess(false)}>OK</Button>

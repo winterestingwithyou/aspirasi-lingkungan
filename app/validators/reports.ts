@@ -28,7 +28,7 @@ export const createReportSchema = z.object({
     .trim()
     .min(10, 'Deskripsi terlalu pendek'),
 
-  photoUrl: z.string().url('URL tidak valid').nullable(),
+  photoUrl: z.string().url('URL tidak valid'),
 
   location: z.string().min(1, 'Lokasi diperlukan'),
 
@@ -50,3 +50,4 @@ export const createReportSchema = z.object({
 });
 
 export type CreateReportInput = z.input<typeof createReportSchema>;
+export type CreateReportPayload = z.output<typeof createReportSchema>;

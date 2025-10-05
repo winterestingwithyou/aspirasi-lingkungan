@@ -1,6 +1,7 @@
 import { Prisma, ReportStatus } from '@prisma/client';
 import { getPrisma } from '~/db/prisma';
 import type { Report, ReportDetail, ReportsResponse } from '~/types';
+import type { CreateReportPayload } from '~/validators/reports';
 
 async function listReports(
   dbUrl: string,
@@ -80,6 +81,28 @@ async function listReports(
   });
 
   return { data, nextCursor, limit: take } satisfies ReportsResponse;
+}
+
+async function createReport(dbUrl: string, data: CreateReportPayload) {
+  const prisma = await getPrisma(dbUrl);
+
+  // Pastikan field opsional diisi null bila kosong
+  const newReport = await prisma.report.create({
+    data: {
+      reporterName: data.reporterName,
+      reporterContact: data.reporterContact ?? null,
+      description: data.description,
+      photoUrl: data.photoUrl, // sudah berupa URL Cloudinary
+      latitude: data.latitude,
+      longitude: data.longitude,
+      location: data.location ?? null,
+      problemTypeId: data.problemTypeId,
+      // kolom default: status, upvoteCount, dsb ditangani Prisma schema
+    },
+    select: { id: true },
+  });
+
+  return newReport;
 }
 
 /**
@@ -219,6 +242,7 @@ async function countReportsByStatus(
 }
 
 export {
+  createReport,
   listReports,
   getReportDetailById,
   countAllReports,

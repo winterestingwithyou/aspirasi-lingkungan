@@ -72,25 +72,14 @@ reportsRouter.post('/', zValidator('json', createReportSchema), async (c) => {
   try {
     const newReport = await prisma.report.create({
       data: {
-        // kolom yang WAJIB di schema
         reporterName: body.reporterName,
         description: body.description,
         photoUrl: body.photoUrl,
-        latitude: body.latitude, // Prisma Decimal akan menerima number
+        latitude: body.latitude,
         longitude: body.longitude,
         problemTypeId: body.problemTypeId,
-
-        // kolom OPSIONAL
         reporterContact: body.reporterContact ?? null,
         location: body.location ?? null,
-
-        // kolom lain mengikuti default di schema Prisma:
-        // status        -> default PENDING
-        // upvoteCount   -> default 0
-        // isFakeReport  -> default false
-        // createdAt     -> default now()
-        // resolvedAt    -> null
-        // deletedAt     -> null
       },
     });
 
