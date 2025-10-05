@@ -4,6 +4,7 @@ interface CloudflareContext {
   env: {
     DATABASE_URL: string;
     [key: string]: string;
+    TURNSTILE_SITE_KEY: string;
   };
   ctx: ExecutionContext;
 }

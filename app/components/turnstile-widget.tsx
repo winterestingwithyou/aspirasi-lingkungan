@@ -2,18 +2,19 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import { useEffect } from 'react';
 
 type Props = {
+  siteKey: string;
   onToken: (token: string | null) => void;
   className?: string;
 };
 
-function TurnstileWidget({ onToken, className }: Props) {
+function TurnstileWidget({ onToken, className, siteKey }: Props) {
   // optional: bersihin token saat unmount
   useEffect(() => () => onToken(null), [onToken]);
 
   return (
     <Turnstile
       className={className}
-      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+      siteKey={siteKey}
       onSuccess={onToken}
       onExpire={() => onToken(null)}
       onError={() => onToken(null)}

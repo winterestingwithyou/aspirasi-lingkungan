@@ -86,14 +86,16 @@ async function action({ request, context }: Route.ActionArgs) {
 }
 
 async function loader({ context }: Route.LoaderArgs) {
+  const siteKey = context.cloudflare.env.TURNSTILE_SITE_KEY;
+
   try {
     const problemTypes = await listProblemTypes(
       context.cloudflare.env.DATABASE_URL,
     );
-    return { problemTypes, ptError: null };
+    return { problemTypes, ptError: null, siteKey };
   } catch (e) {
     console.error('Error loading problem types:', e);
-    return { problemTypes: [], ptError: 'Gagal memuat jenis masalah' };
+    return { problemTypes: [], ptError: 'Gagal memuat jenis masalah', siteKey };
   }
 }
 
@@ -102,6 +104,7 @@ function Report({ loaderData }: Route.ComponentProps) {
     <ReportPage
       problemTypes={loaderData.problemTypes}
       ptError={loaderData.ptError}
+      siteKey={loaderData.siteKey}
     />
   );
 }

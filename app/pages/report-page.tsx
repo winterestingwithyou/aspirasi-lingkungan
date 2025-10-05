@@ -18,9 +18,11 @@ import { createReportSchema } from '~/validators/reports';
 export function ReportPage({
   problemTypes,
   ptError,
+  siteKey,
 }: {
   problemTypes: ProblemType[];
   ptError?: string | null;
+  siteKey: string;
 }) {
   const navigate = useNavigate();
   const fetcher = useFetcher();
@@ -462,6 +464,7 @@ export function ReportPage({
                   <Col xs={12}>
                     <Form.Label>Tunjukkan bahwa Anda adalah manusia</Form.Label>
                     <TurnstileWidget
+                      siteKey={siteKey}
                       onToken={setTsToken}
                       className="mb-3 w-100"
                     />
