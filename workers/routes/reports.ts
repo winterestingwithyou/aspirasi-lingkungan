@@ -36,19 +36,22 @@ reportsRouter.get('/stats', async (c) => {
   const dbUrl = c.env.DATABASE_URL;
 
   try {
-    const [today, todayCompleted, byStatus] = await Promise.all([
+    const [today, todayCompleted, pending, inProgress, completed, fake] = await Promise.all([
       countTodayReports(dbUrl),
       countTodayCompletedReports(dbUrl),
-      countReportsByStatus(dbUrl),
+      countReportsByStatus(dbUrl, 'PENDING'),
+      countReportsByStatus(dbUrl, 'IN_PROGRESS'),
+      countReportsByStatus(dbUrl, 'COMPLETED'),
+      countReportsByStatus(dbUrl, 'FAKE_REPORT'),
     ]);
 
     const stats = {
       today,
       todayCompleted,
-      pending: byStatus.get('PENDING') ?? 0,
-      inProgress: byStatus.get('IN_PROGRESS') ?? 0,
-      completed: byStatus.get('COMPLETED') ?? 0,
-      fake: byStatus.get('FAKE_REPORT') ?? 0,
+      pending,
+      inProgress,
+      completed,
+      fake,
     };
 
     return c.json({ data: stats });

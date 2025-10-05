@@ -23,7 +23,7 @@ export default function GovDashboard({
 }: {
   loaderData: GovDashboardLoaderData;
 }) {
-  const reports = loaderData.recentReports.data;
+  const reports = loaderData.recentReports?.data ?? [];
   const stats = loaderData.stats;
   return (
     <>
