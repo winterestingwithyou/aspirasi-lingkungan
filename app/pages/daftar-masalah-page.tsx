@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useLoaderData, useLocation } from 'react-router';
 import { Col, Container, Form, Pagination, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import type { Report, ReportsResponse } from '~/types';
@@ -24,10 +25,14 @@ function formatTanggal(iso: string) {
   }
 }
 
-function DaftarMasalahPage({ message }: { message: ReportsResponse }) {
-  const { data, nextCursor, limit } = message;
-
+function DaftarMasalahPage() {
+  const { data, nextCursor, limit } = useLoaderData() as ReportsResponse;
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const searchParams = new URLSearchParams(location.search);
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const hasNextPage = !!nextCursor;
 
   // Map data API → tampilan kartu (fallback jika field null)
   const items = useMemo(
@@ -131,14 +136,20 @@ function DaftarMasalahPage({ message }: { message: ReportsResponse }) {
         {/* Cursor-based pagination: tombol Next saja (Prev butuh state stack cursor) */}
         <nav aria-label="Page navigation" className="mt-4">
           <Pagination className="justify-content-center">
-            <Pagination.Prev disabled>Sebelumnya</Pagination.Prev>
-            <Pagination.Item active>1</Pagination.Item>
+            <Pagination.Prev
+              disabled={currentPage <= 1}
+              onClick={() => {
+                if (currentPage > 1) navigate(`?page=${currentPage - 1}`);
+              }}
+            >
+              Sebelumnya
+            </Pagination.Prev>
+            <Pagination.Item active>{currentPage}</Pagination.Item>
 
             <Pagination.Next
-              disabled={!nextCursor}
+              disabled={!hasNextPage}
               onClick={() => {
-                if (nextCursor)
-                  navigate(`?limit=${limit}&cursor=${nextCursor}`);
+                if (hasNextPage) navigate(`?page=${currentPage + 1}`);
               }}
             >
               Selanjutnya

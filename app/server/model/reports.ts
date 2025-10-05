@@ -4,23 +4,18 @@ import type { Report, ReportDetail, ReportsResponse } from '~/types';
 
 async function listReports(
   dbUrl: string,
-  { limit, cursor }: { limit: number; cursor?: string | null },
+  { limit, page }: { limit: number; page: number },
 ): Promise<ReportsResponse> {
   const prisma = await getPrisma(dbUrl);
 
   const take = Math.min(50, Math.max(1, Number.isFinite(limit) ? limit : 6));
-
-  const cursorId = cursor ? Number(cursor) : undefined;
-  if (cursorId !== undefined && Number.isNaN(cursorId)) {
-    throw new Error('Invalid cursor');
-  }
+  const skip = (page - 1) * take;
 
   const rows = await prisma.report.findMany({
     where: {},
     orderBy: { id: 'desc' },
     take: take + 1,
-    cursor: cursorId ? { id: cursorId } : undefined,
-    skip: cursorId ? 1 : 0,
+    skip: skip,
     select: {
       id: true,
       reporterName: true,
@@ -43,9 +38,7 @@ async function listReports(
   const hasMore = rows.length > take;
   const pageItems = hasMore ? rows.slice(0, take) : rows;
 
-  const nextCursor: number | null = hasMore
-    ? pageItems[pageItems.length - 1].id
-    : null;
+  const nextCursor = hasMore ? page + 1 : null;
 
   const data = pageItems.map((r) => {
     return {
