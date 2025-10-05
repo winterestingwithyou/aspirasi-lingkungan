@@ -18,12 +18,14 @@ reportsRouter.get('/', async (c) => {
   const dbUrl = c.env.DATABASE_URL;
 
   // ambil query param dengan default & batasan
-  const limitRaw = c.req.query('limit') ?? '20';
-  const cursorRaw = c.req.query('cursor'); // id terakhir yang sudah diterima
-  const limit = Math.min(Math.max(parseInt(limitRaw, 10) || 20, 1), 100);
+  const limitRaw = c.req.query('limit') ?? '6';
+  const pageRaw = c.req.query('page') ?? '1';
+  const limit = Math.min(Math.max(parseInt(limitRaw, 10) || 6, 1), 100);
+  const page = Math.max(parseInt(pageRaw, 10) || 1, 1);
 
   try {
-    const result = await listReports(dbUrl, { limit, cursor: cursorRaw });
+    // Menggunakan page untuk paginasi
+    const result = await listReports(dbUrl, { limit, page });
     return c.json(result);
   } catch (error) {
     console.error('Failed to list reports:', error);

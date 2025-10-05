@@ -17,14 +17,15 @@ function meta({}: Route.MetaArgs) {
 
 async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const limitStr = url.searchParams.get('limit') ?? '3';
-  const cursor = url.searchParams.get('cursor');
+  const limitStr = url.searchParams.get('limit') ?? '6';
+  const pageStr = url.searchParams.get('page') ?? '1';
 
   try {
     const limit = Number(limitStr);
+    const page = Number(pageStr);
     const payload = await listReports(context.cloudflare.env.DATABASE_URL, {
       limit,
-      cursor,
+      page,
     });
 
     return payload satisfies ReportsResponse;
@@ -33,13 +34,13 @@ async function loader({ request, context }: Route.LoaderArgs) {
     return {
       data: [],
       nextCursor: null,
-      limit: Number(limitStr) || 12,
+      limit: Number(limitStr) || 6,
     } satisfies ReportsResponse;
   }
 }
 
 function DaftarMasalah({ loaderData }: Route.ComponentProps) {
-  return <DaftarMasalahPage message={loaderData} />;
+  return <DaftarMasalahPage />;
 }
 
 export default DaftarMasalah;
