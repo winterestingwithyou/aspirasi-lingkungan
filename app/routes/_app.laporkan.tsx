@@ -1,3 +1,4 @@
+import { verifyTurnstile } from '~/server/lib/tunstile';
 import type { Route } from './+types/_app.laporkan';
 import { ReportPage } from '~/pages/report-page';
 import { listProblemTypes } from '~/server/model/problem-types';
@@ -21,7 +22,33 @@ function meta({}: Route.MetaArgs) {
 async function action({ request, context }: Route.ActionArgs) {
   const form = await request.formData();
 
-  // Ambil semua field dari FormData (photoUrl akan diisi client SETELAH validasi awal)
+  const token =
+    (form.get('cf-turnstile-response') as string | null) ||
+    (await request
+      .json<{ 'cf-turnstile-response'?: string }>()
+      ?.then((j) => j['cf-turnstile-response'] ?? null)
+      .catch(() => null));
+
+  if (!token) {
+    return { status: 400, error: 'Captcha tidak ditemukan' };
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') ?? undefined;
+  const { success, ['error-codes']: codes } = await verifyTurnstile(
+    context.cloudflare.env.TURNSTILE_SECRET_KEY,
+    token,
+    ip,
+  );
+
+  if (!success) {
+    return {
+      status: 400,
+      error: 'Verifikasi captcha gagal',
+      details: codes,
+    };
+  }
+
+  // Ambil semua field dari FormData
   const raw = {
     reporterName: form.get('reporterName'),
     reporterContact: form.get('reporterContact'),
@@ -36,7 +63,7 @@ async function action({ request, context }: Route.ActionArgs) {
   const parsed = createReportSchema.safeParse(raw);
   if (!parsed.success) {
     return {
-      ok: false,
+      status: 400,
       error: parsed.error.issues.map((i) => i.message).join(', '),
     };
   }
@@ -48,10 +75,13 @@ async function action({ request, context }: Route.ActionArgs) {
       context.cloudflare.env.DATABASE_URL,
       data,
     );
-    return { ok: true, data: created };
+    return { status: 200, data: created };
   } catch (err) {
     console.error('Gagal menyimpan laporan:', err);
-    return { ok: false, error: 'Gagal menyimpan laporan ke database.' };
+    return {
+      status: 500,
+      error: 'Gagal menyimpan laporan ke database.',
+    };
   }
 }
 

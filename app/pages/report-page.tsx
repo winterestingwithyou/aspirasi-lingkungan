@@ -10,6 +10,7 @@ import {
   Spinner,
 } from 'react-bootstrap';
 import { useFetcher, useNavigate } from 'react-router';
+import TurnstileWidget from '~/components/turnstile-widget';
 import { uploadToCloudinary, getAddress } from '~/services';
 import type { ProblemType, Report } from '~/types';
 import { createReportSchema } from '~/validators/reports';
@@ -50,6 +51,9 @@ export function ReportPage({
   const [showSuccess, setShowSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // --- Turnstile state
+  const [tsToken, setTsToken] = useState<string | null>(null);
+
   // --- Fetcher derived states
   const clientSchema = createReportSchema.omit({ photoUrl: true });
 
@@ -58,8 +62,8 @@ export function ReportPage({
     (fetcher.state === 'loading' && !!fetcher.formData);
 
   const actionData = fetcher.data as
-    | { ok: true; data: Report }
-    | { ok: false; error: string }
+    | { status: number; data: Report }
+    | { status: number; error: string }
     | undefined;
 
   // Helper numeric
@@ -112,7 +116,7 @@ export function ReportPage({
   // --- Tanggapi hasil action
   useEffect(() => {
     if (!actionData) return;
-    if ('ok' in actionData && actionData.ok) {
+    if (actionData.status === 200) {
       setShowSuccess(true);
       setSubmitError(null);
     } else if ('error' in actionData) {
@@ -258,6 +262,7 @@ export function ReportPage({
     fd.set('latitude', String(parsed.data.latitude));
     fd.set('longitude', String(parsed.data.longitude));
     fd.set('photoUrl', photoUrl);
+    fd.append('cf-turnstile-response', tsToken ?? '');
 
     fetcher.submit(fd, {
       method: 'post',
@@ -268,6 +273,7 @@ export function ReportPage({
 
   const selectDisabled = (problemTypes?.length ?? 0) === 0;
   const submitDisabled =
+    !tsToken ||
     isSubmitting ||
     isUploading ||
     !reporterName.trim() ||
@@ -278,7 +284,7 @@ export function ReportPage({
     !photoFile;
 
   const successReportId = useMemo(() => {
-    if (actionData && 'ok' in actionData && actionData.ok) {
+    if (actionData && actionData.status === 200 && 'data' in actionData) {
       return actionData.data.id;
     }
     return null;
@@ -451,6 +457,14 @@ export function ReportPage({
                         <p className="text-muted mt-2 mb-0">{mapText}</p>
                       </div>
                     </Form.Group>
+                  </Col>
+
+                  <Col xs={12}>
+                    <Form.Label>Tunjukkan bahwa Anda adalah manusia</Form.Label>
+                    <TurnstileWidget
+                      onToken={setTsToken}
+                      className="mb-3 w-100"
+                    />
                   </Col>
 
                   <Col xs={12} className="text-center mt-4">
