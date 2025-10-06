@@ -23,6 +23,11 @@ export default function GovLayout({ children }: PropsWithChildren) {
                     </NavLink>
                   </li>
                   <li>
+                    <NavLink to="/gov/jenis-masalah" className="nav-link-aside">
+                      <i className="bi bi-file-earmark-text" /> Jenis Masalah
+                    </NavLink>
+                  </li>
+                  <li>
                     <NavLink to="/gov/profil" className="nav-link-aside">
                       <i className="bi bi-person-circle" /> Profil
                     </NavLink>
