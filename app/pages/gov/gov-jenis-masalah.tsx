@@ -112,12 +112,14 @@ export default function GovJenisMasalahPage() {
                 <td>{item.nama}</td>
                 <td>{item.deskripsi}</td>
                 <td className="text-center">
+                  <div className='d-flex justify-content-center mx-1'>
                   <Button variant="link" size="sm" onClick={() => handleShowEdit(item)} title="Edit" className="me-2">
                     <i className="bi bi-pencil-square text-primary"></i>
                   </Button>
                   <Button variant="link" size="sm" onClick={() => handleDelete(item.id)} title="Hapus" >
                     <i className="bi bi-trash-fill text-danger"></i>
                   </Button>
+                  </div>
                 </td>
               </tr>
             ))}
