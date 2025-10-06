@@ -2,7 +2,7 @@ import { Form, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import type { ReportsResponse } from '~/types';
 
-const badge = (s: string) =>
+export const badge = (s: string) =>
   s === 'PENDING'
     ? 'status-pending'
     : s === 'IN_PROGRESS'
@@ -11,7 +11,7 @@ const badge = (s: string) =>
         ? 'status-completed'
         : 'status-fake';
 
-const statusText = (s: string) =>
+export const statusText = (s: string) =>
   s === 'PENDING'
     ? 'Menunggu Tindakan'
     : s === 'IN_PROGRESS'

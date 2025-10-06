@@ -1,10 +1,14 @@
+import { useLoaderData } from 'react-router';
 import GovDetailLaporan from '~/pages/gov/gov-detail-laporan';
+import { getReportDetailById } from '~/server/model/reports';
 import type { Route } from './+types/gov.laporan.$id';
 
-// eslint-disable-next-line no-empty-pattern
-export function meta({}: Route.MetaArgs) {
+export function meta({ data }: Route.MetaArgs) {
+  const reportTitle = data?.problemType
+    ? `Laporan #${data.id} - ${data.problemType?.name}`
+    : 'Detail Laporan';
   return [
-    { title: 'Detail Laporan - Web Aspirasi Lingkungan' },
+    { title: `${reportTitle} - Web Aspirasi Lingkungan` },
     {
       name: 'description',
       content: 'Lihat detail laporan aspirasi lingkungan secara lengkap.',
@@ -12,6 +16,29 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+export async function loader({ context, params }: Route.LoaderArgs) {
+  const reportId = Number(params.id);
+  if (isNaN(reportId)) {
+    throw new Response(JSON.stringify({ message: 'ID Laporan tidak valid' }), {
+      status: 400,
+    });
+  }
+
+  const reportDetail = await getReportDetailById(
+    context.cloudflare.env.DATABASE_URL,
+    reportId,
+  );
+
+  if (!reportDetail) {
+    throw new Response(JSON.stringify({ message: 'Laporan tidak ditemukan' }), {
+      status: 404,
+    });
+  }
+
+  return reportDetail;
+}
+
 export default function DetailLaporan() {
-  return <GovDetailLaporan />;
+  const report = useLoaderData<typeof loader>();
+  return <GovDetailLaporan report={report} />;
 }
