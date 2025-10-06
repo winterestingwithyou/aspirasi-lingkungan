@@ -3,6 +3,7 @@ import {
   Alert,
   Button,
   Col,
+  Card,
   Container,
   Form,
   Modal,
@@ -306,186 +307,234 @@ export function ReportPage({
               {submitError && <Alert variant="danger">{submitError}</Alert>}
               {ptError && <Alert variant="warning">{ptError}</Alert>}
 
-              <Form as={fetcher.Form} noValidate onSubmit={handleSubmit}>
-                <Row className="g-3">
-                  <Col md={6}>
-                    <Form.Group controlId="reporterName">
-                      <Form.Label>Nama Pelapor</Form.Label>
-                      <Form.Control
-                        name="reporterName"
-                        value={reporterName}
-                        onChange={(e) => setReporterName(e.target.value)}
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                    <Form.Group controlId="reporterContact">
-                      <Form.Label>Nomor Whatsapp</Form.Label>
-                      <Form.Control
-                        name="reporterContact"
-                        value={reporterContact}
-                        onChange={(e) => setReporterContact(e.target.value)}
-                        placeholder="08xxxxxxxxxx"
-                      />
-                    </Form.Group>
-                  </Col>
+              <Form noValidate onSubmit={handleSubmit}>
+                {/* Card 1: Informasi Pelapor */}
+                <Card className="mb-4 shadow-sm">
+                  <Card.Header as="h5">
+                    <i className="bi bi-person-fill me-2" />
+                    Informasi Pelapor
+                  </Card.Header>
+                  <Card.Body>
+                    <Row className="g-3">
+                      <Col md={6}>
+                        <Form.Group controlId="reporterName">
+                          <Form.Label>Nama Pelapor</Form.Label>
+                          <Form.Control
+                            name="reporterName"
+                            value={reporterName}
+                            onChange={(e) => setReporterName(e.target.value)}
+                            required
+                            placeholder="cth: Budi Sanjaya"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group controlId="reporterContact">
+                          <Form.Label>
+                            Nomor Whatsapp{' '}
+                            <span className="text-muted">(Opsional)</span>
+                          </Form.Label>
+                          <Form.Control
+                            name="reporterContact"
+                            value={reporterContact}
+                            onChange={(e) => setReporterContact(e.target.value)}
+                            placeholder="cth: 081234567890"
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
 
-                  <Col xs={12}>
-                    <Form.Group controlId="problemTypeId">
-                      <Form.Label>Jenis Masalah</Form.Label>
-                      <Form.Select
-                        name="problemTypeId"
-                        value={problemTypeId}
-                        onChange={(e) => setProblemTypeId(e.target.value)}
-                        required
-                        disabled={selectDisabled}
-                      >
-                        <option value="" disabled>
-                          {selectDisabled
-                            ? 'Memuat jenis masalah…'
-                            : 'Pilih jenis masalah'}
-                        </option>
-                        {problemTypes?.map((pt) => (
-                          <option key={pt.id} value={String(pt.id)}>
-                            {pt.name}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12}>
-                    <Form.Group controlId="photoFile">
-                      <Form.Label>Foto Masalah</Form.Label>
-                      <Form.Control
-                        type="file"
-                        accept="image/*"
-                        onChange={onFile}
-                        required
-                      />
-                      {photoPreview && (
-                        <img
-                          src={photoPreview}
-                          className="image-preview d-block mt-2 w-100 h-auto"
-                          alt="Preview"
-                        />
-                      )}
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12}>
-                    <Form.Group controlId="description">
-                      <Form.Label>Deskripsi Masalah</Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        name="description"
-                        rows={4}
-                        placeholder="Jelaskan secara detail..."
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12}>
-                    <Form.Group controlId="location">
-                      <Form.Label>Lokasi</Form.Label>
-                      <div className="input-group">
-                        <Form.Control
-                          name="location"
-                          placeholder="Masukkan alamat atau klik 'Ambil Lokasi'"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                        />
-                        <Button
-                          variant="outline-secondary"
-                          type="button"
-                          onClick={onGeo}
+                {/* Card 2: Detail Masalah */}
+                <Card className="mb-4 shadow-sm">
+                  <Card.Header as="h5">
+                    <i className="bi bi-exclamation-triangle-fill me-2" />
+                    Detail Masalah
+                  </Card.Header>
+                  <Card.Body>
+                    <Row className="g-3">
+                      <Col xs={12}>
+                        <Form.Group controlId="problemTypeId">
+                          <Form.Label>Jenis Masalah</Form.Label>
+                          <Form.Select
+                            name="problemTypeId"
+                            value={problemTypeId}
+                            onChange={(e) => setProblemTypeId(e.target.value)}
+                            required
+                            disabled={selectDisabled}
+                          >
+                            <option value="" disabled>
+                              {selectDisabled
+                                ? 'Memuat jenis masalah…'
+                                : 'Pilih jenis masalah'}
+                            </option>
+                            {problemTypes?.map((pt) => (
+                              <option key={pt.id} value={String(pt.id)}>
+                                {pt.name}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Form.Group>
+                      </Col>
+                      <Col xs={12}>
+                        <Form.Group controlId="description">
+                          <Form.Label>Deskripsi Masalah</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            name="description"
+                            rows={4}
+                            placeholder="Jelaskan secara detail kondisi masalah, lokasi spesifik, dan dampaknya jika ada."
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col xs={12}>
+                        <Form.Label>Foto Masalah</Form.Label>
+                        <Form.Group
+                          controlId="photoFile"
+                          className="file-upload-area text-center p-4"
+                          onClick={() =>
+                            document.getElementById('photo-input')?.click()
+                          }
                         >
-                          <i className="bi bi-geo-alt-fill me-2" />
-                          Ambil Lokasi
-                        </Button>
-                      </div>
-
-                      <div className="mt-2">
-                        <Row className="g-2">
-                          <Col sm={6}>
-                            <Form.Group controlId="latitude">
-                              <Form.Label className="mb-1">
-                                Latitude *
-                              </Form.Label>
-                              <Form.Control
-                                name="latitude"
-                                placeholder="-6.2"
-                                value={latitude}
-                                onChange={(e) => setLatitude(e.target.value)}
-                                required
-                                inputMode="decimal"
+                          <Form.Control
+                            id="photo-input"
+                            type="file"
+                            accept="image/*"
+                            onChange={onFile}
+                            required
+                            hidden
+                          />
+                          {photoPreview ? (
+                            <img
+                              src={photoPreview}
+                              className="image-preview d-block w-100 h-auto"
+                              alt="Preview"
+                            />
+                          ) : (
+                            <div>
+                              <i
+                                className="bi bi-cloud-arrow-up-fill"
+                                style={{ fontSize: '2.5rem' }}
                               />
-                            </Form.Group>
-                          </Col>
-                          <Col sm={6}>
-                            <Form.Group controlId="longitude">
-                              <Form.Label className="mb-1">
-                                Longitude *
-                              </Form.Label>
-                              <Form.Control
-                                name="longitude"
-                                placeholder="106.8"
-                                value={longitude}
-                                onChange={(e) => setLongitude(e.target.value)}
-                                required
-                                inputMode="decimal"
-                              />
-                            </Form.Group>
-                          </Col>
-                        </Row>
-                      </div>
+                              <p className="mb-0 mt-2">
+                                Klik disini untuk mengunggah gambar
+                              </p>
+                              <small className="text-muted">
+                                (Format: JPG, PNG, WEBP)
+                              </small>
+                            </div>
+                          )}
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
 
-                      <div className="gap-2 mt-3">
+                {/* Card 3: Lokasi Masalah */}
+                <Card className="mb-4 shadow-sm">
+                  <Card.Header as="h5">
+                    <i className="bi bi-geo-alt-fill me-2" />
+                    Lokasi Masalah
+                  </Card.Header>
+                  <Card.Body>
+                    <Row className="g-3">
+                      <Col xs={12}>
+                        <Form.Label>Alamat/Nama Jalan</Form.Label>
+                        <div className="input-group mb-3">
+                          <Form.Control
+                            name="location"
+                            placeholder="Klik 'Ambil Lokasi Saat Ini' atau pilih di peta"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                          />
+                          <Button
+                            variant="outline-primary"
+                            type="button"
+                            onClick={onGeo}
+                          >
+                            <i className="bi bi-cursor-fill me-1" />
+                            Ambil Lokasi Saat Ini
+                          </Button>
+                        </div>
+                      </Col>
+
+                      <Col lg={8}>
                         <div className="map-container mt-2">
                           <div
                             ref={mapContainerRef}
                             style={{
                               width: '100%',
-                              height: '100%',
+                              height: '300px',
                               borderRadius: 8,
                               overflow: 'hidden',
                             }}
                           />
                         </div>
-                        <p className="text-muted mt-2 mb-0">{mapText}</p>
-                      </div>
-                    </Form.Group>
-                  </Col>
+                        <p className="text-muted small mt-2 mb-0">{mapText}</p>
+                      </Col>
 
-                  <Col xs={12}>
-                    <Form.Label>Tunjukkan bahwa Anda adalah manusia</Form.Label>
+                      <Col lg={4}>
+                        <Form.Label className="mb-1">Koordinat *</Form.Label>
+                        <Form.Group controlId="latitude" className="mb-2">
+                          <Form.Control
+                            name="latitude"
+                            placeholder="Latitude"
+                            value={latitude}
+                            onChange={(e) => setLatitude(e.target.value)}
+                            required
+                            inputMode="decimal"
+                          />
+                        </Form.Group>
+                        <Form.Group controlId="longitude">
+                          <Form.Control
+                            name="longitude"
+                            placeholder="Longitude"
+                            value={longitude}
+                            onChange={(e) => setLongitude(e.target.value)}
+                            required
+                            inputMode="decimal"
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
+
+                <div className="d-grid gap-2">
+                  <div className="text-center">
+                    <Form.Label>Verifikasi Keamanan</Form.Label>
                     <TurnstileWidget
                       siteKey={siteKey}
                       onToken={setTsToken}
-                      className="mb-3 w-100"
+                      className="mb-3 d-flex justify-content-center"
                     />
-                  </Col>
+                  </div>
 
-                  <Col xs={12} className="text-center mt-4">
-                    <Button type="submit" size="lg" disabled={submitDisabled}>
-                      {isSubmitting ? (
+                  <Button type="submit" size="lg" disabled={submitDisabled}>
+                    {isSubmitting || isUploading ? (
+                      <>
                         <Spinner
                           as="span"
                           animation="border"
                           size="sm"
                           role="status"
                           aria-hidden="true"
+                          className="me-2"
                         />
-                      ) : (
-                        'Kirim Laporan'
-                      )}
-                    </Button>
-                  </Col>
-                </Row>
+                        {isUploading ? 'Mengunggah Foto…' : 'Mengirim…'}
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-send-fill me-2" />
+                        Kirim Laporan
+                      </>
+                    )}
+                  </Button>
+                </div>
               </Form>
             </div>
           </Col>

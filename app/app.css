@@ -606,4 +606,26 @@ footer {
     transform: scale(1);
     opacity: 1;
   }
+
+  /* Tambahkan ini ke file CSS global Anda */
+.file-upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.file-upload-area:hover {
+  border-color: #0d6efd; /* Bootstrap primary color */
+  background-color: #f8f9fa; /* Bootstrap light gray */
+}
+
+.file-upload-area .image-preview {
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
 }
