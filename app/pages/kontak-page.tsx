@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap';
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Modal,
+  Row,
+} from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 
 export default function KontakPage() {
@@ -62,9 +70,36 @@ export default function KontakPage() {
                   <Card.Body>
                     <Form.Group>
                       <div className="d-flex flex-wrap gap-3">
-                        <Form.Check type="radio" label="Lapor Bug/Error" name="type" id="type-bugs" value="bugs" checked={type === 'bugs'} onChange={() => setType('bugs')} required />
-                        <Form.Check type="radio" label="Pertanyaan" name="type" id="type-questions" value="questions" checked={type === 'questions'} onChange={() => setType('questions')} required />
-                        <Form.Check type="radio" label="Komentar/Saran" name="type" id="type-comments" value="comments" checked={type === 'comments'} onChange={() => setType('comments')} required />
+                        <Form.Check
+                          type="radio"
+                          label="Lapor Bug/Error"
+                          name="type"
+                          id="type-bugs"
+                          value="bugs"
+                          checked={type === 'bugs'}
+                          onChange={() => setType('bugs')}
+                          required
+                        />
+                        <Form.Check
+                          type="radio"
+                          label="Pertanyaan"
+                          name="type"
+                          id="type-questions"
+                          value="questions"
+                          checked={type === 'questions'}
+                          onChange={() => setType('questions')}
+                          required
+                        />
+                        <Form.Check
+                          type="radio"
+                          label="Komentar/Saran"
+                          name="type"
+                          id="type-comments"
+                          value="comments"
+                          checked={type === 'comments'}
+                          onChange={() => setType('comments')}
+                          required
+                        />
                       </div>
                     </Form.Group>
                   </Card.Body>
@@ -80,26 +115,57 @@ export default function KontakPage() {
                     <Row className="g-3">
                       <Col xs={12}>
                         <Form.Group>
-                          <Form.Label>Pesan<span className="text-danger">*</span></Form.Label>
-                          <Form.Control as="textarea" rows={4} value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Tuliskan pesan, pertanyaan, atau deskripsi bug Anda di sini..." required />
+                          <Form.Label>
+                            Pesan<span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={4}
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
+                            placeholder="Tuliskan pesan, pertanyaan, atau deskripsi bug Anda di sini..."
+                            required
+                          />
                         </Form.Group>
                       </Col>
                       {type === 'bugs' && (
                         <Col xs={12}>
-                          <Form.Label>Screenshot Bug <span className="text-muted">(Opsional)</span></Form.Label>
+                          <Form.Label>
+                            Screenshot Bug{' '}
+                            <span className="text-muted">(Opsional)</span>
+                          </Form.Label>
                           <Form.Group
                             controlId="bugFile"
                             className="file-upload-area text-center p-4"
-                            onClick={() => document.getElementById('bug-file-input')?.click()}
+                            onClick={() =>
+                              document.getElementById('bug-file-input')?.click()
+                            }
                           >
-                            <Form.Control id="bug-file-input" type="file" accept="image/*" onChange={onFile} hidden />
+                            <Form.Control
+                              id="bug-file-input"
+                              type="file"
+                              accept="image/*"
+                              onChange={onFile}
+                              hidden
+                            />
                             {bugPreview ? (
-                              <img src={bugPreview} className="image-preview d-block w-100 h-auto" alt="Bug Preview" />
+                              <img
+                                src={bugPreview}
+                                className="image-preview d-block w-100 h-auto"
+                                alt="Bug Preview"
+                              />
                             ) : (
                               <div>
-                                <i className="bi bi-cloud-arrow-up-fill" style={{ fontSize: '2.5rem' }} />
-                                <p className="mb-0 mt-2">Klik disini untuk mengunggah gambar</p>
-                                <small className="text-muted">(Format: JPG, PNG, WEBP)</small>
+                                <i
+                                  className="bi bi-cloud-arrow-up-fill"
+                                  style={{ fontSize: '2.5rem' }}
+                                />
+                                <p className="mb-0 mt-2">
+                                  Klik disini untuk mengunggah gambar
+                                </p>
+                                <small className="text-muted">
+                                  (Format: JPG, PNG, WEBP)
+                                </small>
                               </div>
                             )}
                           </Form.Group>
@@ -119,20 +185,39 @@ export default function KontakPage() {
                     <Row className="g-3">
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label>Nama Depan<span className="text-danger">*</span></Form.Label>
-                          <Form.Control placeholder="cth: Raffi" value={first} onChange={(e) => setFirst(e.target.value)} required />
+                          <Form.Label>
+                            Nama Depan<span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="cth: Raffi"
+                            value={first}
+                            onChange={(e) => setFirst(e.target.value)}
+                            required
+                          />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label>Nama Belakang</Form.Label>
-                          <Form.Control placeholder="cth: Ahmad" value={last} onChange={(e) => setLast(e.target.value)} />
+                          <Form.Control
+                            placeholder="cth: Ahmad"
+                            value={last}
+                            onChange={(e) => setLast(e.target.value)}
+                          />
                         </Form.Group>
                       </Col>
                       <Col xs={12}>
                         <Form.Group>
-                          <Form.Label>Email<span className="text-danger">*</span></Form.Label>
-                          <Form.Control type="email" placeholder="cth: raffi.ahmad@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                          <Form.Label>
+                            Email<span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            type="email"
+                            placeholder="cth: raffi.ahmad@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
                         </Form.Group>
                       </Col>
                     </Row>
@@ -157,12 +242,13 @@ export default function KontakPage() {
           <Modal.Body className="text-center">
             <div className="mb-3">
               <i
-                className="bi bi-check-circle-fill text-success" 
+                className="bi bi-check-circle-fill text-success"
                 style={{ fontSize: '3rem' }}
               />
             </div>
             <p>
-              Terima kasih atas masukan Anda. Kami menghargai masukan yang Anda berikan dan akan menggunakannya untuk meningkatkan layanan kami.
+              Terima kasih atas masukan Anda. Kami menghargai masukan yang Anda
+              berikan dan akan menggunakannya untuk meningkatkan layanan kami.
             </p>
           </Modal.Body>
           <Modal.Footer className="justify-content-center">

@@ -1,5 +1,5 @@
 import { PrismaClient } from '../app/generated/prisma';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 // Inisialisasi Prisma Client
 const prisma = new PrismaClient();
@@ -9,8 +9,26 @@ const hashPassword = (password: string) => {
   return bcrypt.hash(password, 10);
 };
 
+/**
+ * Fungsi ini mereset sequence auto-increment untuk semua tabel.
+ * Ini sangat berguna di lingkungan pengembangan untuk memperbaiki error "Unique constraint failed"
+ * yang terjadi ketika sequence tidak sinkron setelah operasi manual pada database.
+ */
+async function resetAllSequences() {
+  console.log('🔄 Mereset semua sequence ID...');
+  const tableNames = ['users', 'problem_types', 'reports', 'report_progress'];
+  for (const tableName of tableNames) {
+    const sequenceName = `${tableName}_id_seq`;
+    await prisma.$executeRawUnsafe(
+      `SELECT setval('${sequenceName}', COALESCE((SELECT MAX(id) FROM "${tableName}"), 1), false);`,
+    );
+  }
+  console.log('✅ Semua sequence berhasil direset.');
+}
+
 async function main() {
   console.log('🌱 Memulai proses seeding...');
+  await resetAllSequences();
 
   // 1. Membuat Kategori Masalah (Problem Types)
   console.log('Membuat kategori masalah...');
