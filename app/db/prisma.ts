@@ -1,9 +1,8 @@
-async function getPrisma(connectionString: string) {
-  const { PrismaClient } = await import('@prisma/client');
-  const { PrismaNeonHTTP } = await import('@prisma/adapter-neon');
+import { PrismaClient } from '@prisma/client/edge';
+import { withAccelerate } from '@prisma/extension-accelerate';
 
-  const adapter = new PrismaNeonHTTP(connectionString, {});
-  return new PrismaClient({ adapter });
+async function getPrisma(datasourceUrl: string) {
+  return new PrismaClient({ datasourceUrl }).$extends(withAccelerate());
 }
 
 export { getPrisma };

@@ -7,19 +7,12 @@
 generator client {
   provider = "prisma-client-js"
   decimalNumberStrategy = "number"
-  engineType = "wasm"
-  output   = "../app/generated/prisma"
-}
-
-generator clientEdge {
-  provider = "prisma-client-js"
-  decimalNumberStrategy = "number"
-  engineType = "edge"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
