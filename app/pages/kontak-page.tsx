@@ -1,7 +1,10 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
+import { useNavigate } from 'react-router';
 
 export default function KontakPage() {
+  const navigate = useNavigate();
+
   const [type, setType] = useState<'bugs' | 'questions' | 'comments' | ''>('');
   const [feedback, setFeedback] = useState('');
   const [first, setFirst] = useState('');
@@ -22,6 +25,7 @@ export default function KontakPage() {
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+    // TODO: Kirim data form ke server di sini
     setShowSuccess(true);
     setType('');
     setFeedback('');
@@ -30,6 +34,11 @@ export default function KontakPage() {
     setEmail('');
     setBugFile(null);
     setBugPreview(null);
+  };
+
+  const handleCloseAndRedirect = () => {
+    setShowSuccess(false);
+    navigate('/');
   };
 
   return (
@@ -172,11 +181,11 @@ export default function KontakPage() {
               />
             </div>
             <p>
-              Thank you for your feedback. We appreciate your input and will use it to improve our service.
+              Terima kasih atas masukan Anda. Kami menghargai masukan yang Anda berikan dan akan menggunakannya untuk meningkatkan layanan kami.
             </p>
           </Modal.Body>
           <Modal.Footer className="justify-content-center">
-            <Button onClick={() => setShowSuccess(false)}>OK</Button>
+            <Button onClick={handleCloseAndRedirect}>OK</Button>
           </Modal.Footer>
         </Modal>
       </Container>
