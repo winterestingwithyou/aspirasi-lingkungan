@@ -324,7 +324,7 @@ export function ReportPage({
                             value={reporterName}
                             onChange={(e) => setReporterName(e.target.value)}
                             required
-                            placeholder="cth: Budi Sanjaya"
+                            placeholder="cth: Raffi Ahmad"
                           />
                         </Form.Group>
                       </Col>
