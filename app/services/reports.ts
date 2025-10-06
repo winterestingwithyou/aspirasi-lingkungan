@@ -1,9 +1,6 @@
 import type { ReportsResponse, ReportStatsResponse } from '~/types';
 
-interface GetReportsParams {
-  limit?: number | string;
-  cursor?: number | string;
-}
+type GetReportsParams = Record<string, string | number | undefined | null>;
 
 /**
  * Ambil daftar reports dari /api/reports (same-origin).
@@ -15,10 +12,12 @@ async function getReports(
   const origin = request ? new URL(request.url).origin : '';
   const url = new URL('/api/reports', origin);
 
-  // Pasang query params
-  if (params.limit != null) url.searchParams.set('limit', String(params.limit));
-  if (params.cursor != null && params.cursor !== '')
-    url.searchParams.set('cursor', String(params.cursor));
+  // Secara dinamis menambahkan semua parameter yang valid ke URL
+  Object.entries(params).forEach(([key, value]) => {
+    if (value != null && value !== '') {
+      url.searchParams.set(key, String(value));
+    }
+  });
 
   const res = await fetch(url.toString(), {
     method: 'GET',

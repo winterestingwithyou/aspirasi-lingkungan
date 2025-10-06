@@ -17,7 +17,7 @@ function meta({}: Route.MetaArgs) {
 
 async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const limitStr = url.searchParams.get('limit') ?? '6';
+  const limitStr = url.searchParams.get('limit') ?? '6'; // Biarkan 6 untuk halaman publik
   const pageStr = url.searchParams.get('page') ?? '1';
 
   try {

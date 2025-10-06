@@ -1,6 +1,6 @@
 import { Form, Pagination } from 'react-bootstrap';
-import { useNavigate } from 'react-router';
-import type { ReportsResponse } from '~/types';
+import { useLocation, useNavigate } from 'react-router';
+import type { GovLaporanLoaderData } from '~/routes/gov.laporan._index'; // Import tipe data baru dari loader
 
 export const badge = (s: string) =>
   s === 'PENDING'
@@ -20,9 +20,13 @@ export const statusText = (s: string) =>
         ? 'Selesai'
         : 'Laporan Palsu';
 
-export default function GovLaporanPage({ reportsResponse }: { reportsResponse: ReportsResponse }) {
+export default function GovLaporanPage({ reportsResponse }: { reportsResponse: GovLaporanLoaderData }) {
   const { data: reports, nextCursor, limit } = reportsResponse;
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
   return (
     <>
       <h2 className="mb-4">Daftar Laporan Masalah</h2>
@@ -94,12 +98,23 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: R
 
       <nav aria-label="Page navigation" className="mt-4">
         <Pagination className="justify-content-center">
-          <Pagination.Prev disabled>Sebelumnya</Pagination.Prev>
-          <Pagination.Item active>1</Pagination.Item>
+          <Pagination.Prev
+            disabled={currentPage <= 1}
+            onClick={() => {
+              if (currentPage > 1) {
+                navigate(`?limit=${limit}&page=${currentPage - 1}`);
+              }
+            }}
+          >
+            Sebelumnya
+          </Pagination.Prev>
+          <Pagination.Item active>{currentPage}</Pagination.Item>
           <Pagination.Next
             disabled={!nextCursor}
             onClick={() => {
-              if (nextCursor) navigate(`?limit=${limit}&cursor=${nextCursor}`);
+              if (nextCursor) {
+                navigate(`?limit=${limit}&page=${currentPage + 1}`);
+              }
             }}
           >
             Selanjutnya

@@ -5,18 +5,26 @@ import type { CreateReportPayload } from '~/validators/reports';
 
 async function listReports(
   dbUrl: string,
-  { limit, page }: { limit: number; page: number },
+  { limit, cursor, page }: { limit: number; cursor?: number | null; page?: number },
 ): Promise<ReportsResponse> {
   const prisma = await getPrisma(dbUrl);
 
-  const take = Math.min(50, Math.max(1, Number.isFinite(limit) ? limit : 6));
-  const skip = (page - 1) * take;
+  // Gunakan limit yang diberikan, dengan default 10 jika tidak valid. Batasi maksimal 50.
+  const take = Math.min(50, Number.isFinite(limit) && limit > 0 ? limit : 10);
+
+  // Tentukan skip. Prioritaskan cursor. Jika tidak ada, gunakan page.
+  let skip = 0;
+  const cursorObj = cursor ? { id: cursor } : undefined;
+  if (cursor) {
+    skip = 1; // Skip the cursor item itself
+  } else if (page && page > 1) {
+    skip = (page - 1) * take;
+  }
 
   const rows = await prisma.report.findMany({
-    where: {},
+    ...(cursorObj ? { cursor: cursorObj, skip: 1 } : { skip: skip }),
     orderBy: { id: 'desc' },
     take: take + 1,
-    skip: skip,
     select: {
       id: true,
       reporterName: true,
@@ -39,7 +47,7 @@ async function listReports(
   const hasMore = rows.length > take;
   const pageItems = hasMore ? rows.slice(0, take) : rows;
 
-  const nextCursor = hasMore ? page + 1 : null;
+  const nextCursor = hasMore ? pageItems[pageItems.length - 1].id : null;
 
   const data = pageItems.map((r) => {
     return {
@@ -80,7 +88,7 @@ async function listReports(
     } satisfies Report;
   });
 
-  return { data, nextCursor, limit: take } satisfies ReportsResponse;
+  return { data, nextCursor, limit: take };
 }
 
 async function createReport(dbUrl: string, data: CreateReportPayload) {
