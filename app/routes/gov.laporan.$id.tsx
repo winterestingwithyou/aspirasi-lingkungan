@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router';
 import GovDetailLaporan from '~/pages/gov/gov-detail-laporan';
 import { getReportDetailById } from '~/server/model/reports';
 import type { Route } from './+types/gov.laporan.$id';
@@ -38,7 +37,6 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   return reportDetail;
 }
 
-export default function DetailLaporan() {
-  const report = useLoaderData<typeof loader>();
-  return <GovDetailLaporan report={report} />;
+export default function DetailLaporan({ loaderData }: Route.ComponentProps) {
+  return <GovDetailLaporan report={loaderData} />;
 }
