@@ -1,13 +1,10 @@
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { useNavigate } from 'react-router';
+import { useLoaderData, useNavigate } from 'react-router';
 import type { ReportStats } from '~/types';
 
-export default function LandingPage({
-  all,
-  pending,
-  inProgress,
-  completed,
-}: ReportStats) {
+function LandingPage() {
+  const { all, pending, inProgress, completed } = useLoaderData<ReportStats>();
+
   const navigate = useNavigate();
 
   return (
@@ -102,3 +99,5 @@ export default function LandingPage({
     </>
   );
 }
+
+export { LandingPage };
