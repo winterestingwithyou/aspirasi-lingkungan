@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client/edge';
+import type { Prisma } from '~/generated/prisma/client';
 import type { ApiError } from './api';
 
 type ReportStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAKE_REPORT';

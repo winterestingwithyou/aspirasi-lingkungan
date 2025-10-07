@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { getPrisma } from 'workers/db';
 import { createReportSchema } from 'workers/schemas/reports';
 import { zValidator } from '@hono/zod-validator';
 import type { Env } from '../types';
@@ -9,6 +8,7 @@ import {
   countTodayCompletedReports,
   countTodayReports,
 } from '~/server/model/reports';
+import { getPrisma } from '~/db/prisma';
 
 export const reportsRouter = new Hono<{ Bindings: Env }>();
 

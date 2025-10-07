@@ -1,4 +1,4 @@
-import { Prisma, ReportStatus } from '@prisma/client/edge';
+import { Prisma, ReportStatus } from '~/generated/prisma/client';
 import { getPrisma } from '~/db/prisma';
 import type { Report, ReportDetail, ReportsResponse } from '~/types';
 import type { CreateReportPayload } from '~/validators/reports';
