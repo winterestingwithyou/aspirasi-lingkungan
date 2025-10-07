@@ -1,5 +1,5 @@
 import { Prisma, ReportStatus } from '~/generated/prisma/client';
-import { getPrisma } from '~/db/prisma';
+import { getPrisma } from '~/db';
 import type { Report, ReportDetail, ReportsResponse } from '~/types';
 import type { CreateReportPayload } from '~/validators/reports';
 

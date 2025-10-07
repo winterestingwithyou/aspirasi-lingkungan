@@ -1,4 +1,4 @@
-import { getPrisma } from '../../db/prisma';
+import { getPrisma } from '~/db';
 
 async function listProblemTypes(dbUrl: string, includeDescription = false) {
   const prisma = await getPrisma(dbUrl);
@@ -33,11 +33,17 @@ async function deleteProblemType(dbUrl: string, id: number) {
   } catch (error: any) {
     // Handle case where problem type is still in use by reports
     if (error.code === 'P2003') {
-      throw new Error('Jenis masalah ini tidak dapat dihapus karena masih digunakan oleh beberapa laporan.');
+      throw new Error(
+        'Jenis masalah ini tidak dapat dihapus karena masih digunakan oleh beberapa laporan.',
+      );
     }
     throw error;
   }
 }
 
-
-export { listProblemTypes, createProblemType, updateProblemType, deleteProblemType };
+export {
+  listProblemTypes,
+  createProblemType,
+  updateProblemType,
+  deleteProblemType,
+};

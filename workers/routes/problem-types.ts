@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Env } from 'workers/types';
-import { getPrisma } from '~/db/prisma';
+import { getPrisma } from '~/db';
 
 export const problemTypeRouter = new Hono<{ Bindings: Env }>();
 
