@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { useLoaderData } from 'react-router';
 import { Carousel, Col, Row } from 'react-bootstrap';
 import type { ReportDetail } from '~/types';
 import { badge, statusText } from './gov-laporan';
@@ -18,7 +18,9 @@ const imgStyle: React.CSSProperties = {
   minHeight: 300,
 };
 
-export default function GovDetailLaporan({ report }: { report: ReportDetail }) {
+export default function GovDetailLaporan() {
+  const report = useLoaderData<ReportDetail>();
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">

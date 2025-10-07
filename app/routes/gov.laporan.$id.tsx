@@ -37,6 +37,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   return reportDetail;
 }
 
-export default function DetailLaporan({ loaderData }: Route.ComponentProps) {
-  return <GovDetailLaporan report={loaderData} />;
+// eslint-disable-next-line no-empty-pattern
+export default function DetailLaporan({}: Route.ComponentProps) {
+  return <GovDetailLaporan />;
 }
