@@ -35,7 +35,7 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
         <div className="row g-3">
           <div className="col-md-4">
             <Form.Label>Pencarian Laporan</Form.Label>
-            <div className="input-group">
+            <div className="input-group input-group-sm">
               <Form.Control placeholder="Cari berdasarkan judul atau lokasi..." />
               <button className="btn btn-outline-secondary" type="button">
                 <i className="bi bi-search" />
@@ -44,6 +44,7 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
           </div>
           <div className="col-md-4">
             <Form.Label>Filter Kategori</Form.Label>
+            <div className="input-group input-group-sm">
             <Form.Select defaultValue="all">
               <option value="all">Semua Kategori</option>
               <option value="sampah">Tumpukan Sampah</option>
@@ -53,9 +54,11 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
               <option value="banjir">Genangan Air/Banjir</option>
               <option value="lainnya">Lainnya</option>
             </Form.Select>
+            </div>
           </div>
           <div className="col-md-4">
             <Form.Label>Filter Status</Form.Label>
+            <div className="input-group input-group-sm">
             <Form.Select defaultValue="all">
               <option value="all">Semua Status</option>
               <option value="pending">Menunggu Tindakan</option>
@@ -63,6 +66,7 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
               <option value="completed">Selesai</option>
               <option value="fake_report">Laporan Palsu</option>
             </Form.Select>
+            </div>
           </div>
         </div>
       </div>
