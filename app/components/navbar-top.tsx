@@ -8,8 +8,13 @@ export default function NavbarTop() {
     <Navbar expand="lg" data-bs-theme="dark" sticky="top" className="shadow-sm">
       <Container>
         <Navbar.Brand as={NavLink} to="/">
-          <i className="bi bi-tree-fill me-2" />
-          Platform Pelaporan Masalah Lingkungan
+          <img
+            alt="ECO-RAPID Logo"
+            src="/eco-rapid-black-white.png"
+            height="32"
+            className="d-inline-block align-top me-2"
+          />
+          ECO-RAPID
         </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse>

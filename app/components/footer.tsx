@@ -51,25 +51,25 @@ export default function Footer() {
             <h5>Hubungi Kami</h5>
             <ul className="footer-links">
               <li>
-                <i className="bi bi-geo-alt me-2" /> Jl. Srijaya Negara
+                <i className="bi bi-geo-alt me-2" /> Jl. Masjid Al-Ghazali, Bukit Lama, Kec. Ilir Bar. I, Kota Palembang, Sumatera Selatan 30128
               </li>
               <li>
-                <i className="bi bi-telephone me-2" /> (021) 1234-5678
+                <i className="bi bi-telephone me-2" /> (+62) 852-1195-1640
               </li>
               <li>
-                <i className="bi bi-envelope me-2" /> info@bertindaksegereee.id
+                <i className="bi bi-envelope me-2" /> eco.rapid@gmail.com
               </li>
             </ul>
           </Col>
           <Col lg={3} className="mb-4">
-            <h5>Newsletter</h5>
-            <p>Daftar untuk mendapatkan update terbaru tentang lingkungan</p>
-            <Form className="mt-3">
-              <div className="input-group">
-                <Form.Control type="email" placeholder="Email Anda" />
-                <Button>Daftar</Button>
-              </div>
-            </Form>
+            <h5>Jadilah Pahlawan Lingkungan</h5>
+            <p>
+              Lihat masalah di sekitar Anda? Jangan diam saja. Laporkan sekarang
+              dan bantu kami mengambil tindakan.
+            </p>
+            <Button href="/laporkan" variant="success" className="w-100 mt-2">
+              <i className="bi bi-megaphone-fill me-2" /> Laporkan Masalah
+            </Button>
           </Col>
         </Row>
         <div className="copyright">
