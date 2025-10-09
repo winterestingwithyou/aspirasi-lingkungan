@@ -34,9 +34,9 @@ export default function GovLayout({ children }: PropsWithChildren) {
           </NavLink>
         </li>
         <li>
-          <a className="nav-link-aside" href="#">
+          <NavLink to="/gov/pengaturan" className="nav-link-aside" onClick={handleCloseSidebar}>
             <i className="bi bi-gear" /> Pengaturan
-          </a>
+          </NavLink>
         </li>
         <li>
           <a className="nav-link-aside" href="/">
