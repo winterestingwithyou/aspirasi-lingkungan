@@ -13,7 +13,7 @@ import {
 import { useFetcher, useNavigate } from 'react-router';
 import TurnstileWidget from '~/components/turnstile-widget';
 import { uploadToCloudinary, getAddress } from '~/services';
-import type { ProblemType, Report } from '~/types';
+import type { ProblemType } from '~/types';
 import { createReportSchema } from '~/validators/reports';
 
 export function ReportPage({
@@ -65,7 +65,7 @@ export function ReportPage({
     (fetcher.state === 'loading' && !!fetcher.formData);
 
   const actionData = fetcher.data as
-    | { status: number; data: Report }
+    | { status: number; data: { id: string } }
     | { status: number; error: string }
     | undefined;
 
@@ -397,11 +397,11 @@ export function ReportPage({
                           controlId="photoFile"
                           className="file-upload-area text-center p-4"
                           onClick={() =>
-                            document.getElementById('photo-input')?.click()
+                            document.getElementById('photoFile')?.click()
                           }
                         >
                           <Form.Control
-                            id="photo-input"
+                            name="photo-input"
                             type="file"
                             accept="image/*"
                             onChange={onFile}
