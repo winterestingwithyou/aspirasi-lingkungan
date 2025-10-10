@@ -31,10 +31,10 @@ async function loader({ context, params }: Route.LoaderArgs) {
     throw new Response('Laporan tidak ditemukan', { status: 404 });
   }
 
-  const allowedNext = getAllowedNextStatuses(state.status as ReportStatus);
+  const allowedNext = getAllowedNextStatuses(state.status);
   return {
     reportId,
-    currentStatus: state.status as ReportStatus,
+    currentStatus: state.status,
     allowedNext,
     isFakeReport: state.isFakeReport ?? false,
   };
@@ -87,5 +87,4 @@ function Page({}: Route.ComponentProps) {
   return <GovTambahProgress />;
 }
 
-export { meta, loader, action };
-export default Page;
+export { meta, loader, action, Page as default };

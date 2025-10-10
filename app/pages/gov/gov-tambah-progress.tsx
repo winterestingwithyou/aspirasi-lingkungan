@@ -1,5 +1,6 @@
 import { useActionData, useLoaderData, Form, Link } from 'react-router';
 import { Alert } from 'react-bootstrap';
+import { statusText } from '~/helper/report-status';
 
 type LoaderData = {
   reportId: number;
@@ -50,7 +51,7 @@ export default function GovTambahProgress() {
           <select name="status" className="form-select" disabled={disabled}>
             {data.allowedNext.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {statusText(s)}
               </option>
             ))}
           </select>
