@@ -60,7 +60,7 @@ export default function GovJenisMasalahPage({ problemTypes }: { problemTypes: Je
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Kelola Jenis Masalah</h2>
         <Button onClick={handleShowAdd} disabled={isSubmitting}>
-          <i className="bi bi-plus-lg me-2"></i>
+          <i className="bi bi-plus-lg me-1"></i>
           Tambah
         </Button>
       </div>
