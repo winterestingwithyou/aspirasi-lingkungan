@@ -77,10 +77,11 @@ model Report {
 // Model untuk setiap update progress dari sebuah laporan
 model ReportProgress {
   id                 Int      @id @default(autoincrement())
-  status             String // Contoh: "Verifikasi Lapangan", "Pembersihan Dimulai"
+  phase              String   // Contoh: "Verifikasi Lapangan", "Pembersihan Dimulai"
   description        String   @db.Text
   progressPhotoUrl   String?  @map("progress_photo_url")
   createdAt          DateTime @default(now()) @map("created_at")
+  reportStatus     ReportStatus  @default(PENDING) @map("report_status")
 
   // Foreign Key untuk relasi dengan Report
   reportId           Int      @map("report_id")
