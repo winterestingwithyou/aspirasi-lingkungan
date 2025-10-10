@@ -74,7 +74,7 @@ export default function GovLayout({ children }: PropsWithChildren) {
           </div>
 
           {/* Sidebar Offcanvas untuk Tampilan Mobile */}
-          <Offcanvas show={showSidebar} onHide={handleCloseSidebar} className="offcanvas-half">
+          <Offcanvas show={showSidebar} onHide={handleCloseSidebar} placement="start" className="offcanvas-half">
             <Offcanvas.Header closeButton>
               <Offcanvas.Title className="d-flex align-items-center">
                 <div
