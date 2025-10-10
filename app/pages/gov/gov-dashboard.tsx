@@ -13,7 +13,7 @@ export default function GovDashboard() {
     <>
       <div className="welcome-card mb-4">
         <h2 className="h5-sm">Selamat Datang, Admin!</h2>
-        <p>Dashboard Platform Pelaporan Masalah Lingkungan</p>
+        <p style={{ fontSize: '0.9rem' }}>Dashboard Platform Pelaporan Masalah Lingkungan</p>
       </div>
 
       <div className="today-stats">
