@@ -1,7 +1,12 @@
+import type { Route } from './+types/gov._index';
 import GovDashboard from '~/pages/gov/gov-dashboard';
-import type { Route } from './+types/gov-index';
-import { getReportStats, getReports } from '~/services';
-import type { ReportsResponse } from '~/types';
+import { ReportStatus } from '~/prisma-enums';
+import {
+  countAllReports,
+  countReportsByStatus,
+  listReports,
+} from '~/server/model/reports';
+import type { ReportsResponse, ReportStats } from '~/types';
 
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
@@ -16,17 +21,22 @@ export function meta({}: Route.MetaArgs) {
 }
 
 // Loader untuk mengambil statistik dan 3 laporan terbaru
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
+  const dbUrl = context.cloudflare.env.DATABASE_URL;
   try {
     // Ambil data secara paralel menggunakan request yang sama
-    const [recentReportsResponse, statsResponse] = await Promise.all([
-      getReports({ limit: '3', cursor: '' }, request),
-      getReportStats(request),
-    ]);
+    const [recentReportsResponse, all, pending, inProgress, completed] =
+      await Promise.all([
+        listReports(dbUrl, { limit: 3, page: 1 }),
+        countAllReports(dbUrl),
+        countReportsByStatus(dbUrl, ReportStatus.PENDING),
+        countReportsByStatus(dbUrl, ReportStatus.IN_PROGRESS),
+        countReportsByStatus(dbUrl, ReportStatus.COMPLETED),
+      ]);
 
     // Ekstrak data dari masing-masing response
     const recentReports = recentReportsResponse;
-    const stats = statsResponse.data;
+    const stats = { all, pending, inProgress, completed } satisfies ReportStats;
 
     return { recentReports, stats };
   } catch (err) {
@@ -43,6 +53,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
-export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  return <GovDashboard loaderData={loaderData} />;
+// eslint-disable-next-line no-empty-pattern
+export default function Dashboard({}: Route.ComponentProps) {
+  return <GovDashboard />;
 }

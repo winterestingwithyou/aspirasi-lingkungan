@@ -39,7 +39,8 @@ async function loader({ request, context }: Route.LoaderArgs) {
   }
 }
 
-function DaftarMasalah({ loaderData }: Route.ComponentProps) {
+// eslint-disable-next-line no-empty-pattern
+function DaftarMasalah({}: Route.ComponentProps) {
   return <DaftarMasalahPage />;
 }
 

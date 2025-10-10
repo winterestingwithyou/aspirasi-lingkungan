@@ -1,4 +1,5 @@
-import type { GovDashboardLoaderData } from '~/types';
+import { useLoaderData } from 'react-router';
+import type { ReportsResponse, ReportStats } from '~/types';
 
 const badge = (s: string) =>
   s === 'PENDING'
@@ -18,18 +19,18 @@ const statusText = (s: string) =>
         ? 'Selesai'
         : 'Laporan Palsu';
 
-export default function GovDashboard({
-  loaderData,
-}: {
-  loaderData: GovDashboardLoaderData;
-}) {
+export default function GovDashboard() {
+  const loaderData = useLoaderData<{
+    recentReports: ReportsResponse;
+    stats: ReportStats;
+  }>();
   const reports = loaderData.recentReports?.data ?? [];
   const stats = loaderData.stats;
   return (
     <>
       <div className="welcome-card mb-4">
         <h2>Selamat Datang, Admin!</h2>
-        <p>Dashboard Sistem Pelaporan Masalah Lingkungan</p>
+        <p>Dashboard Platform Pelaporan Masalah Lingkungan</p>
       </div>
 
       <div className="today-stats">
@@ -43,7 +44,7 @@ export default function GovDashboard({
           </div>
           <div className="col-md-6">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats?.todayCompleted ?? 0}</div>
+              <div className="stats-number">{stats?.todayCompleeted ?? 0}</div>
               <p>Laporan Selesai Hari Ini</p>
             </div>
           </div>
@@ -79,7 +80,9 @@ export default function GovDashboard({
         <div className="report-card" key={report.id}>
           <div className="d-flex justify-content-between align-items-start">
             <div>
-              <h5>{report.problemType?.name || 'Laporan'} #{report.id}</h5>
+              <h5>
+                {report.problemType?.name || 'Laporan'} #{report.id}
+              </h5>
               <p className="text-muted mb-2">
                 <i className="bi bi-geo-alt-fill me-1" />{' '}
                 {report.location || 'Lokasi tidak ada'}

@@ -61,7 +61,7 @@ export default function GovJenisMasalahPage({ problemTypes }: { problemTypes: Je
         <h2>Kelola Jenis Masalah</h2>
         <Button onClick={handleShowAdd} disabled={isSubmitting}>
           <i className="bi bi-plus-lg me-2"></i>
-          Tambah Jenis Masalah
+          Tambah
         </Button>
       </div>
 
@@ -153,7 +153,7 @@ export default function GovJenisMasalahPage({ problemTypes }: { problemTypes: Je
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose} disabled={isSubmitting}>
+            <Button variant="primary" onClick={handleClose} disabled={isSubmitting}>
               Batal
             </Button>
             <Button variant="primary" type="submit" disabled={isSubmitting}>
