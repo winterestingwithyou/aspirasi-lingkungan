@@ -47,6 +47,21 @@ export default function GovTambahProgress() {
 
       <Form method="post" className="border rounded p-3" replace>
         <div className="mb-3">
+          <label className="form-label">Fase Progress</label>
+          <input
+            name="phase"
+            className="form-control"
+            placeholder="Fase Progress saat ini...."
+            disabled={disabled}
+          />
+          {result && result.ok === false && result.fieldErrors?.phase && (
+            <div className="text-danger small mt-1">
+              {result.fieldErrors.status}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-3">
           <label className="form-label">Status</label>
           <select name="status" className="form-select" disabled={disabled}>
             {data.allowedNext.map((s) => (

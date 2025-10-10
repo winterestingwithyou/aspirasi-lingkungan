@@ -39,58 +39,82 @@ export async function addReportProgress(
   dbUrl: string,
   reportId: number,
   payload: {
+    phase: string;
     status: ReportStatus;
     description: string;
     progressPhotoUrl?: string | null;
   },
 ) {
   const prisma = await getPrisma(dbUrl);
-  try {
-    // Ambil status terkini
-    const report = await prisma.report.findUnique({
+
+  // 1) Ambil status terkini untuk validasi cepat
+  const report = await prisma.report.findUnique({
+    where: { id: reportId },
+    select: { id: true, status: true, isFakeReport: true },
+  });
+
+  if (!report) {
+    throw new Error('Laporan tidak ditemukan');
+  }
+  if (report.isFakeReport) {
+    throw new Error('Laporan telah ditandai palsu dan tidak bisa diubah');
+  }
+
+  const allowed = getAllowedNextStatuses(report.status as ReportStatus);
+  if (!allowed.includes(payload.status)) {
+    throw new Error(
+      `Transisi status tidak diizinkan. Status sekarang: ${report.status}. Opsi: ${allowed.join(', ')}`,
+    );
+  }
+
+  const previousStatus = report.status as ReportStatus;
+  const nextStatus = payload.status;
+
+  // 2) Compare-and-swap untuk update status agar “nyangkut” hanya jika status belum berubah
+  const updated = await prisma.report.updateMany({
+    where: {
+      id: reportId,
+      status: previousStatus,
+      isFakeReport: false,
+    },
+    data: { status: nextStatus },
+  });
+
+  if (updated.count === 0) {
+    // Status sudah berubah oleh proses lain; beri pesan yang jelas
+    const latest = await prisma.report.findUnique({
       where: { id: reportId },
-      select: { id: true, status: true, isFakeReport: true },
+      select: { status: true },
+    });
+    const latestStatus = latest?.status ?? previousStatus;
+    throw new Error(
+      `Status laporan sudah berubah menjadi "${latestStatus}". Silakan muat ulang dan coba lagi.`,
+    );
+  }
+
+  // 3) Insert progress; jika gagal, coba rollback status (best effort, non-atomic)
+  try {
+    const progress = await prisma.reportProgress.create({
+      data: {
+        reportId,
+        phase: payload.phase,
+        reportStatus: nextStatus, // kolom baru menggantikan 'status' lama
+        description: payload.description,
+        progressPhotoUrl: payload.progressPhotoUrl ?? null,
+        userId: 1, // TODO: ambil dari session/ctx
+      },
     });
 
-    if (!report) {
-      throw new Error('Laporan tidak ditemukan');
-    }
-    if (report.isFakeReport) {
-      throw new Error('Laporan telah ditandai palsu dan tidak bisa diubah');
-    }
-
-    const allowed = getAllowedNextStatuses(report.status as ReportStatus);
-    if (!allowed.includes(payload.status)) {
-      throw new Error(
-        `Transisi status tidak diizinkan. Status sekarang: ${report.status}. Opsi: ${allowed.join(
-          ', ',
-        )}`,
-      );
-    }
-
-    // Simpan progress + update status report sebagai transaksi
-    const result = await prisma.$transaction(async (tx) => {
-      const progress = await tx.reportProgress.create({
-        data: {
-          reportId,
-          status: payload.status,
-          description: payload.description,
-          progressPhotoUrl: payload.progressPhotoUrl ?? null,
-          userId: 1,
-        },
-      });
-
-      await tx.report.update({
-        where: { id: reportId },
-        data: { status: payload.status },
-      });
-
-      return progress;
+    return progress;
+  } catch (err) {
+    // Best-effort rollback (tidak menjamin sukses bila sudah ada perubahan lain)
+    await prisma.report.updateMany({
+      where: { id: reportId, status: nextStatus, isFakeReport: false },
+      data: { status: previousStatus },
     });
-
-    return result;
-  } finally {
-    await prisma.$disconnect();
+    throw err instanceof Error
+      ? new Error(`Gagal menyimpan progress: ${err.message}`)
+      : new Error('Gagal menyimpan progress karena kesalahan tak dikenal');
   }
 }
 
@@ -118,7 +142,8 @@ export async function markReportAsFake(
       await prisma.reportProgress.create({
         data: {
           reportId,
-          status: 'Menandai Laporan Palsu',
+          phase: 'Menandai Laporan Palsu',
+          reportStatus: ReportStatus.FAKE_REPORT,
           description: `Ditandai sebagai laporan palsu. Alasan: ${reason}`,
           progressPhotoUrl: null,
           userId: 1,

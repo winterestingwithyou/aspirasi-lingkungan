@@ -43,6 +43,7 @@ async function loader({ context, params }: Route.LoaderArgs) {
 async function action({ request, params, context }: Route.ActionArgs) {
   const form = await request.formData();
   const reportId = Number(params.id);
+  const phase = String(form.get('phase') || '');
   const status = String(form.get('status') || '');
   const description = String(form.get('description') || '');
   const progressPhotoUrlRaw = form.get('progressPhotoUrl');
@@ -67,14 +68,18 @@ async function action({ request, params, context }: Route.ActionArgs) {
 
   try {
     await addReportProgress(context.cloudflare.env.DATABASE_URL, reportId, {
+      phase: phase.trim(),
       status: status as ReportStatus,
       description: description.trim(),
       progressPhotoUrl,
     });
 
     // Kembali ke halaman detail laporan
-    throw redirect(`/gov/laporan/${reportId}`);
-  } catch (e) {
+    return redirect(`/gov/laporan/${reportId}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    console.error(e);
+
     return {
       ok: false as const,
       message: e?.message ?? 'Gagal menyimpan progress',

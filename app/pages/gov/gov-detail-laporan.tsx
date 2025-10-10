@@ -58,15 +58,15 @@ export default function GovDetailLaporan() {
             </Carousel.Item>
             {report.progressUpdates
               .filter((p) => p.progressPhotoUrl)
-              .map((p, i) => (
+              .map((p) => (
                 <Carousel.Item key={p.id}>
                   <img
                     style={imgStyle}
                     src={p.progressPhotoUrl!}
-                    alt={`Progress ${i + 1}`}
+                    alt={p.phase}
                   />
                   <Carousel.Caption>
-                    <strong>{p.status}</strong>
+                    <strong>{p.phase}</strong>
                   </Carousel.Caption>
                 </Carousel.Item>
               ))}
@@ -105,7 +105,7 @@ export default function GovDetailLaporan() {
           {/* Header Tabel */}
           <Row className="fw-bold border-bottom pb-2 mb-2 d-none d-md-flex">
             <Col md={3} className="text-center">
-              Status
+              Fase Progress
             </Col>
             <Col md={6} className="text-center">
               Deskripsi
@@ -141,7 +141,7 @@ export default function GovDetailLaporan() {
                   >
                     {index + 1}
                   </div>
-                  <span className="fw-semibold">{progress.status}</span>
+                  <span className="fw-semibold">{progress.phase}</span>
                 </div>
               </Col>
               <Col md={6} className="small text-center my-auto">
