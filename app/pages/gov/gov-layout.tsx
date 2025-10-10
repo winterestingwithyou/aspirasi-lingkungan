@@ -78,7 +78,7 @@ export default function GovLayout({ children }: PropsWithChildren) {
             <Offcanvas.Header closeButton>
               <Offcanvas.Title className="d-flex align-items-center">
                 <div
-                  className="py-2 px-3 rounded d-inline-flex align-items-center"
+                  className="py-1 px-3 rounded d-inline-flex align-items-center"
                   style={{ backgroundColor: '#2e8b57', color: 'white' }}
                 >
                   <img
@@ -87,7 +87,7 @@ export default function GovLayout({ children }: PropsWithChildren) {
                     height="30"
                     className="d-inline-block align-top me-2"
                   />
-                  <span className="fw-bold">ECO-RAPID</span>
+                  <span className="fw-bold fs-6">ECO-RAPID</span>
                 </div>
               </Offcanvas.Title>
             </Offcanvas.Header>
