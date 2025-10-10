@@ -64,6 +64,7 @@ interface ReportStats {
   pending?: number;
   inProgress?: number;
   completed?: number;
+  todayCompleeted?: number;
 }
 
 export type {
