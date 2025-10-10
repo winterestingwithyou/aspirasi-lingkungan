@@ -12,7 +12,7 @@ export default function GovDashboard() {
   return (
     <>
       <div className="welcome-card mb-4">
-        <h3>Selamat Datang, Admin!</h3>
+        <h4>Selamat Datang, Admin!</h4>
         <p>Dashboard Platform Pelaporan Masalah Lingkungan</p>
       </div>
 
