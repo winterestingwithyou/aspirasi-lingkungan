@@ -59,13 +59,9 @@ export default function GovJenisMasalahPage({ problemTypes }: { problemTypes: Je
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Kelola Jenis Masalah</h2>
-        <Button
-          onClick={handleShowAdd}
-          disabled={isSubmitting}
-          className="btn-sm d-flex align-items-center"
-        >
-          <i className="bi bi-plus me-1"></i>
-          <span className="text-nowrap">Tambah</span>
+        <Button onClick={handleShowAdd} disabled={isSubmitting} style={{ display: 'flex', alignItems: 'center' }}>
+          <i className="bi bi-plus-lg" style={{ marginRight: '0.5rem' }}></i>
+          Tambah
         </Button>
       </div>
 
