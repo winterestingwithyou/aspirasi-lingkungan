@@ -40,7 +40,10 @@ export default function GovDetailLaporan() {
             </Link>
           )}
 
-          {!report.isFakeReport && <FakeReportButton report={report} />}
+          {!report.isFakeReport &&
+            !(report.status === ReportStatus.COMPLETED) && (
+              <FakeReportButton report={report} />
+            )}
         </div>
       </div>
 

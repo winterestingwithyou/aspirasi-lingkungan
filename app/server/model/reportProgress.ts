@@ -118,7 +118,7 @@ export async function markReportAsFake(
       await prisma.reportProgress.create({
         data: {
           reportId,
-          status: ReportStatus.FAKE_REPORT,
+          status: 'Menandai Laporan Palsu',
           description: `Ditandai sebagai laporan palsu. Alasan: ${reason}`,
           progressPhotoUrl: null,
           userId: 1,
