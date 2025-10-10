@@ -589,6 +589,10 @@ footer {
   border-color: #bbb;
 }
 
+.offcanvas-half {
+  --bs-offcanvas-width: 50vw;
+}
+
 /* Efek fokus pada item carousel teknologi hanya untuk layar besar (tampilan 3 item) */
 @media (min-width: 992px) {
   .tech-carousel-item.side {
