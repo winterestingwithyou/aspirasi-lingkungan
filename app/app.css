@@ -590,7 +590,7 @@ footer {
 }
 
 @media (max-width: 767.98px) {
-  .offcanvas-half {
+  .offcanvas.offcanvas-half {
     width: 50vw !important;
   }
 }
