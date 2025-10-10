@@ -64,7 +64,7 @@ export default function GovJenisMasalahPage({ problemTypes }: { problemTypes: Je
           disabled={isSubmitting}
           className="btn-sm d-flex align-items-center"
         >
-          <i className="bi bi-plus-lg me-1"></i>
+          <i className="bi bi-plus me-1"></i>
           <span className="text-nowrap">Tambah</span>
         </Button>
       </div>
