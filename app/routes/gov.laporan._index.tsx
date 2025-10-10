@@ -1,10 +1,10 @@
 import type { Route } from './+types/gov.laporan._index';
-import type { Report, ReportsResponse } from '~/types'; // Pastikan Report juga diimpor jika diperlukan
-import { getReports } from '~/services';
+import type { ReportsResponse } from '~/types'; // Pastikan Report juga diimpor jika diperlukan
 import GovLaporanPage from '~/pages/gov/gov-laporan';
+import { listReports } from '~/server/model/reports';
 
 // eslint-disable-next-line no-empty-pattern
-export function meta({}: Route.MetaArgs) {
+function meta({}: Route.MetaArgs) {
   return [
     { title: 'Daftar Laporan - Admin' },
     {
@@ -14,11 +14,10 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-// Definisikan tipe data untuk nilai kembalian loader
-export type GovLaporanLoaderData = ReportsResponse;
-
 // Loader mengambil data dari Hono API: /api/reports
-export async function loader({ request }: Route.LoaderArgs) {
+async function loader({ request, context }: Route.LoaderArgs) {
+  const dbUrl = context.cloudflare.env.DATABASE_URL;
+
   const url = new URL(request.url);
   const limitStr = url.searchParams.get('limit') ?? '10';
   const pageStr = url.searchParams.get('page') ?? '1';
@@ -28,25 +27,25 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   try {
     // Panggil service getReports dengan limit dan page, bukan cursor
-    const response = await getReports({
-      limit: limit.toString(),
-      page: page.toString(),
-    }, request);
+    const response = await listReports(dbUrl, { limit, page });
 
     return {
       ...response,
       limit, // Pastikan limit adalah angka
-    } satisfies GovLaporanLoaderData;
+    } satisfies ReportsResponse;
   } catch (err) {
     console.error('Failed to load reports for admin:', err);
     return {
       data: [],
       nextCursor: null,
       limit: limit,
-    } satisfies GovLaporanLoaderData;
+    } satisfies ReportsResponse;
   }
 }
 
-export default function GovLaporan({ loaderData }: Route.ComponentProps) {
-  return <GovLaporanPage reportsResponse={loaderData as GovLaporanLoaderData} />;
+// eslint-disable-next-line no-empty-pattern
+function GovLaporan({}: Route.ComponentProps) {
+  return <GovLaporanPage />;
 }
+
+export { meta, loader, GovLaporan as default };

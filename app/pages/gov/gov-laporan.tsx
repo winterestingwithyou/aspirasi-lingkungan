@@ -1,6 +1,6 @@
 import { Form, Pagination } from 'react-bootstrap';
-import { useLocation, useNavigate } from 'react-router';
-import type { GovLaporanLoaderData } from '~/routes/gov.laporan._index'; // Import tipe data baru dari loader
+import { useLoaderData, useLocation, useNavigate } from 'react-router';
+import type { ReportsResponse } from '~/types';
 
 export const badge = (s: string) =>
   s === 'PENDING'
@@ -20,8 +20,8 @@ export const statusText = (s: string) =>
         ? 'Selesai'
         : 'Laporan Palsu';
 
-export default function GovLaporanPage({ reportsResponse }: { reportsResponse: GovLaporanLoaderData }) {
-  const { data: reports, nextCursor, limit } = reportsResponse;
+export default function GovLaporanPage() {
+  const { data: reports, nextCursor, limit } = useLoaderData<ReportsResponse>();
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -45,27 +45,27 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
           <div className="col-md-4">
             <Form.Label>Filter Kategori</Form.Label>
             <div className="input-group input-group-sm">
-            <Form.Select defaultValue="all">
-              <option value="all">Semua Kategori</option>
-              <option value="sampah">Tumpukan Sampah</option>
-              <option value="jalan">Jalan Berlubang</option>
-              <option value="pohon">Penebangan Pohon Liar</option>
-              <option value="limbah">Pembuangan Limbah</option>
-              <option value="banjir">Genangan Air/Banjir</option>
-              <option value="lainnya">Lainnya</option>
-            </Form.Select>
+              <Form.Select defaultValue="all">
+                <option value="all">Semua Kategori</option>
+                <option value="sampah">Tumpukan Sampah</option>
+                <option value="jalan">Jalan Berlubang</option>
+                <option value="pohon">Penebangan Pohon Liar</option>
+                <option value="limbah">Pembuangan Limbah</option>
+                <option value="banjir">Genangan Air/Banjir</option>
+                <option value="lainnya">Lainnya</option>
+              </Form.Select>
             </div>
           </div>
           <div className="col-md-4">
             <Form.Label>Filter Status</Form.Label>
             <div className="input-group input-group-sm">
-            <Form.Select defaultValue="all">
-              <option value="all">Semua Status</option>
-              <option value="pending">Menunggu Tindakan</option>
-              <option value="progress">Sedang Diproses</option>
-              <option value="completed">Selesai</option>
-              <option value="fake_report">Laporan Palsu</option>
-            </Form.Select>
+              <Form.Select defaultValue="all">
+                <option value="all">Semua Status</option>
+                <option value="pending">Menunggu Tindakan</option>
+                <option value="progress">Sedang Diproses</option>
+                <option value="completed">Selesai</option>
+                <option value="fake_report">Laporan Palsu</option>
+              </Form.Select>
             </div>
           </div>
         </div>
@@ -75,9 +75,12 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
         <div className="report-card" key={report.id}>
           <div className="d-flex justify-content-between align-items-start">
             <div>
-              <h5>{report.problemType?.name || 'Laporan'} #{report.id}</h5>
+              <h5>
+                {report.problemType?.name || 'Laporan'} #{report.id}
+              </h5>
               <p className="text-muted mb-2">
-                <i className="bi bi-geo-alt-fill me-1" /> {report.location || 'Lokasi tidak ada'}
+                <i className="bi bi-geo-alt-fill me-1" />{' '}
+                {report.location || 'Lokasi tidak ada'}
               </p>
               <p className="mb-2">{report.description.slice(0, 100)}...</p>
               <span className={`report-status ${badge(report.status)}`}>
@@ -85,7 +88,9 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
               </span>
             </div>
             <div className="text-end">
-              <small className="text-muted">{new Date(report.createdAt).toLocaleDateString('id-ID')}</small>
+              <small className="text-muted">
+                {new Date(report.createdAt).toLocaleDateString('id-ID')}
+              </small>
               <div className="mt-2">
                 <a
                   className="btn btn-sm btn-outline-primary"
@@ -98,7 +103,9 @@ export default function GovLaporanPage({ reportsResponse }: { reportsResponse: G
           </div>
         </div>
       ))}
-      {reports.length === 0 && <div className="text-center text-muted py-5">Tidak ada laporan.</div>}
+      {reports.length === 0 && (
+        <div className="text-center text-muted py-5">Tidak ada laporan.</div>
+      )}
 
       <nav aria-label="Page navigation" className="mt-4">
         <Pagination className="justify-content-center">
