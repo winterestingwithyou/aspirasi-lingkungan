@@ -1,8 +1,10 @@
-import { useLoaderData } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import { Carousel, Col, Row } from 'react-bootstrap';
 import type { ReportDetail } from '~/types';
 import { badge, statusText } from '~/helper/report-status';
 import { formatDateToIndonesian } from '~/helper/date';
+import { ReportStatus } from '~/prisma-enums';
+import { FakeReportButton } from '~/components/fake-report-button';
 
 const carouselStyle: React.CSSProperties = {
   height: '100%',
@@ -21,10 +23,25 @@ const imgStyle: React.CSSProperties = {
 export default function GovDetailLaporan() {
   const report = useLoaderData<ReportDetail>();
 
+  const canAddProgress =
+    report.status !== ReportStatus.COMPLETED && !report.isFakeReport;
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Detail Laporan #{report.id}</h2>
+        <div className="d-flex gap-2">
+          {canAddProgress && (
+            <Link
+              to={`/gov/laporan/${report.id}/tambah-progress`}
+              className="btn btn-primary"
+            >
+              Tambah Progress
+            </Link>
+          )}
+
+          {!report.isFakeReport && <FakeReportButton report={report} />}
+        </div>
       </div>
 
       <div className="row align-items-stretch">

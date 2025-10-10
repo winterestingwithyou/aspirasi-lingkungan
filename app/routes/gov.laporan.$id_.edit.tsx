@@ -1,5 +1,5 @@
 import GovEditLaporan from '~/pages/gov/gov-edit-laporan';
-import type { Route } from './+types/gov.laporan.$id.edit';
+import type { Route } from './+types/gov.laporan.$id_.edit';
 
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
