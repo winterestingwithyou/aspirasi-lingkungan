@@ -1,7 +1,7 @@
 import { useLoaderData } from 'react-router';
 import { Carousel, Col, Row } from 'react-bootstrap';
 import type { ReportDetail } from '~/types';
-import { badge, statusText } from './gov-laporan';
+import { badge, statusText } from '~/helper/report-status';
 import { formatDateToIndonesian } from '~/helper/date';
 
 const carouselStyle: React.CSSProperties = {
@@ -66,9 +66,7 @@ export default function GovDetailLaporan() {
               <div>Tanggal: {formatDateToIndonesian(report.createdAt)}</div>
               <div>
                 Status:{' '}
-                <span
-                  className={`badge ${badge(report.status).replace('report-status ', '')}`}
-                >
+                <span className={`report-status ${badge(report.status)}`}>
                   {statusText(report.status)}
                 </span>
               </div>

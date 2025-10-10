@@ -1,24 +1,7 @@
 import { Form, Pagination } from 'react-bootstrap';
-import { useLoaderData, useLocation, useNavigate } from 'react-router';
+import { Link, useLoaderData, useLocation, useNavigate } from 'react-router';
+import { badge, statusText } from '~/helper/report-status';
 import type { ReportsResponse } from '~/types';
-
-export const badge = (s: string) =>
-  s === 'PENDING'
-    ? 'status-pending'
-    : s === 'IN_PROGRESS'
-      ? 'status-progress'
-      : s === 'COMPLETED'
-        ? 'status-completed'
-        : 'status-fake';
-
-export const statusText = (s: string) =>
-  s === 'PENDING'
-    ? 'Menunggu Tindakan'
-    : s === 'IN_PROGRESS'
-      ? 'Sedang Diproses'
-      : s === 'COMPLETED'
-        ? 'Selesai'
-        : 'Laporan Palsu';
 
 export default function GovLaporanPage() {
   const { data: reports, nextCursor, limit } = useLoaderData<ReportsResponse>();
@@ -92,12 +75,12 @@ export default function GovLaporanPage() {
                 {new Date(report.createdAt).toLocaleDateString('id-ID')}
               </small>
               <div className="mt-2">
-                <a
+                <Link
                   className="btn btn-sm btn-outline-primary"
-                  href={`/gov/laporan/${report.id}`}
+                  to={`/gov/laporan/${report.id}`}
                 >
                   Detail
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,23 +1,6 @@
 import { useLoaderData } from 'react-router';
+import { badge, statusText } from '~/helper/report-status';
 import type { ReportsResponse, ReportStats } from '~/types';
-
-const badge = (s: string) =>
-  s === 'PENDING'
-    ? 'status-pending'
-    : s === 'IN_PROGRESS'
-      ? 'status-progress'
-      : s === 'COMPLETED'
-        ? 'status-completed'
-        : 'status-fake';
-
-const statusText = (s: string) =>
-  s === 'PENDING'
-    ? 'Menunggu Tindakan'
-    : s === 'IN_PROGRESS'
-      ? 'Sedang Diproses'
-      : s === 'COMPLETED'
-        ? 'Selesai'
-        : 'Laporan Palsu';
 
 export default function GovDashboard() {
   const loaderData = useLoaderData<{
@@ -44,7 +27,7 @@ export default function GovDashboard() {
           </div>
           <div className="col-md-6">
             <div className="stats-card text-center">
-              <div className="stats-number">{stats?.todayCompleeted ?? 0}</div>
+              <div className="stats-number">{stats?.todayCompleted ?? 0}</div>
               <p>Laporan Selesai Hari Ini</p>
             </div>
           </div>
