@@ -639,4 +639,21 @@ footer {
   border-radius: 4px;
 }
 
+.custom-carousel-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.custom-carousel-icon i {
+  line-height: 1;
+}
+
 }

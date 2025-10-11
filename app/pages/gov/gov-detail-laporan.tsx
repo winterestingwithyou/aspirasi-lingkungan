@@ -46,6 +46,21 @@ const progressCircleColors: Record<
   },
 };
 
+const captionClassName =
+  'd-inline-block bg-dark bg-opacity-75 text-white rounded px-3 py-2';
+
+const prevIcon = (
+  <span className="custom-carousel-icon" aria-hidden="true">
+    <i className="bi bi-chevron-left" />
+  </span>
+);
+
+const nextIcon = (
+  <span className="custom-carousel-icon" aria-hidden="true">
+    <i className="bi bi-chevron-right" />
+  </span>
+);
+
 const carouselStyle: React.CSSProperties = {
   height: '100%',
   minHeight: 300,
@@ -89,11 +104,16 @@ export default function GovDetailLaporan() {
 
       <div className="row align-items-stretch">
         <div className="col-md-6 d-flex" style={{ minHeight: 300 }}>
-          <Carousel style={carouselStyle} className="w-100">
+          <Carousel
+            style={carouselStyle}
+            className="w-100"
+            prevIcon={prevIcon}
+            nextIcon={nextIcon}
+          >
             <Carousel.Item>
               <img style={imgStyle} src={report.photoUrl} alt="Foto Pelapor" />
               <Carousel.Caption>
-                <strong>Foto Pelapor</strong>
+                <strong className={captionClassName}>Foto Pelapor</strong>
               </Carousel.Caption>
             </Carousel.Item>
             {report.progressUpdates
@@ -106,7 +126,7 @@ export default function GovDetailLaporan() {
                     alt={p.phase}
                   />
                   <Carousel.Caption>
-                    <strong>{p.phase}</strong>
+                    <strong className={captionClassName}>{p.phase}</strong>
                   </Carousel.Caption>
                 </Carousel.Item>
               ))}
