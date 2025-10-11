@@ -83,23 +83,15 @@ export default function GovDetailLaporan() {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Detail Laporan #{report.id}</h2>
-        <div className="d-flex gap-2">
-          {canAddProgress && (
-            <Link
-              to={`/gov/laporan/${report.id}/tambah-progress`}
-              className="btn btn-primary"
-            >
-              Tambah Progress
-            </Link>
-          )}
-
-          {!report.isFakeReport &&
-            !(report.status === ReportStatus.COMPLETED) && (
-              <FakeReportButton report={report} />
-            )}
-        </div>
+      <div className="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <h2 className="mb-0">Detail Laporan #{report.id}</h2>
+        <Link
+          to={`/gov/laporan`}
+          className="btn btn-outline-secondary d-inline-flex align-items-center gap-2 shadow-sm"
+        >
+          <i className="bi bi-arrow-left" />
+          <span>Kembali</span>
+        </Link>
       </div>
 
       <div className="row align-items-stretch">
@@ -159,6 +151,23 @@ export default function GovDetailLaporan() {
         </div>
       </div>
 
+      <div className="mt-4">
+        <div className="d-flex justify-content-end gap-2">
+          {canAddProgress && (
+            <Link
+              to={`/gov/laporan/${report.id}/tambah-progress`}
+              className="btn btn-primary"
+            >
+              Tambah Progress
+            </Link>
+          )}
+
+          {!report.isFakeReport &&
+            !(report.status === ReportStatus.COMPLETED) && (
+              <FakeReportButton report={report} />
+            )}
+        </div>
+      </div>
       <div className="mt-4">
         <h5>Riwayat Penanganan</h5>
         <div className="mt-3 border rounded p-3">
