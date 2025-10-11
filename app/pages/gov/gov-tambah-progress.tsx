@@ -309,7 +309,12 @@ export default function GovTambahProgress() {
           )}
         </Form.Group>
 
-        <Button type="submit" variant="primary" disabled={disableInputs}>
+        <Button
+          className="w-100"
+          type="submit"
+          variant="primary"
+          disabled={disableInputs}
+        >
           {isBusy ? (
             <>
               <Spinner
