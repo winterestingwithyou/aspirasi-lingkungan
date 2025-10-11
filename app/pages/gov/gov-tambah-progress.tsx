@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { useFetcher, useLoaderData, Link } from 'react-router';
-import { Alert, Spinner } from 'react-bootstrap';
+import { Alert, Button, Form, Spinner } from 'react-bootstrap';
 import { statusText } from '~/helper/report-status';
 import { uploadToCloudinary } from '~/services';
 import { reportProgressClientSchema } from '~/validators/report-progress';
@@ -213,16 +213,16 @@ export default function GovTambahProgress() {
         </Alert>
       )}
 
-      <form
+      <Form
+        noValidate
         onSubmit={handleSubmit}
         className="border rounded p-3"
         encType="multipart/form-data"
       >
-        <div className="mb-3">
-          <label className="form-label">Fase Progress</label>
-          <input
+        <Form.Group className="mb-3" controlId="phase">
+          <Form.Label>Fase Progress</Form.Label>
+          <Form.Control
             name="phase"
-            className="form-control"
             placeholder="Fase Progress saat ini...."
             disabled={disableInputs}
             onChange={() => clearClientError('phase')}
@@ -230,13 +230,12 @@ export default function GovTambahProgress() {
           {phaseError && (
             <div className="text-danger small mt-1">{phaseError}</div>
           )}
-        </div>
+        </Form.Group>
 
-        <div className="mb-3">
-          <label className="form-label">Status</label>
-          <select
+        <Form.Group className="mb-3" controlId="status">
+          <Form.Label>Status</Form.Label>
+          <Form.Select
             name="status"
-            className="form-select"
             disabled={disableInputs}
             onChange={() => clearClientError('status')}
             defaultValue={defaultStatus}
@@ -246,17 +245,17 @@ export default function GovTambahProgress() {
                 {statusText(s)}
               </option>
             ))}
-          </select>
+          </Form.Select>
           {statusError && (
             <div className="text-danger small mt-1">{statusError}</div>
           )}
-        </div>
+        </Form.Group>
 
-        <div className="mb-3">
-          <label className="form-label">Deskripsi</label>
-          <textarea
+        <Form.Group className="mb-3" controlId="description">
+          <Form.Label>Deskripsi</Form.Label>
+          <Form.Control
+            as="textarea"
             name="description"
-            className="form-control"
             rows={4}
             placeholder="Jelaskan progres penanganan..."
             disabled={disableInputs}
@@ -265,10 +264,10 @@ export default function GovTambahProgress() {
           {descriptionError && (
             <div className="text-danger small mt-1">{descriptionError}</div>
           )}
-        </div>
+        </Form.Group>
 
-        <div className="mb-3">
-          <label className="form-label">Foto Progress</label>
+        <Form.Group className="mb-3" controlId="progressPhoto">
+          <Form.Label>Foto Progress</Form.Label>
           <div
             className={fileAreaClassName}
             role="button"
@@ -278,7 +277,7 @@ export default function GovTambahProgress() {
             onKeyDown={handleFileAreaKeyDown}
             style={{ cursor: disableInputs ? 'not-allowed' : 'pointer' }}
           >
-            <input
+            <Form.Control
               ref={fileInputRef}
               type="file"
               accept="image/*"
@@ -308,9 +307,9 @@ export default function GovTambahProgress() {
           {photoError && (
             <div className="text-danger small mt-1">{photoError}</div>
           )}
-        </div>
+        </Form.Group>
 
-        <button className="btn btn-primary" disabled={disableInputs}>
+        <Button type="submit" variant="primary" disabled={disableInputs}>
           {isBusy ? (
             <>
               <Spinner
@@ -326,8 +325,8 @@ export default function GovTambahProgress() {
           ) : (
             'Simpan Progress'
           )}
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   );
 }
