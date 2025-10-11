@@ -285,7 +285,6 @@ export default function GovTambahProgress() {
               name="progressPhoto"
               hidden
               disabled={disableInputs}
-              required
               onChange={handleFileChange}
             />
             {photoPreview ? (
