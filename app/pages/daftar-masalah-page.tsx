@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useLoaderData, useLocation } from 'react-router';
-import { Col, Container, Form, Pagination, Row } from 'react-bootstrap';
+import { Card, Col, Container, Form, Pagination, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import type { Report, ReportsResponse } from '~/types';
 import { formatTanggal } from '~/helper/date';
@@ -83,21 +83,23 @@ function DaftarMasalahPage() {
         <Row className="g-4 mt-1">
           {items.map((r) => (
             <Col md={6} lg={4} key={r.key}>
-              <div className="report-list-card">
-                <img src={r.img} alt={r.title} />
-                <div className="report-list-card-body">
-                  <h5>{r.title}</h5>
-                  <p className="text-muted mb-2">
+              <Card as="a" href={`/daftar-masalah/${r.key}`} className="report-list-card text-decoration-none h-100" onClick={(e) => { e.preventDefault(); navigate(`/daftar-masalah/${r.key}`); }}>
+                <Card.Img variant="top" src={r.img} alt={r.title} className="report-list-card-img" />
+                <Card.Body className="d-flex flex-column">
+                  <Card.Title as="h5" className="mb-2">{r.title}</Card.Title>
+                  <Card.Text className="text-muted mb-2 small">
                     <i className="bi bi-geo-alt-fill me-1" /> {r.loc}
-                  </p>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <span className={`report-status ${badge(r.status)}`}>
-                      {statusText(r.status)}
-                    </span>
+                  </Card.Text>
+                  <div className="mt-auto d-flex justify-content-between align-items-center">
+                    <div>
+                      <span className={`report-status ${badge(r.status)}`}>
+                        {statusText(r.status)}
+                      </span>
+                    </div>
                     <small className="text-muted">{r.date}</small>
                   </div>
-                </div>
-              </div>
+                </Card.Body>
+              </Card>
             </Col>
           ))}
 
