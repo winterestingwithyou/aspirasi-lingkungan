@@ -6,6 +6,46 @@ import { formatDateToIndonesian } from '~/helper/date';
 import { ReportStatus } from '~/prisma-enums';
 import { FakeReportButton } from '~/components/fake-report-button';
 
+const progressCircleBase: React.CSSProperties = {
+  width: 28,
+  height: 28,
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 600,
+  fontSize: 16,
+  marginRight: '10px',
+  flexShrink: 0,
+  border: '1px solid transparent',
+};
+
+const progressCircleColors: Record<
+  ReportStatus,
+  Pick<React.CSSProperties, 'background' | 'color' | 'border'>
+> = {
+  PENDING: {
+    background: '#fff3cd',
+    color: '#856404',
+    border: '1px solid #ffe29a',
+  },
+  IN_PROGRESS: {
+    background: '#cfe2ff',
+    color: '#084298',
+    border: '1px solid #9ec5fe',
+  },
+  COMPLETED: {
+    background: '#d1e7dd',
+    color: '#0f5132',
+    border: '1px solid #a3cfbb',
+  },
+  FAKE_REPORT: {
+    background: '#ffebee',
+    color: '#c62828',
+    border: '1px solid #ffcdd2',
+  },
+};
+
 const carouselStyle: React.CSSProperties = {
   height: '100%',
   minHeight: 300,
@@ -119,39 +159,30 @@ export default function GovDetailLaporan() {
               Belum ada riwayat penanganan.
             </div>
           )}
-          {report.progressUpdates.map((progress, index) => (
-            <Row key={progress.id} className="py-2 border-bottom">
-              <Col md={3}>
-                <div className="d-flex align-items-center justify-content-center justify-content-md-start">
-                  <div
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: '#0d6efd',
-                      color: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 600,
-                      fontSize: 16,
-                      marginRight: '10px',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {index + 1}
+          {report.progressUpdates.map((progress, index) => {
+            const statusKey = (progress.reportStatus ??
+              ReportStatus.PENDING) as ReportStatus;
+            const colorStyle =
+              progressCircleColors[statusKey] ?? progressCircleColors.PENDING;
+            return (
+              <Row key={progress.id} className="py-2 border-bottom">
+                <Col md={3}>
+                  <div className="d-flex align-items-center justify-content-center justify-content-md-start">
+                    <div style={{ ...progressCircleBase, ...colorStyle }}>
+                      {index + 1}
+                    </div>
+                    <span className="fw-semibold">{progress.phase}</span>
                   </div>
-                  <span className="fw-semibold">{progress.phase}</span>
-                </div>
-              </Col>
-              <Col md={6} className="small text-center my-auto">
-                {progress.description}
-              </Col>
-              <Col md={3} className="text-muted small text-center my-auto">
-                {formatDateToIndonesian(progress.createdAt, true)}
-              </Col>
-            </Row>
-          ))}
+                </Col>
+                <Col md={6} className="small text-center my-auto">
+                  {progress.description}
+                </Col>
+                <Col md={3} className="text-muted small text-center my-auto">
+                  {formatDateToIndonesian(progress.createdAt, true)}
+                </Col>
+              </Row>
+            );
+          })}
         </div>
       </div>
     </div>
