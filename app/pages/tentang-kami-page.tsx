@@ -65,7 +65,7 @@ const teknologi = [
 const developers = [
   {
     photo:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
+      'Rafly.jpg',
     name: 'Rafly Alamsyach',
     nim: '09010282327055',
     prodi: 'Manajemen Informatika',
@@ -194,7 +194,7 @@ export default function TentangKamiPage() {
                     <Image
                       src={dev.photo}
                       roundedCircle
-                      style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                      style={{ width: '170px', height: '170px', objectFit: 'cover' }}
                       className="me-3"
                     />
                     <div>
