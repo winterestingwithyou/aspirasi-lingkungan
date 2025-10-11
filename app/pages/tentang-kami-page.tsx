@@ -64,14 +64,13 @@ const teknologi = [
 // Data Developer
 const developers = [
   {
-    photo:
-      'Rafly.jpg',
+    photo: '/Rafly.jpg', // Pastikan file Rafly.jpg ada di folder /public
     name: 'Rafly Alamsyach',
     nim: '09010282327055',
     prodi: 'Manajemen Informatika',
     univ: 'Universitas Sriwijaya',
     role: 'Front-End Developer',
-    description: 'Kata-kata hari ini',
+    description: 'Optimis itu harus, tapi jangan lupa untuk menyediakan ruang ikhlas',
   },
   {
     photo:
@@ -179,37 +178,37 @@ export default function TentangKamiPage() {
         </div>
 
         {/* Bagian 3: Tim Pengembang */}
-        <div className="text-center mb-5 mt-5">
-          <h2 className="section-title">Tim Pengembang</h2>
-          <p className="lead">
-            Orang-orang di balik pengembangan aplikasi ini.
-          </p>
-        </div>
-        <Row className="justify-content-center g-4">
-          {developers.map((dev, index) => (
-            <Col md={8} lg={6} key={index}>
-              <Card className="h-100 shadow-sm">
-                <Card.Body className="p-4">
-                  <div className="d-flex align-items-center mb-3">
-                    <Image
-                      src={dev.photo}
-                      roundedCircle
-                      style={{ width: '170px', height: '170px', objectFit: 'cover' }}
-                      className="me-3"
-                    />
-                    <div>
-                      <h5 className="mb-1">{dev.name}</h5>
-                      <p className="text-muted small mb-1">{dev.nim}</p>
-                      <p className="text-muted small mb-2">{`${dev.prodi}, ${dev.univ}`}</p>
-                      <Badge bg="primary">{dev.role}</Badge>
-                    </div>
+      <div className="text-center mb-5 mt-5">
+        <h2 className="section-title">Tim Pengembang</h2>
+        <p className="lead">
+          Orang-orang di balik pengembangan aplikasi ini.
+        </p>
+      </div>
+      <Row className="justify-content-center g-4">
+        {developers.map((dev, index) => (
+          <Col md={8} lg={6} key={index}>
+            <Card className="h-100 shadow-sm">
+              <Card.Body className="p-4">
+                <div className="d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+                  <Image
+                    src={dev.photo}
+                    roundedCircle
+                    style={{ width: '170px', height: '170px', objectFit: 'cover' }}
+                    className="mb-3 mb-md-0 me-md-4 flex-shrink-0"
+                  />
+                  <div>
+                    <h5 className="mb-1">{dev.name}</h5>
+                    <p className="text-muted small mb-1">{dev.nim}</p>
+                    <p className="text-muted small mb-2">{`${dev.prodi}, ${dev.univ}`}</p>
+                    <Badge bg="primary">{dev.role}</Badge>
                   </div>
-                  <p className="mt-3 mb-0 fst-italic text-center">"{dev.description}"</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                </div>
+                <p className="mt-3 mb-0 fst-italic text-center text-md-start">"{dev.description}"</p>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
       </Container>
     </section>
   );
