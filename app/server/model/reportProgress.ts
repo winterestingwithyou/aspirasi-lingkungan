@@ -42,7 +42,7 @@ export async function addReportProgress(
     phase: string;
     status: ReportStatus;
     description: string;
-    progressPhotoUrl?: string | null;
+    progressPhotoUrl: string;
   },
 ) {
   const prisma = await getPrisma(dbUrl);
@@ -100,7 +100,7 @@ export async function addReportProgress(
         phase: payload.phase,
         reportStatus: nextStatus, // kolom baru menggantikan 'status' lama
         description: payload.description,
-        progressPhotoUrl: payload.progressPhotoUrl ?? null,
+        progressPhotoUrl: payload.progressPhotoUrl,
         userId: 1, // TODO: ambil dari session/ctx
       },
     });

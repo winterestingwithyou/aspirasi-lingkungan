@@ -1,6 +1,16 @@
-import { useActionData, useLoaderData, Form, Link } from 'react-router';
-import { Alert } from 'react-bootstrap';
+import {
+  type ChangeEventHandler,
+  type FormEventHandler,
+  type KeyboardEventHandler,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
+import { useFetcher, useLoaderData, Link } from 'react-router';
+import { Alert, Spinner } from 'react-bootstrap';
 import { statusText } from '~/helper/report-status';
+import { uploadToCloudinary } from '~/services';
+import { reportProgressClientSchema } from '~/validators/report-progress';
 
 type LoaderData = {
   reportId: number;
@@ -15,9 +25,167 @@ type ActionData =
 
 export default function GovTambahProgress() {
   const data = useLoaderData<LoaderData>();
-  const result = useActionData<ActionData>();
+  const fetcher = useFetcher<ActionData>();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+  const [clientMessage, setClientMessage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const defaultStatus = data.allowedNext[0] ?? '';
 
-  const disabled = data.currentStatus === 'COMPLETED' || data.isFakeReport;
+  const disabledByStatus =
+    data.currentStatus === 'COMPLETED' || data.isFakeReport;
+  const isSubmitting = fetcher.state === 'submitting';
+  const isBusy = isUploading || isSubmitting;
+  const disableInputs = disabledByStatus || isBusy;
+
+  const serverResult = fetcher.data;
+  const serverFieldErrors =
+    serverResult && serverResult.ok === false
+      ? (serverResult.fieldErrors ?? {})
+      : {};
+
+  const takeMessage = <T extends string>(
+    client: T | undefined,
+    server: T | undefined,
+  ) => client ?? server;
+
+  const phaseError = takeMessage(clientErrors.phase, serverFieldErrors.phase);
+  const statusError = takeMessage(
+    clientErrors.status,
+    serverFieldErrors.status,
+  );
+  const descriptionError = takeMessage(
+    clientErrors.description,
+    serverFieldErrors.description,
+  );
+  const photoError = takeMessage(
+    clientErrors.progressPhoto,
+    serverFieldErrors.progressPhotoUrl,
+  );
+
+  const generalError =
+    clientMessage ??
+    (serverResult && serverResult.ok === false ? serverResult.message : null);
+
+  const fileAreaClassName = disableInputs
+    ? 'file-upload-area text-center p-4 disabled'
+    : 'file-upload-area text-center p-4 cursor-pointer';
+
+  const clearClientError = useCallback((field: string) => {
+    setClientErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setClientMessage(null);
+  }, []);
+
+  const triggerFileDialog = useCallback(() => {
+    if (disableInputs) return;
+    fileInputRef.current?.click();
+  }, [disableInputs]);
+
+  const handleFileAreaKeyDown: KeyboardEventHandler<HTMLDivElement> = (
+    event,
+  ) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      triggerFileDialog();
+    }
+  };
+
+  const handleFileChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    if (disableInputs) return;
+
+    const file = event.target.files?.[0] ?? null;
+    setPhotoFile(file);
+    clearClientError('progressPhoto');
+
+    if (!file) {
+      setPhotoPreview(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const value = e.target?.result;
+      setPhotoPreview(typeof value === 'string' ? value : null);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+    if (disabledByStatus || isBusy) return;
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const parsed = reportProgressClientSchema.safeParse({
+      phase: formData.get('phase'),
+      status: formData.get('status'),
+      description: formData.get('description'),
+    });
+
+    if (!parsed.success) {
+      const flattened = parsed.error.flatten().fieldErrors;
+      const nextErrors: Record<string, string> = {};
+      if (flattened.phase?.[0]) nextErrors.phase = flattened.phase[0];
+      if (flattened.status?.[0]) {
+        nextErrors.status = 'Status progress wajib dipilih';
+      }
+      if (flattened.description?.[0]) {
+        nextErrors.description = flattened.description[0];
+      }
+      setClientErrors(nextErrors);
+      setClientMessage('Periksa kembali isian Anda.');
+      return;
+    }
+
+    setClientErrors({});
+    setClientMessage(null);
+
+    if (!photoFile) {
+      const message = 'Foto progress wajib diunggah.';
+      setClientErrors({ progressPhoto: message });
+      setClientMessage('Periksa kembali isian Anda.');
+      return;
+    }
+
+    setIsUploading(true);
+    let progressPhotoUrl = '';
+    try {
+      progressPhotoUrl = await uploadToCloudinary(photoFile);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Gagal mengunggah foto progress.';
+      setClientErrors({ progressPhoto: message });
+      setClientMessage(message);
+      return;
+    } finally {
+      setIsUploading(false);
+    }
+
+    if (!progressPhotoUrl) {
+      const message = 'Gagal mengunggah foto progress.';
+      setClientErrors({ progressPhoto: message });
+      setClientMessage(message);
+      return;
+    }
+
+    const submission = new FormData();
+    submission.set('phase', parsed.data.phase);
+    submission.set('status', parsed.data.status);
+    submission.set('description', parsed.data.description);
+    submission.set('progressPhotoUrl', progressPhotoUrl);
+
+    fetcher.submit(submission, {
+      method: 'post',
+      encType: 'multipart/form-data',
+    });
+  };
 
   return (
     <div className="container">
@@ -31,7 +199,7 @@ export default function GovTambahProgress() {
         </Link>
       </div>
 
-      {disabled && (
+      {disabledByStatus && (
         <Alert variant="warning">
           {data.isFakeReport
             ? 'Laporan ini telah ditandai sebagai palsu. Penambahan progress dinonaktifkan.'
@@ -39,41 +207,48 @@ export default function GovTambahProgress() {
         </Alert>
       )}
 
-      {result && !result.ok && (
+      {generalError && (
         <Alert variant="danger" className="mb-3">
-          {result.message}
+          {generalError}
         </Alert>
       )}
 
-      <Form method="post" className="border rounded p-3" replace>
+      <form
+        onSubmit={handleSubmit}
+        className="border rounded p-3"
+        encType="multipart/form-data"
+      >
         <div className="mb-3">
           <label className="form-label">Fase Progress</label>
           <input
             name="phase"
             className="form-control"
             placeholder="Fase Progress saat ini...."
-            disabled={disabled}
+            disabled={disableInputs}
+            onChange={() => clearClientError('phase')}
           />
-          {result && result.ok === false && result.fieldErrors?.phase && (
-            <div className="text-danger small mt-1">
-              {result.fieldErrors.status}
-            </div>
+          {phaseError && (
+            <div className="text-danger small mt-1">{phaseError}</div>
           )}
         </div>
 
         <div className="mb-3">
           <label className="form-label">Status</label>
-          <select name="status" className="form-select" disabled={disabled}>
+          <select
+            name="status"
+            className="form-select"
+            disabled={disableInputs}
+            onChange={() => clearClientError('status')}
+            defaultValue={defaultStatus}
+          >
             {data.allowedNext.map((s) => (
               <option key={s} value={s}>
                 {statusText(s)}
               </option>
             ))}
           </select>
-          {result && result.ok === false && result.fieldErrors?.status && (
-            <div className="text-danger small mt-1">
-              {result.fieldErrors.status}
-            </div>
+          {statusError && (
+            <div className="text-danger small mt-1">{statusError}</div>
           )}
         </div>
 
@@ -83,31 +258,77 @@ export default function GovTambahProgress() {
             name="description"
             className="form-control"
             rows={4}
-            placeholder="Jelaskan progres penanganan…"
-            disabled={disabled}
+            placeholder="Jelaskan progres penanganan..."
+            disabled={disableInputs}
+            onChange={() => clearClientError('description')}
           />
-          {result && result.ok === false && result.fieldErrors?.description && (
-            <div className="text-danger small mt-1">
-              {result.fieldErrors.description}
-            </div>
+          {descriptionError && (
+            <div className="text-danger small mt-1">{descriptionError}</div>
           )}
         </div>
 
         <div className="mb-3">
-          <label className="form-label">URL Foto Progress (opsional)</label>
-          <input
-            type="url"
-            name="progressPhotoUrl"
-            className="form-control"
-            placeholder="https://…"
-            disabled={disabled}
-          />
+          <label className="form-label">Foto Progress</label>
+          <div
+            className={fileAreaClassName}
+            role="button"
+            tabIndex={0}
+            aria-disabled={disableInputs}
+            onClick={triggerFileDialog}
+            onKeyDown={handleFileAreaKeyDown}
+            style={{ cursor: disableInputs ? 'not-allowed' : 'pointer' }}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              name="progressPhoto"
+              hidden
+              disabled={disableInputs}
+              required
+              onChange={handleFileChange}
+            />
+            {photoPreview ? (
+              <img
+                src={photoPreview}
+                alt="Preview foto progress"
+                className="image-preview d-block w-100 h-auto"
+                style={{ maxHeight: 220, objectFit: 'cover' }}
+              />
+            ) : (
+              <div>
+                <i
+                  className="bi bi-cloud-arrow-up-fill"
+                  style={{ fontSize: '2.5rem' }}
+                />
+                <p className="mb-0 mt-2">Klik disini untuk mengunggah gambar</p>
+                <small className="text-muted">(Format: JPG, PNG, WEBP)</small>
+              </div>
+            )}
+          </div>
+          {photoError && (
+            <div className="text-danger small mt-1">{photoError}</div>
+          )}
         </div>
 
-        <button className="btn btn-primary" disabled={disabled}>
-          Simpan Progress
+        <button className="btn btn-primary" disabled={disableInputs}>
+          {isBusy ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+                className="me-2"
+              />
+              {isUploading ? 'Mengunggah Foto...' : 'Menyimpan...'}
+            </>
+          ) : (
+            'Simpan Progress'
+          )}
         </button>
-      </Form>
+      </form>
     </div>
   );
 }

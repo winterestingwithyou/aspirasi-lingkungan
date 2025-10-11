@@ -6,7 +6,7 @@ import {
   getReportState,
 } from '~/server/model/reportProgress';
 import { redirect } from 'react-router';
-import type { ReportStatus } from '~/prisma-enums';
+import { reportProgressServerSchema } from '~/validators/report-progress';
 
 function meta({ params }: Route.MetaArgs) {
   return [
@@ -43,22 +43,34 @@ async function loader({ context, params }: Route.LoaderArgs) {
 async function action({ request, params, context }: Route.ActionArgs) {
   const form = await request.formData();
   const reportId = Number(params.id);
-  const phase = String(form.get('phase') || '');
-  const status = String(form.get('status') || '');
-  const description = String(form.get('description') || '');
-  const progressPhotoUrlRaw = form.get('progressPhotoUrl');
-  const progressPhotoUrl =
-    typeof progressPhotoUrlRaw === 'string' && progressPhotoUrlRaw.trim()
-      ? progressPhotoUrlRaw.trim()
-      : null;
-
-  // Validasi sederhana
-  const fieldErrors: Record<string, string> = {};
-  if (!status) fieldErrors.status = 'Pilih status';
-  if (!description || description.trim().length < 5) {
-    fieldErrors.description = 'Deskripsi minimal 5 karakter';
+  if (!Number.isFinite(reportId)) {
+    return {
+      ok: false as const,
+      message: 'ID laporan tidak valid.',
+    };
   }
-  if (Object.keys(fieldErrors).length) {
+
+  const parsed = reportProgressServerSchema.safeParse({
+    phase: form.get('phase'),
+    status: form.get('status'),
+    description: form.get('description'),
+    progressPhotoUrl: form.get('progressPhotoUrl'),
+  });
+
+  if (!parsed.success) {
+    const flattened = parsed.error.flatten().fieldErrors;
+    const fieldErrors: Record<string, string> = {};
+    for (const [key, value] of Object.entries(flattened)) {
+      if (value?.length) {
+        fieldErrors[key] = value[0];
+      }
+    }
+    if (
+      typeof fieldErrors.status === 'string' &&
+      fieldErrors.status.toLowerCase().includes('invalid enum value')
+    ) {
+      fieldErrors.status = 'Status progress wajib dipilih';
+    }
     return {
       ok: false as const,
       message: 'Periksa kembali isian Anda.',
@@ -68,10 +80,10 @@ async function action({ request, params, context }: Route.ActionArgs) {
 
   try {
     await addReportProgress(context.cloudflare.env.DATABASE_URL, reportId, {
-      phase: phase.trim(),
-      status: status as ReportStatus,
-      description: description.trim(),
-      progressPhotoUrl,
+      phase: parsed.data.phase,
+      status: parsed.data.status,
+      description: parsed.data.description,
+      progressPhotoUrl: parsed.data.progressPhotoUrl,
     });
 
     // Kembali ke halaman detail laporan
