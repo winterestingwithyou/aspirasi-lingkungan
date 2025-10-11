@@ -3,30 +3,11 @@ import { useLoaderData, useLocation } from 'react-router';
 import { Col, Container, Form, Pagination, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import type { Report, ReportsResponse } from '~/types';
-
-const badge = (s: string) =>
-  s === 'PENDING'
-    ? 'report-status status-pending'
-    : s === 'IN_PROGRESS' || s === 'PROGRESS' || s === 'progress'
-      ? 'report-status status-progress'
-      : 'report-status status-completed';
-
-// Format tanggal sederhana (ID)
-function formatTanggal(iso: string) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  } catch {
-    return iso;
-  }
-}
+import { formatTanggal } from '~/helper/date';
+import { badge, statusText } from '~/helper/report-status';
 
 function DaftarMasalahPage() {
-  const { data, nextCursor, limit } = useLoaderData() as ReportsResponse;
+  const { data, nextCursor } = useLoaderData() as ReportsResponse;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -110,12 +91,8 @@ function DaftarMasalahPage() {
                     <i className="bi bi-geo-alt-fill me-1" /> {r.loc}
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
-                    <span className={badge(r.status)}>
-                      {r.status === 'IN_PROGRESS'
-                        ? 'Sedang Diproses'
-                        : r.status === 'PENDING'
-                          ? 'Menunggu Tindakan'
-                          : 'Selesai'}
+                    <span className={`report-status ${badge(r.status)}`}>
+                      {statusText(r.status)}
                     </span>
                     <small className="text-muted">{r.date}</small>
                   </div>

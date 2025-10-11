@@ -16,4 +16,17 @@ function formatDateToIndonesian(iso: string | Date, withTime = false) {
   }
 }
 
-export { formatDateToIndonesian };
+function formatTanggal(iso: string) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+export { formatDateToIndonesian, formatTanggal };
