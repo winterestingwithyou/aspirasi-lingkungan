@@ -176,11 +176,14 @@ export default function GovDetailLaporan() {
             <Col md={3} className="text-center">
               Fase Progress
             </Col>
-            <Col md={6} className="text-center">
+            <Col md={4} className="text-center">
               Deskripsi
             </Col>
             <Col md={3} className="text-center">
               Waktu
+            </Col>
+            <Col md={2} className="text-center">
+              Aksi
             </Col>
           </Row>
           {report.progressUpdates.length === 0 && (
@@ -194,20 +197,34 @@ export default function GovDetailLaporan() {
             const colorStyle =
               progressCircleColors[statusKey] ?? progressCircleColors.PENDING;
             return (
-              <Row key={progress.id} className="py-2 border-bottom">
-                <Col md={3}>
+              <Row key={progress.id} className="py-3 border-bottom">
+                <Col md={3} className="mb-2 mb-md-0">
                   <div className="d-flex align-items-center justify-content-center justify-content-md-start">
                     <div style={{ ...progressCircleBase, ...colorStyle }}>
                       {index + 1}
                     </div>
-                    <span className="fw-semibold">{progress.phase}</span>
+                    <span className="fw-semibold ms-2 ms-md-3">
+                      {progress.phase}
+                    </span>
                   </div>
                 </Col>
-                <Col md={6} className="small text-center my-auto">
+                <Col md={4} className="small text-center my-auto">
                   {progress.description}
                 </Col>
                 <Col md={3} className="text-muted small text-center my-auto">
                   {formatDateToIndonesian(progress.createdAt, true)}
+                </Col>
+                <Col
+                  md={2}
+                  className="text-center my-auto mt-3 mt-md-0 d-flex justify-content-center"
+                >
+                  <Link
+                    to={`/gov/laporan/${report.id}/progress/${progress.id}`}
+                    className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1"
+                  >
+                    <i className="bi bi-eye" />
+                    <span>Detail</span>
+                  </Link>
                 </Col>
               </Row>
             );

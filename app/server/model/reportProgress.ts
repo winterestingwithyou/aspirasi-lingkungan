@@ -118,6 +118,56 @@ export async function addReportProgress(
   }
 }
 
+export async function getReportProgressDetail(
+  dbUrl: string,
+  reportId: number,
+  progressId: number,
+) {
+  const prisma = await getPrisma(dbUrl);
+  try {
+    const progress = await prisma.reportProgress.findFirst({
+      where: { id: progressId, reportId },
+      include: {
+        report: {
+          select: {
+            id: true,
+            reporterName: true,
+            status: true,
+            problemType: { select: { name: true } },
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            fullName: true,
+            departmentName: true,
+          },
+        },
+      },
+    });
+
+    if (!progress) return null;
+
+    return {
+      id: progress.id,
+      phase: progress.phase,
+      description: progress.description,
+      progressPhotoUrl: progress.progressPhotoUrl ?? null,
+      createdAt:
+        progress.createdAt instanceof Date
+          ? progress.createdAt.toISOString()
+          : String(progress.createdAt),
+      reportStatus: progress.reportStatus,
+      report: progress.report,
+      user: progress.user,
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 /**
  * Tandai laporan sebagai palsu.
  * Opsional: simpan alasan sebagai progress catatan.
