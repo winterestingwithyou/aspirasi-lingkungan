@@ -32,6 +32,7 @@ export async function loader({ context }: Route.LoaderArgs) {
       pending,
       inProgress,
       completed,
+      fake,
       todayCompleted,
     ] = await Promise.all([
       listReports(dbUrl, { limit: 3, page: 1 }),
@@ -39,6 +40,7 @@ export async function loader({ context }: Route.LoaderArgs) {
       countReportsByStatus(dbUrl, ReportStatus.PENDING),
       countReportsByStatus(dbUrl, ReportStatus.IN_PROGRESS),
       countReportsByStatus(dbUrl, ReportStatus.COMPLETED),
+      countReportsByStatus(dbUrl, ReportStatus.FAKE_REPORT),
       countTodayCompletedReports(dbUrl),
     ]);
 
@@ -49,6 +51,7 @@ export async function loader({ context }: Route.LoaderArgs) {
       pending,
       inProgress,
       completed,
+      fake,
       todayCompleted,
     } satisfies ReportStats;
 

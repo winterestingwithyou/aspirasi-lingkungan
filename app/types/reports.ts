@@ -63,6 +63,7 @@ interface ReportStats {
   today?: number;
   pending?: number;
   inProgress?: number;
+  fake?: number;
   completed?: number;
   todayCompleted?: number;
 }

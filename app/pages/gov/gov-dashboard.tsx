@@ -37,22 +37,28 @@ export default function GovDashboard() {
       <div className="today-stats mt-4">
         <h4 className="mb-3">Statistik Berdasarkan Kategori</h4>
         <div className="row g-4">
-          <div className="col-md-4">
+          <div className="col-md-3">
             <div className="stats-card text-center">
               <div className="stats-number">{stats?.completed ?? 0}</div>
               <p>Terselesaikan</p>
             </div>
           </div>
-          <div className="col-md-4">
+          <div className="col-md-3">
             <div className="stats-card text-center">
               <div className="stats-number">{stats?.inProgress ?? 0}</div>
               <p>Dalam Proses</p>
             </div>
           </div>
-          <div className="col-md-4">
+          <div className="col-md-3">
             <div className="stats-card text-center">
               <div className="stats-number">{stats?.pending ?? 0}</div>
               <p>Belum Ditindak</p>
+            </div>
+          </div>
+          <div className="col-md-3">
+            <div className="stats-card text-center">
+              <div className="stats-number">{stats?.fake ?? 0}</div>
+              <p>Laporan Palsu</p>
             </div>
           </div>
         </div>
