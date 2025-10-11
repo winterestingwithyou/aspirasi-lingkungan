@@ -88,7 +88,7 @@ function LandingPage() {
                 <Card className="stats-card">
                   <Card.Body className="text-center">
                     <div className="stats-number">{x.n}</div>
-                    <p className="mb-0">{x.label}</p>
+                    <p className="mb-0" style={{ fontSize: '0.875rem' }}>{x.label}</p>
                   </Card.Body>
                 </Card>
               </Col>
