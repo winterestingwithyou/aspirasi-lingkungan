@@ -82,13 +82,13 @@ function LandingPage() {
               { n: all, label: 'Total Laporan' },
               { n: pending, label: 'Menunggu Tindakan' },
               { n: inProgress, label: 'Dalam Proses' },
-              { n: completed, label: 'Terselesaikan' },
+              { n: completed, label: 'Masalah Selesai' },
             ].map((x, i) => (
               <Col md={3} xs={6} key={i}>
                 <Card className="stats-card">
                   <Card.Body className="text-center">
                     <div className="stats-number">{x.n}</div>
-                    <p className="mb-0" style={{ fontSize: '0.875rem' }}>{x.label}</p>
+                    <p className="mb-0">{x.label}</p>
                   </Card.Body>
                 </Card>
               </Col>
