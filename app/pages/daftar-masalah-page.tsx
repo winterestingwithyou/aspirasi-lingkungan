@@ -1,19 +1,41 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLoaderData, useLocation } from 'react-router';
 import { Card, Col, Container, Form, Pagination, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import type { Report, ReportsResponse } from '~/types';
+import type { ProblemType, Report, ReportsResponse } from '~/types';
 import { formatTanggal } from '~/helper/date';
 import { badge, statusText } from '~/helper/report-status';
+import { ReportStatus } from '~/generated/prisma/client';
 
 function DaftarMasalahPage() {
-  const { data, nextCursor } = useLoaderData() as ReportsResponse;
+  const { reports, problemTypes } = useLoaderData() as {
+    reports: ReportsResponse;
+    problemTypes: ProblemType[];
+  };
+  const { data, nextCursor } = reports;
   const location = useLocation();
   const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(location.search);
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const hasNextPage = !!nextCursor;
+
+  // State untuk filter
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [category, setCategory] = useState(
+    searchParams.get('category') || 'all',
+  );
+  const [status, setStatus] = useState(searchParams.get('status') || 'all');
+
+  // Fungsi untuk menangani perubahan filter dan navigasi
+  const handleFilterChange = () => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (category !== 'all') params.set('category', category);
+    if (status !== 'all') params.set('status', status);
+    // Hapus page saat filter berubah untuk kembali ke halaman 1
+    navigate(`?${params.toString()}`);
+  };
 
   // Map data API → tampilan kartu (fallback jika field null)
   const items = useMemo(
@@ -44,41 +66,74 @@ function DaftarMasalahPage() {
           </p>
         </div>
 
-        <div className="filter-section">
+        <Form
+          className="filter-section"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleFilterChange();
+          }}
+        >
           <Row className="g-3">
             <Col md={4}>
               <Form.Label>Pencarian Masalah</Form.Label>
-              {/* Untuk penyaringan berbasis URL, kamu bisa ubah ke <form method="get"> dan pakai name="q" */}
               <div className="input-group">
-                <Form.Control placeholder="Cari berdasarkan judul atau lokasi..." />
-                <button className="btn btn-outline-secondary" type="button">
+                <Form.Control
+                  placeholder="Cari berdasarkan judul atau lokasi..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <button
+                  className="btn btn-outline-secondary"
+                  type="submit"
+                >
                   <i className="bi bi-search" />
                 </button>
               </div>
             </Col>
             <Col md={4}>
               <Form.Label>Filter Kategori</Form.Label>
-              <Form.Select defaultValue="all">
+              <Form.Select
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  // Langsung filter saat kategori berubah
+                  const params = new URLSearchParams(location.search);
+                  if (e.target.value === 'all') params.delete('category');
+                  else params.set('category', e.target.value);
+                  params.delete('page'); // Reset ke halaman 1
+                  navigate(`?${params.toString()}`);
+                }}
+              >
                 <option value="all">Semua Kategori</option>
-                <option value="sampah">Tumpukan Sampah</option>
-                <option value="jalan">Jalan Berlubang</option>
-                <option value="pohon">Penebangan Pohon Liar</option>
-                <option value="limbah">Pembuangan Limbah</option>
-                <option value="banjir">Genangan Air/Banjir</option>
-                <option value="lainnya">Lainnya</option>
+                {problemTypes.map((pt) => (
+                  <option key={pt.id} value={String(pt.id)}>
+                    {pt.name}
+                  </option>
+                ))}
               </Form.Select>
             </Col>
             <Col md={4}>
               <Form.Label>Filter Status</Form.Label>
-              <Form.Select defaultValue="all">
+              <Form.Select
+                value={status}
+                onChange={(e) => {
+                  setStatus(e.target.value);
+                  // Langsung filter saat status berubah
+                  const params = new URLSearchParams(location.search);
+                  if (e.target.value === 'all') params.delete('status');
+                  else params.set('status', e.target.value);
+                  params.delete('page'); // Reset ke halaman 1
+                  navigate(`?${params.toString()}`);
+                }}
+              >
                 <option value="all">Semua Status</option>
-                <option value="pending">Menunggu Tindakan</option>
-                <option value="progress">Sedang Diproses</option>
-                <option value="completed">Selesai</option>
+                <option value={ReportStatus.PENDING}>Menunggu Tindakan</option>
+                <option value={ReportStatus.IN_PROGRESS}>Sedang Diproses</option>
+                <option value={ReportStatus.COMPLETED}>Selesai</option>
               </Form.Select>
             </Col>
           </Row>
-        </div>
+        </Form>
 
         <Row className="g-4 mt-1">
           {items.map((r) => (
@@ -112,13 +167,16 @@ function DaftarMasalahPage() {
           )}
         </Row>
 
-        {/* Cursor-based pagination: tombol Next saja (Prev butuh state stack cursor) */}
+        {/* Pagination */}
         <nav aria-label="Page navigation" className="mt-4">
           <Pagination className="justify-content-center">
             <Pagination.Prev
               disabled={currentPage <= 1}
               onClick={() => {
-                if (currentPage > 1) navigate(`?page=${currentPage - 1}`);
+                if (currentPage > 1) {
+                  searchParams.set('page', String(currentPage - 1));
+                  navigate(`?${searchParams.toString()}`);
+                }
               }}
             >
               Sebelumnya
@@ -128,7 +186,10 @@ function DaftarMasalahPage() {
             <Pagination.Next
               disabled={!hasNextPage}
               onClick={() => {
-                if (hasNextPage) navigate(`?page=${currentPage + 1}`);
+                if (hasNextPage) {
+                  searchParams.set('page', String(currentPage + 1));
+                  navigate(`?${searchParams.toString()}`);
+                }
               }}
             >
               Selanjutnya
