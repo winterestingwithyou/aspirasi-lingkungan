@@ -82,7 +82,7 @@ function LandingPage() {
               { n: all, label: 'Total Laporan' },
               { n: pending, label: 'Menunggu Tindakan' },
               { n: inProgress, label: 'Dalam Proses' },
-              { n: completed, label: 'Terselesaikan' },
+              { n: completed, label: 'Masalah Selesai' },
             ].map((x, i) => (
               <Col md={3} xs={6} key={i}>
                 <Card className="stats-card">

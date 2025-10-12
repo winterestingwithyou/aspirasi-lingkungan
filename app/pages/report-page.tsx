@@ -456,8 +456,10 @@ export function ReportPage({
                             type="button"
                             onClick={onGeo}
                           >
-                            <i className="bi bi-cursor-fill me-1" />
-                            Ambil Lokasi Saat Ini
+                            <i className="bi bi-cursor-fill" />
+                            <span className="d-none d-lg-inline ms-2">
+                              Ambil Lokasi Saat Ini
+                            </span>
                           </Button>
                         </div>
                       </Col>

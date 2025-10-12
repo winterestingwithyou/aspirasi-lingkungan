@@ -1,58 +1,109 @@
+import { useState } from 'react';
 import { Form, Pagination } from 'react-bootstrap';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router';
+import { ReportStatus } from '~/generated/prisma/client';
 import { badge, statusText } from '~/helper/report-status';
-import type { ReportsResponse } from '~/types';
+import type { ProblemType, ReportsResponse } from '~/types';
 
 export default function GovLaporanPage() {
-  const { data: reports, nextCursor, limit } = useLoaderData<ReportsResponse>();
+  const { reports: reportsPayload, problemTypes } = useLoaderData<{
+    reports: ReportsResponse;
+    problemTypes: ProblemType[];
+  }>();
+  const { data: reports, nextCursor, limit } = reportsPayload;
+
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
+  // State untuk filter
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [category, setCategory] = useState(
+    searchParams.get('category') || 'all',
+  );
+  const [status, setStatus] = useState(searchParams.get('status') || 'all');
+
+  // Fungsi untuk menangani perubahan filter dan navigasi
+  const handleFilterChange = () => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (category !== 'all') params.set('category', category);
+    if (status !== 'all') params.set('status', status);
+    // Hapus page saat filter berubah untuk kembali ke halaman 1
+    navigate(`?${params.toString()}`);
+  };
+
   return (
     <>
       <h2 className="mb-4">Daftar Laporan Masalah</h2>
 
-      <div className="filter-section">
+      <Form
+        className="filter-section"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleFilterChange();
+        }}
+      >
         <div className="row g-3">
           <div className="col-md-4">
             <Form.Label>Pencarian Laporan</Form.Label>
             <div className="input-group input-group-sm">
-              <Form.Control placeholder="Cari berdasarkan judul atau lokasi..." />
-              <button className="btn btn-outline-secondary" type="button">
+              <Form.Control
+                placeholder="Cari berdasarkan judul atau lokasi..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <button className="btn btn-outline-secondary" type="submit">
                 <i className="bi bi-search" />
               </button>
             </div>
           </div>
           <div className="col-md-4">
             <Form.Label>Filter Kategori</Form.Label>
-            <div className="input-group input-group-sm">
-              <Form.Select defaultValue="all">
-                <option value="all">Semua Kategori</option>
-                <option value="sampah">Tumpukan Sampah</option>
-                <option value="jalan">Jalan Berlubang</option>
-                <option value="pohon">Penebangan Pohon Liar</option>
-                <option value="limbah">Pembuangan Limbah</option>
-                <option value="banjir">Genangan Air/Banjir</option>
-                <option value="lainnya">Lainnya</option>
-              </Form.Select>
-            </div>
+            <Form.Select
+              size="sm"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                const params = new URLSearchParams(location.search);
+                if (e.target.value === 'all') params.delete('category');
+                else params.set('category', e.target.value);
+                params.delete('page'); // Reset ke halaman 1
+                navigate(`?${params.toString()}`);
+              }}
+            >
+              <option value="all">Semua Kategori</option>
+              {problemTypes.map((pt) => (
+                <option key={pt.id} value={String(pt.id)}>
+                  {pt.name}
+                </option>
+              ))}
+            </Form.Select>
           </div>
           <div className="col-md-4">
             <Form.Label>Filter Status</Form.Label>
-            <div className="input-group input-group-sm">
-              <Form.Select defaultValue="all">
-                <option value="all">Semua Status</option>
-                <option value="pending">Menunggu Tindakan</option>
-                <option value="progress">Sedang Diproses</option>
-                <option value="completed">Selesai</option>
-                <option value="fake_report">Laporan Palsu</option>
-              </Form.Select>
-            </div>
+            <Form.Select
+              size="sm"
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value);
+                const params = new URLSearchParams(location.search);
+                if (e.target.value === 'all') params.delete('status');
+                else params.set('status', e.target.value);
+                params.delete('page'); // Reset ke halaman 1
+                navigate(`?${params.toString()}`);
+              }}
+            >
+              <option value="all">Semua Status</option>
+              <option value={ReportStatus.PENDING}>Menunggu Tindakan</option>
+              <option value={ReportStatus.IN_PROGRESS}>Sedang Diproses</option>
+              <option value={ReportStatus.COMPLETED}>Selesai</option>
+              <option value={ReportStatus.FAKE_REPORT}>Laporan Palsu</option>
+            </Form.Select>
           </div>
         </div>
-      </div>
+      </Form>
 
       {reports.map((report) => (
         <div className="report-card" key={report.id}>
@@ -96,7 +147,8 @@ export default function GovLaporanPage() {
             disabled={currentPage <= 1}
             onClick={() => {
               if (currentPage > 1) {
-                navigate(`?limit=${limit}&page=${currentPage - 1}`);
+                searchParams.set('page', String(currentPage - 1));
+                navigate(`?${searchParams.toString()}`);
               }
             }}
           >
@@ -104,10 +156,11 @@ export default function GovLaporanPage() {
           </Pagination.Prev>
           <Pagination.Item active>{currentPage}</Pagination.Item>
           <Pagination.Next
-            disabled={!nextCursor}
+            disabled={!nextCursor || reports.length < limit}
             onClick={() => {
-              if (nextCursor) {
-                navigate(`?limit=${limit}&page=${currentPage + 1}`);
+              if (nextCursor && reports.length >= limit) {
+                searchParams.set('page', String(currentPage + 1));
+                navigate(`?${searchParams.toString()}`);
               }
             }}
           >

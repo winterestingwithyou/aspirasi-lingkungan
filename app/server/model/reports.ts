@@ -5,7 +5,21 @@ import type { CreateReportPayload } from '~/validators/reports';
 
 async function listReports(
   dbUrl: string,
-  { limit, cursor, page }: { limit: number; cursor?: number | null; page?: number },
+  {
+    limit,
+    cursor,
+    page,
+    search,
+    status,
+    problemTypeId,
+  }: {
+    limit: number;
+    cursor?: number | null;
+    page?: number;
+    search?: string | null;
+    status?: ReportStatus | null;
+    problemTypeId?: number | null;
+  },
 ): Promise<ReportsResponse> {
   const prisma = await getPrisma(dbUrl);
 
@@ -21,8 +35,29 @@ async function listReports(
     skip = (page - 1) * take;
   }
 
+  const where: Prisma.ReportWhereInput = {
+    deletedAt: null, // Selalu kecualikan yang soft-deleted
+  };
+
+  if (status) {
+    where.status = status;
+  }
+
+  if (problemTypeId) {
+    where.problemTypeId = problemTypeId;
+  }
+
+  if (search) {
+    where.OR = [
+      { description: { contains: search, mode: 'insensitive' } },
+      { location: { contains: search, mode: 'insensitive' } },
+      { problemType: { name: { contains: search, mode: 'insensitive' } } },
+    ];
+  }
+
   const rows = await prisma.report.findMany({
     ...(cursorObj ? { cursor: cursorObj, skip: 1 } : { skip: skip }),
+    where,
     orderBy: { id: 'desc' },
     take: take + 1,
     select: {

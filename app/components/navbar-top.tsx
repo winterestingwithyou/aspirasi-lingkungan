@@ -1,11 +1,25 @@
-import { Container, Nav, Navbar } from 'react-bootstrap';
+import { useState } from 'react';
+import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { NavLink } from 'react-router';
 import { useLoginModal } from './login-modal-provider';
 
 export default function NavbarTop() {
   const { open } = useLoginModal();
+  const [expanded, setExpanded] = useState(false);
+
+  // Fungsi untuk menutup navbar, dipanggil setiap kali link diklik
+  const handleNavClick = () => {
+    setExpanded(false);
+  };
+
   return (
-    <Navbar expand="lg" data-bs-theme="dark" sticky="top" className="shadow-sm">
+    <Navbar 
+      expand="lg" 
+      data-bs-theme="dark" 
+      sticky="top" 
+      expanded={expanded}
+      onToggle={() => setExpanded(!expanded)}
+    >
       <Container>
         <Navbar.Brand as={NavLink} to="/">
           <img
@@ -16,25 +30,34 @@ export default function NavbarTop() {
           />
           ECO-RAPID
         </Navbar.Brand>
-        <Navbar.Toggle />
-        <Navbar.Collapse>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link as={NavLink} to="/">
+            <Nav.Link as={NavLink} to="/" onClick={handleNavClick}>
               Beranda
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/laporkan">
+            <Nav.Link as={NavLink} to="/laporkan" onClick={handleNavClick}>
               Laporkan
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/daftar-masalah">
+            <Nav.Link as={NavLink} to="/daftar-masalah" onClick={handleNavClick}>
               Daftar Masalah
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/tentang-kami">
+            <Nav.Link as={NavLink} to="/tentang-kami" onClick={handleNavClick}>
               Tentang Kami
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/kontak">
+            <Nav.Link as={NavLink} to="/kontak" onClick={handleNavClick}>
               Kontak
             </Nav.Link>
-            <Nav.Link onClick={open}>Log In</Nav.Link>
+            <Button
+              variant="outline-light"
+              className="ms-lg-2 mt-2 mt-lg-0"
+              onClick={() => {
+                open();
+                handleNavClick();
+              }}
+            >
+              Log In
+            </Button>
           </Nav>
         </Navbar.Collapse>
       </Container>
