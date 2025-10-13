@@ -10,6 +10,12 @@ type EmailContent = {
   value: string;
 };
 
+export type EmailAttachment = {
+  filename: string;
+  contentType: string;
+  data: Uint8Array;
+};
+
 export type EmailPayload = {
   personalizations: Array<{
     to: EmailAddress[];
@@ -19,6 +25,7 @@ export type EmailPayload = {
   subject: string;
   content: EmailContent[];
   headers?: Record<string, string>;
+  attachments?: EmailAttachment[];
 };
 
 export type GmailCredentials = {
@@ -92,7 +99,10 @@ function encodeMimeMessage(payload: EmailPayload): string {
   const htmlPart =
     payload.content.find((item) => item.type === 'text/html')?.value ?? '';
 
-  const boundary = `=_Part_${Math.random().toString(36).slice(2)}`;
+  const attachments = payload.attachments ?? [];
+  const hasAttachments = attachments.length > 0;
+  const alternativeBoundary = `=_Alt_${Math.random().toString(36).slice(2)}`;
+  const mixedBoundary = `=_Mixed_${Math.random().toString(36).slice(2)}`;
   const lines: string[] = [
     `From: ${fromHeader}`,
     `To: ${to}`,
@@ -110,27 +120,94 @@ function encodeMimeMessage(payload: EmailPayload): string {
     }
   }
 
-  if (textPart && htmlPart) {
+  const pushPlainPart = () => {
+    lines.push('Content-Type: text/plain; charset="UTF-8"');
+    lines.push('Content-Transfer-Encoding: 7bit', '', textPart, '');
+  };
+
+  const pushHtmlPart = () => {
+    lines.push('Content-Type: text/html; charset="UTF-8"');
+    lines.push('Content-Transfer-Encoding: 7bit', '', htmlPart, '');
+  };
+
+  if (hasAttachments) {
     lines.push(
-      `Content-Type: multipart/alternative; boundary="${boundary}"`,
+      `Content-Type: multipart/mixed; boundary="${mixedBoundary}"`,
       '',
     );
-    lines.push(`--${boundary}`);
-    lines.push('Content-Type: text/plain; charset="UTF-8"');
-    lines.push('Content-Transfer-Encoding: 7bit', '', textPart, '');
-    lines.push(`--${boundary}`);
-    lines.push('Content-Type: text/html; charset="UTF-8"');
-    lines.push('Content-Transfer-Encoding: 7bit', '', htmlPart, '');
-    lines.push(`--${boundary}--`, '');
+
+    if (textPart && htmlPart) {
+      lines.push(`--${mixedBoundary}`);
+      lines.push(
+        `Content-Type: multipart/alternative; boundary="${alternativeBoundary}"`,
+        '',
+      );
+      lines.push(`--${alternativeBoundary}`);
+      pushPlainPart();
+      lines.push('');
+      lines.push(`--${alternativeBoundary}`);
+      pushHtmlPart();
+      lines.push('');
+      lines.push(`--${alternativeBoundary}--`, '');
+    } else {
+      lines.push(`--${mixedBoundary}`);
+      if (htmlPart) {
+        pushHtmlPart();
+      } else {
+        pushPlainPart();
+      }
+      lines.push('');
+    }
+
+    for (const attachment of attachments) {
+      const base64Data = encodeToBase64(attachment.data);
+      lines.push(`--${mixedBoundary}`);
+      lines.push(
+        `Content-Type: ${attachment.contentType}; name="${attachment.filename}"`,
+      );
+      lines.push('Content-Transfer-Encoding: base64');
+      lines.push(
+        `Content-Disposition: attachment; filename="${attachment.filename}"`,
+        '',
+      );
+      for (const chunk of chunkString(base64Data, 76)) {
+        lines.push(chunk);
+      }
+      lines.push('');
+    }
+
+    lines.push(`--${mixedBoundary}--`, '');
+  } else if (textPart && htmlPart) {
+    lines.push(
+      `Content-Type: multipart/alternative; boundary="${alternativeBoundary}"`,
+      '',
+    );
+    lines.push(`--${alternativeBoundary}`);
+    pushPlainPart();
+    lines.push('');
+    lines.push(`--${alternativeBoundary}`);
+    pushHtmlPart();
+    lines.push('');
+    lines.push(`--${alternativeBoundary}--`, '');
   } else if (htmlPart) {
-    lines.push('Content-Type: text/html; charset="UTF-8"');
-    lines.push('Content-Transfer-Encoding: 7bit', '', htmlPart, '');
+    pushHtmlPart();
+    lines.push('');
   } else {
-    lines.push('Content-Type: text/plain; charset="UTF-8"');
-    lines.push('Content-Transfer-Encoding: 7bit', '', textPart, '');
+    pushPlainPart();
+    lines.push('');
   }
 
   return lines.join('\r\n');
+}
+
+function encodeToBase64(data: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < data.length; i += chunkSize) {
+    const chunk = data.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
 }
 
 function encodeToBase64Url(value: string): string {
@@ -144,6 +221,14 @@ function encodeToBase64Url(value: string): string {
 
   const base64 = btoa(binary);
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function chunkString(value: string, size: number): string[] {
+  const result: string[] = [];
+  for (let i = 0; i < value.length; i += size) {
+    result.push(value.slice(i, i + size));
+  }
+  return result;
 }
 
 export async function sendWithGmail(

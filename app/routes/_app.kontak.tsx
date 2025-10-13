@@ -1,6 +1,10 @@
 import { escapeHtml, nl2br } from '~/helper/html';
 import KontakPage from '~/pages/kontak-page';
-import { sendWithGmail, type EmailPayload } from '~/server/lib/gmail';
+import {
+  sendWithGmail,
+  type EmailAttachment,
+  type EmailPayload,
+} from '~/server/lib/gmail';
 import { verifyTurnstile } from '~/server/lib/tunstile';
 import type { Route } from './+types/_app.kontak';
 
@@ -137,6 +141,33 @@ async function action({ request, context }: Route.ActionArgs) {
     fullName || normalizedEmail
   }`;
 
+  const attachments: EmailAttachment[] = [];
+  const screenshot = form.get('screenshot');
+  if (
+    rawType === 'bugs' &&
+    screenshot instanceof File &&
+    typeof screenshot.name === 'string' &&
+    screenshot.size > 0
+  ) {
+    try {
+      const buffer = await screenshot.arrayBuffer();
+      attachments.push({
+        filename: screenshot.name || 'screenshot',
+        contentType: screenshot.type || 'application/octet-stream',
+        data: new Uint8Array(buffer),
+      });
+    } catch (error) {
+      console.error('Gagal membaca lampiran screenshot:', error);
+      return Response.json(
+        {
+          success: false,
+          error: 'Gagal memproses file screenshot.',
+        },
+        { status: 400 },
+      );
+    }
+  }
+
   const txt = [
     `Jenis: ${rawType}`,
     `Nama : ${fullName}`,
@@ -183,6 +214,7 @@ async function action({ request, context }: Route.ActionArgs) {
       'X-Source-IP': request.headers.get('CF-Connecting-IP') || '',
       'X-User-Agent': request.headers.get('User-Agent') || '',
     },
+    attachments: attachments.length ? attachments : undefined,
   };
 
   try {
