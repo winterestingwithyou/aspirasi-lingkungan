@@ -8,7 +8,7 @@ import type { ReportStatus } from '~/prisma-enums';
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Daftar Masalah - Web Aspirasi Lingkungan' },
+    { title: 'Daftar Masalah - Eco Rapid' },
     {
       name: 'description',
       content:

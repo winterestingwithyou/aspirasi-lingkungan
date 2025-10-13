@@ -4,7 +4,7 @@ import type { Route } from '../+types/gov.pengaturan';
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Pengaturan Pemerintah - Web Aspirasi Lingkungan' },
+    { title: 'Pengaturan Pemerintah - Eco Rapid' },
     {
       name: 'description',
       content: 'Kelola informasi Pengaturan instansi pemerintah.',

@@ -7,10 +7,10 @@ import { ReportStatus } from '~/prisma-enums';
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Beranda - Web Aspirasi Lingkungan' },
+    { title: 'Beranda - Eco Rapid' },
     {
       name: 'description',
-      content: 'Selamat datang di aplikasi Web Aspirasi Lingkungan.',
+      content: 'Selamat datang di aplikasi Eco Rapid.',
     },
   ];
 }

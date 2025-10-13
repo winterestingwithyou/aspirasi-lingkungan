@@ -11,7 +11,7 @@ import { reportProgressServerSchema } from '~/validators/report-progress';
 function meta({ params }: Route.MetaArgs) {
   return [
     {
-      title: `Tambah Progress Laporan #${params.id} - Web Aspirasi Lingkungan`,
+      title: `Tambah Progress Laporan #${params.id} - Eco Rapid`,
     },
     { name: 'description', content: 'Tambah progress penanganan laporan.' },
   ];

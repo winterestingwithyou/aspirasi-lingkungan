@@ -11,7 +11,7 @@ import {
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Form Pelaporan Masalah - Web Aspirasi Lingkungan' },
+    { title: 'Form Pelaporan Masalah - Eco Rapid' },
     {
       name: 'description',
       content: 'Laporkan masalah lingkungan yang Anda temukan.',

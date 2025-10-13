@@ -5,7 +5,7 @@ import { createProblemType, deleteProblemType, listProblemTypes, updateProblemTy
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Jenis Masalah - Web Aspirasi Lingkungan' },
+    { title: 'Jenis Masalah - Eco Rapid' },
     {
       name: 'description',
       content: 'Halaman untuk kelola jenis masalah.',

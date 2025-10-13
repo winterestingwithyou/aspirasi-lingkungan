@@ -11,7 +11,7 @@ import type { Route } from './+types/_app.kontak';
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Kontak - Web Aspirasi Lingkungan' },
+    { title: 'Kontak - Eco Rapid' },
     {
       name: 'description',
       content: 'Hubungi kami untuk pertanyaan, kritik, atau saran.',

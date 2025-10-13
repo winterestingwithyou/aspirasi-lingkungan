@@ -4,7 +4,7 @@ import type { Route } from '../+types/gov-profil';
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Profil Pemerintah - Web Aspirasi Lingkungan' },
+    { title: 'Profil Pemerintah - Eco Rapid' },
     {
       name: 'description',
       content: 'Kelola informasi profil instansi pemerintah.',

@@ -4,7 +4,7 @@ import { getReportProgressDetail } from '~/server/model/reportProgress';
 
 function meta({ data }: Route.MetaArgs) {
   const title = data
-    ? `Progress "${data.phase}" - Laporan #${data.report.id} | Web Aspirasi Lingkungan`
+    ? `Progress "${data.phase}" - Laporan #${data.report.id} | Eco Rapid`
     : 'Detail Progress Laporan';
   return [
     { title },

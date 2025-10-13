@@ -12,7 +12,7 @@ import type { ReportsResponse, ReportStats } from '~/types';
 // eslint-disable-next-line no-empty-pattern
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'Dashboard Pemerintah - Web Aspirasi Lingkungan' },
+    { title: 'Dashboard Pemerintah - Eco Rapid' },
     {
       name: 'description',
       content:

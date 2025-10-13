@@ -7,7 +7,7 @@ export function meta({ data }: Route.MetaArgs) {
     ? `Laporan #${data.id} - ${data.problemType?.name}`
     : 'Detail Laporan';
   return [
-    { title: `${reportTitle} - Web Aspirasi Lingkungan` },
+    { title: `${reportTitle} - Eco Rapid` },
     {
       name: 'description',
       content: 'Lihat detail laporan aspirasi lingkungan secara lengkap.',
