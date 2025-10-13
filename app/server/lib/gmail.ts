@@ -3,10 +3,7 @@ type EmailAddress = {
   name?: string;
 };
 
-export enum EmailContentType {
-  TEXT = 'text/plain',
-  HTML = 'text/html',
-}
+type EmailContentType = 'text/plain' | 'text/html';
 
 type EmailContent = {
   type: EmailContentType;

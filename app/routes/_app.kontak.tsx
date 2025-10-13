@@ -1,6 +1,6 @@
 import { escapeHtml, nl2br } from '~/helper/html';
 import KontakPage from '~/pages/kontak-page';
-import { EmailContentType, sendWithGmail } from '~/server/lib/gmail';
+import { sendWithGmail, type EmailPayload } from '~/server/lib/gmail';
 import { verifyTurnstile } from '~/server/lib/tunstile';
 import type { Route } from './+types/_app.kontak';
 
@@ -160,7 +160,7 @@ async function action({ request, context }: Route.ActionArgs) {
     </div>
   `.trim();
 
-  const payload = {
+  const payload: EmailPayload = {
     personalizations: [
       {
         to: [{ email: destinationEmail }],
@@ -176,8 +176,8 @@ async function action({ request, context }: Route.ActionArgs) {
     },
     subject,
     content: [
-      { type: EmailContentType.TEXT, value: txt },
-      { type: EmailContentType.HTML, value: html },
+      { type: 'text/plain', value: txt },
+      { type: 'text/html', value: html },
     ],
     headers: {
       'X-Source-IP': request.headers.get('CF-Connecting-IP') || '',

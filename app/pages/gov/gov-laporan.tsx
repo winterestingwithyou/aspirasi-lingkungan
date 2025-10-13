@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Form, Pagination } from 'react-bootstrap';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router';
-import { ReportStatus } from '~/generated/prisma/client';
 import { badge, statusText } from '~/helper/report-status';
 import type { ProblemType, ReportsResponse } from '~/types';
+import { ReportStatus } from '~/prisma-enums';
 
 export default function GovLaporanPage() {
   const { reports: reportsPayload, problemTypes } = useLoaderData<{

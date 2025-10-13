@@ -1,7 +1,8 @@
-import { Prisma, ReportStatus } from '~/generated/prisma/client';
+import { Prisma } from '~/generated/prisma/client';
 import { getPrisma } from '~/db';
 import type { Report, ReportDetail, ReportsResponse } from '~/types';
 import type { CreateReportPayload } from '~/validators/reports';
+import type { ReportStatus } from '~/prisma-enums';
 
 async function listReports(
   dbUrl: string,

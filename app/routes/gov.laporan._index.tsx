@@ -3,7 +3,7 @@ import type { ProblemType, ReportsResponse } from '~/types';
 import GovLaporanPage from '~/pages/gov/gov-laporan';
 import { listReports } from '~/server/model/reports';
 import { listProblemTypes } from '~/server/model/problem-types';
-import { ReportStatus } from '~/generated/prisma/client';
+import type { ReportStatus } from '~/prisma-enums';
 
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
@@ -16,7 +16,6 @@ function meta({}: Route.MetaArgs) {
   ];
 }
 
-// Loader mengambil data dari Hono API: /api/reports
 async function loader({ request, context }: Route.LoaderArgs) {
   const dbUrl = context.cloudflare.env.DATABASE_URL;
 
