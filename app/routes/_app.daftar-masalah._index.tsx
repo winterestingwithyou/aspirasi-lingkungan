@@ -1,9 +1,9 @@
-import type { Route } from './+types/_app.daftar-masalah';
+import type { Route } from './+types/_app.daftar-masalah._index';
 import type { ProblemType, ReportsResponse } from '~/types';
 import { DaftarMasalahPage } from '~/pages/daftar-masalah-page';
 import { listReports } from '~/server/model/reports';
 import { listProblemTypes } from '~/server/model/problem-types';
-import { ReportStatus } from '~/generated/prisma/client';
+import type { ReportStatus } from '~/prisma-enums';
 
 // eslint-disable-next-line no-empty-pattern
 function meta({}: Route.MetaArgs) {
@@ -64,5 +64,4 @@ function DaftarMasalah({}: Route.ComponentProps) {
   return <DaftarMasalahPage />;
 }
 
-export default DaftarMasalah;
-export { meta, loader };
+export { meta, loader, DaftarMasalah as default };

@@ -13,10 +13,10 @@ export default function NavbarTop() {
   };
 
   return (
-    <Navbar 
-      expand="lg" 
-      data-bs-theme="dark" 
-      sticky="top" 
+    <Navbar
+      expand="lg"
+      data-bs-theme="dark"
+      sticky="top"
       expanded={expanded}
       onToggle={() => setExpanded(!expanded)}
     >
@@ -39,7 +39,11 @@ export default function NavbarTop() {
             <Nav.Link as={NavLink} to="/laporkan" onClick={handleNavClick}>
               Laporkan
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/daftar-masalah" onClick={handleNavClick}>
+            <Nav.Link
+              as={NavLink}
+              to="/daftar-masalah"
+              onClick={handleNavClick}
+            >
               Daftar Masalah
             </Nav.Link>
             <Nav.Link as={NavLink} to="/tentang-kami" onClick={handleNavClick}>
@@ -48,16 +52,17 @@ export default function NavbarTop() {
             <Nav.Link as={NavLink} to="/kontak" onClick={handleNavClick}>
               Kontak
             </Nav.Link>
-            <Button
-              variant="outline-light"
-              className="ms-lg-2 mt-2 mt-lg-0"
+            <Nav.Link
+              as={Button}
+              variant="outline-secondary"
+              className="ms-lg-2 mt-2 mt-lg-0 border border-white px-4"
               onClick={() => {
                 open();
                 handleNavClick();
               }}
             >
               Log In
-            </Button>
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

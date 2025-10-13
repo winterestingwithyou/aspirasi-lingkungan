@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLoaderData, useLocation } from 'react-router';
 import { Card, Col, Container, Form, Pagination, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import type { ProblemType, Report, ReportsResponse } from '~/types';
 import { formatTanggal } from '~/helper/date';
 import { badge, statusText } from '~/helper/report-status';
-import { ReportStatus } from '~/generated/prisma/client';
+import { ReportStatus } from '~/prisma-enums';
 
 function DaftarMasalahPage() {
   const { reports, problemTypes } = useLoaderData() as {
@@ -82,10 +82,7 @@ function DaftarMasalahPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
-                <button
-                  className="btn btn-outline-secondary"
-                  type="submit"
-                >
+                <button className="btn btn-outline-secondary" type="submit">
                   <i className="bi bi-search" />
                 </button>
               </div>
@@ -128,7 +125,9 @@ function DaftarMasalahPage() {
               >
                 <option value="all">Semua Status</option>
                 <option value={ReportStatus.PENDING}>Menunggu Tindakan</option>
-                <option value={ReportStatus.IN_PROGRESS}>Sedang Diproses</option>
+                <option value={ReportStatus.IN_PROGRESS}>
+                  Sedang Diproses
+                </option>
                 <option value={ReportStatus.COMPLETED}>Selesai</option>
               </Form.Select>
             </Col>
@@ -138,10 +137,25 @@ function DaftarMasalahPage() {
         <Row className="g-4 mt-1">
           {items.map((r) => (
             <Col md={6} lg={4} key={r.key}>
-              <Card as="a" href={`/daftar-masalah/${r.key}`} className="report-list-card text-decoration-none h-100" onClick={(e) => { e.preventDefault(); navigate(`/daftar-masalah/${r.key}`); }}>
-                <Card.Img variant="top" src={r.img} alt={r.title} className="report-list-card-img" />
+              <Card
+                as="a"
+                href={`/daftar-masalah/${r.key}`}
+                className="report-list-card text-decoration-none h-100"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/daftar-masalah/${r.key}`);
+                }}
+              >
+                <Card.Img
+                  variant="top"
+                  src={r.img}
+                  alt={r.title}
+                  className="report-list-card-img"
+                />
                 <Card.Body className="d-flex flex-column">
-                  <Card.Title as="h5" className="mb-2">{r.title}</Card.Title>
+                  <Card.Title as="h5" className="mb-2">
+                    {r.title}
+                  </Card.Title>
                   <Card.Text className="text-muted mb-2 small">
                     <i className="bi bi-geo-alt-fill me-1" /> {r.loc}
                   </Card.Text>
