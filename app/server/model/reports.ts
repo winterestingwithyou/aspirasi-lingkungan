@@ -2,7 +2,7 @@ import { Prisma } from '~/generated/prisma/client';
 import { getPrisma } from '~/db';
 import type { Report, ReportDetail, ReportsResponse } from '~/types';
 import type { CreateReportPayload } from '~/validators/reports';
-import type { ReportStatus } from '~/prisma-enums';
+import { ReportStatus } from '~/prisma-enums';
 
 async function listReports(
   dbUrl: string,
@@ -259,7 +259,7 @@ async function countTodayCompletedReports(dbUrl: string): Promise<number> {
   return prisma.report.count({
     where: {
       deletedAt: null,
-      status: 'COMPLETED',
+      status: ReportStatus.COMPLETED,
       resolvedAt: { gte: startUtc, lt: endUtc },
     },
   });

@@ -2,7 +2,6 @@ import type { Route } from './+types/gov._index';
 import GovDashboard from '~/pages/gov/gov-dashboard';
 import { ReportStatus } from '~/prisma-enums';
 import {
-  countAllReports,
   countReportsByStatus,
   countTodayReports,
   countTodayCompletedReports,
@@ -30,7 +29,6 @@ export async function loader({ context }: Route.LoaderArgs) {
     const [
       recentReportsResponse,
       today,
-      all,
       pending,
       inProgress,
       completed,
@@ -39,7 +37,6 @@ export async function loader({ context }: Route.LoaderArgs) {
     ] = await Promise.all([
       listReports(dbUrl, { limit: 3, page: 1 }),
       countTodayReports(dbUrl),
-      countAllReports(dbUrl),
       countReportsByStatus(dbUrl, ReportStatus.PENDING),
       countReportsByStatus(dbUrl, ReportStatus.IN_PROGRESS),
       countReportsByStatus(dbUrl, ReportStatus.COMPLETED),
@@ -51,7 +48,6 @@ export async function loader({ context }: Route.LoaderArgs) {
     const recentReports = recentReportsResponse;
     const stats = {
       today,
-      all,
       pending,
       inProgress,
       completed,
