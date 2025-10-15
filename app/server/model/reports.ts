@@ -218,6 +218,9 @@ async function countTodayReports(dbUrl: string): Promise<number> {
   const startUtc = new Date(startOfDayJkt.getTime() - JKT_OFFSET_MS);
   const endUtc = new Date(endOfDayJkt.getTime() - JKT_OFFSET_MS);
 
+  console.log('countTodayReports - startUtc:', startUtc);
+  console.log('countTodayReports - endUtc:', endUtc);
+
   return prisma.report.count({
     where: {
       deletedAt: null,
@@ -255,6 +258,9 @@ async function countTodayCompletedReports(dbUrl: string): Promise<number> {
   // Kembalikan ke UTC untuk dipakai di DB
   const startUtc = new Date(startOfDayJkt.getTime() - JKT_OFFSET_MS);
   const endUtc = new Date(endOfDayJkt.getTime() - JKT_OFFSET_MS);
+
+  console.log('countTodayReports - startUtc:', startUtc);
+  console.log('countTodayReports - endUtc:', endUtc);
 
   return prisma.report.count({
     where: {
