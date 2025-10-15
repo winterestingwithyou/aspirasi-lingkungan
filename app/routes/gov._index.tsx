@@ -55,12 +55,6 @@ export async function loader({ context }: Route.LoaderArgs) {
       todayCompleted,
     } satisfies ReportStats;
 
-    recentReportsResponse.data.forEach((data) => {
-      console.log(data.createdAt);
-    });
-
-    console.log(today, todayCompleted);
-
     return { recentReports, stats };
   } catch (err) {
     console.error('Failed to load recent reports for dashboard:', err);

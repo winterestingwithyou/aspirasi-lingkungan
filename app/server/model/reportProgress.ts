@@ -47,7 +47,6 @@ export async function addReportProgress(
 ) {
   const prisma = await getPrisma(dbUrl);
 
-  // 1) Ambil status terkini untuk validasi cepat
   const report = await prisma.report.findUnique({
     where: { id: reportId },
     select: { id: true, status: true, isFakeReport: true },
@@ -69,15 +68,18 @@ export async function addReportProgress(
 
   const previousStatus = report.status as ReportStatus;
   const nextStatus = payload.status;
+  const isCompleting = nextStatus === ReportStatus.COMPLETED;
 
-  // 2) Compare-and-swap untuk update status agar “nyangkut” hanya jika status belum berubah
   const updated = await prisma.report.updateMany({
     where: {
       id: reportId,
       status: previousStatus,
       isFakeReport: false,
     },
-    data: { status: nextStatus },
+    data: {
+      status: nextStatus,
+      ...(isCompleting ? { resolvedAt: new Date() } : {}),
+    },
   });
 
   if (updated.count === 0) {
@@ -92,7 +94,6 @@ export async function addReportProgress(
     );
   }
 
-  // 3) Insert progress; jika gagal, coba rollback status (best effort, non-atomic)
   try {
     const progress = await prisma.reportProgress.create({
       data: {
@@ -110,7 +111,10 @@ export async function addReportProgress(
     // Best-effort rollback (tidak menjamin sukses bila sudah ada perubahan lain)
     await prisma.report.updateMany({
       where: { id: reportId, status: nextStatus, isFakeReport: false },
-      data: { status: previousStatus },
+      data: {
+        status: previousStatus,
+        ...(isCompleting ? { resolvedAt: null } : {}),
+      },
     });
     throw err instanceof Error
       ? new Error(`Gagal menyimpan progress: ${err.message}`)
