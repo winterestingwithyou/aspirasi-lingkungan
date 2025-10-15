@@ -4,6 +4,7 @@ import { ReportStatus } from '~/prisma-enums';
 import {
   countAllReports,
   countReportsByStatus,
+  countTodayReports,
   countTodayCompletedReports,
   listReports,
 } from '~/server/model/reports';
@@ -28,6 +29,7 @@ export async function loader({ context }: Route.LoaderArgs) {
     // Ambil data secara paralel menggunakan request yang sama
     const [
       recentReportsResponse,
+      today,
       all,
       pending,
       inProgress,
@@ -36,6 +38,7 @@ export async function loader({ context }: Route.LoaderArgs) {
       todayCompleted,
     ] = await Promise.all([
       listReports(dbUrl, { limit: 3, page: 1 }),
+      countTodayReports(dbUrl),
       countAllReports(dbUrl),
       countReportsByStatus(dbUrl, ReportStatus.PENDING),
       countReportsByStatus(dbUrl, ReportStatus.IN_PROGRESS),
@@ -47,6 +50,7 @@ export async function loader({ context }: Route.LoaderArgs) {
     // Ekstrak data dari masing-masing response
     const recentReports = recentReportsResponse;
     const stats = {
+      today,
       all,
       pending,
       inProgress,
