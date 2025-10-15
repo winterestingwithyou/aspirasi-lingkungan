@@ -64,23 +64,23 @@ const teknologi = [
 // Data Developer
 const developers = [
   {
-    photo: '/Rafly.jpg', // Pastikan file Rafly.jpg ada di folder /public
+    photo: '/Rafly.jpg',
     name: 'Rafly Alamsyach',
     nim: '09010282327055',
     prodi: 'Manajemen Informatika',
     univ: 'Universitas Sriwijaya',
     role: 'Front-End Developer',
-    description: 'Optimis itu harus, tapi jangan lupa untuk menyediakan ruang ikhlas',
+    description:
+      'Optimis itu harus, tapi jangan lupa untuk menyediakan ruang ikhlas',
   },
   {
-    photo:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC532ntuioceluApWgmdzoWp-PJllVki0jUA&s',
+    photo: '/adam.jpg',
     name: 'M. Adam Yudistira',
     nim: '09010182327064',
     prodi: 'Manajemen Informatika',
     univ: 'Universitas Sriwijaya',
     role: 'Back-End Developer',
-    description: 'Kata-kata hari ini',
+    description: "Don't love your job, job your love",
   },
 ];
 
@@ -149,7 +149,10 @@ export default function TentangKamiPage() {
               const itemClass = isCenter ? 'center' : 'side';
 
               return (
-                <div key={index} className={`tech-carousel-item ${itemClass} text-center p-4`}>
+                <div
+                  key={index}
+                  className={`tech-carousel-item ${itemClass} text-center p-4`}
+                >
                   <img
                     src={tech.logo}
                     alt={`${tech.name} logo`}
@@ -178,37 +181,43 @@ export default function TentangKamiPage() {
         </div>
 
         {/* Bagian 3: Tim Pengembang */}
-      <div className="text-center mb-5 mt-5">
-        <h2 className="section-title">Tim Pengembang</h2>
-        <p className="lead">
-          Orang-orang di balik pengembangan aplikasi ini.
-        </p>
-      </div>
-      <Row className="justify-content-center g-4">
-        {developers.map((dev, index) => (
-          <Col md={8} lg={6} key={index}>
-            <Card className="h-100 shadow-sm">
-              <Card.Body className="p-4">
-                <div className="d-flex flex-column flex-md-row align-items-center text-center text-md-start">
-                  <Image
-                    src={dev.photo}
-                    roundedCircle
-                    style={{ width: '170px', height: '170px', objectFit: 'cover' }}
-                    className="mb-3 mb-md-0 me-md-4 flex-shrink-0"
-                  />
-                  <div>
-                    <h5 className="mb-1">{dev.name}</h5>
-                    <p className="text-muted small mb-1">{dev.nim}</p>
-                    <p className="text-muted small mb-2">{`${dev.prodi}, ${dev.univ}`}</p>
-                    <Badge bg="primary">{dev.role}</Badge>
+        <div className="text-center mb-5 mt-5">
+          <h2 className="section-title">Tim Pengembang</h2>
+          <p className="lead">
+            Orang-orang di balik pengembangan aplikasi ini.
+          </p>
+        </div>
+        <Row className="justify-content-center g-4">
+          {developers.map((dev, index) => (
+            <Col md={8} lg={6} key={index}>
+              <Card className="h-100 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+                    <Image
+                      src={dev.photo}
+                      roundedCircle
+                      style={{
+                        width: '170px',
+                        height: '170px',
+                        objectFit: 'cover',
+                      }}
+                      className="mb-3 mb-md-0 me-md-4 flex-shrink-0"
+                    />
+                    <div>
+                      <h5 className="mb-1">{dev.name}</h5>
+                      <p className="text-muted small mb-1">{dev.nim}</p>
+                      <p className="text-muted small mb-2">{`${dev.prodi}, ${dev.univ}`}</p>
+                      <Badge bg="primary">{dev.role}</Badge>
+                    </div>
                   </div>
-                </div>
-                <p className="mt-3 mb-0 fst-italic text-center text-md-start">"{dev.description}"</p>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                  <p className="mt-3 mb-0 fst-italic text-center text-md-start">
+                    &quot;{dev.description}&quot;
+                  </p>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </Container>
     </section>
   );
