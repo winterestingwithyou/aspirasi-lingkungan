@@ -5,68 +5,74 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider              = "prisma-client"
   decimalNumberStrategy = "number"
-  engineType = "client"
-  runtime = "workerd"
-  output   = "../app/generated/prisma"
+  engineType            = "client"
+  runtime               = "workerd"
+  output                = "../app/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id                Int              @id @default(autoincrement())
-  username          String           @unique
-  email             String           @unique
-  password          String // Hashing dilakukan di level aplikasi (backend Hono)
-  fullName          String           @map("full_name")
-  profilePictureUrl String?          @map("profile_picture_url")
-  departmentName    String           @map("department_name")
-  createdAt         DateTime         @default(now()) @map("created_at")
-  updatedAt         DateTime         @updatedAt @map("updated_at")
+  id                Int      @id @default(autoincrement())
+  username          String   @unique
+  email             String   @unique
+  profilePictureUrl String?  @map("profile_picture_url")
+  departmentName    String   @map("department_name")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Relasi: Satu User bisa membuat banyak progress laporan
-  progressUpdates   ReportProgress[]
+  progressUpdates ReportProgress[]
+
+  name          String    @map("full_name")
+  emailVerified Boolean   @default(false)
+  image         String?
+  sessions      Session[]
+  accounts      Account[]
 
   @@map("users")
 }
 
 // Model untuk kategori atau jenis masalah lingkungan
+
 model ProblemType {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
   description String?
 
   // Relasi: Satu jenis masalah bisa dimiliki oleh banyak laporan
-  reports     Report[]
+  reports Report[]
 
   @@map("problem_types")
 }
 
 // Model untuk laporan masalah yang dibuat oleh masyarakat
+
 model Report {
-  id              Int      @id @default(autoincrement())
-  reporterName    String   @map("reporter_name")
-  reporterContact String?  @map("reporter_contact")
-  description     String   @db.Text // Menggunakan tipe Text untuk deskripsi panjang
-  photoUrl        String   @map("photo_url")
+  id              Int          @id @default(autoincrement())
+  reporterName    String       @map("reporter_name")
+  reporterContact String?      @map("reporter_contact")
+  description     String       @db.Text // Menggunakan tipe Text untuk deskripsi panjang
+  photoUrl        String       @map("photo_url")
   location        String?
   latitude        Decimal
   longitude       Decimal
   status          ReportStatus @default(PENDING) // Menggunakan Enum untuk status
-  upvoteCount     Int      @default(0) @map("upvote_count")
-  isFakeReport    Boolean  @default(false) @map("is_fake_report")
-  createdAt       DateTime @default(now()) @map("created_at")
-  resolvedAt      DateTime? @map("resolved_at")
-  deletedAt       DateTime? @map("deleted_at") // Untuk soft-delete laporan palsu
+  upvoteCount     Int          @default(0) @map("upvote_count")
+  isFakeReport    Boolean      @default(false) @map("is_fake_report")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  resolvedAt      DateTime?    @map("resolved_at")
+  deletedAt       DateTime?    @map("deleted_at") // Untuk soft-delete laporan palsu
 
   // Foreign Key untuk relasi dengan ProblemType
-  problemTypeId Int          @map("problem_type_id")
-  problemType   ProblemType  @relation(fields: [problemTypeId], references: [id])
+  problemTypeId Int         @map("problem_type_id")
+  problemType   ProblemType @relation(fields: [problemTypeId], references: [id])
 
   // Relasi: Satu laporan memiliki banyak update progress
   progressUpdates ReportProgress[]
@@ -75,29 +81,77 @@ model Report {
 }
 
 // Model untuk setiap update progress dari sebuah laporan
+
 model ReportProgress {
-  id                 Int      @id @default(autoincrement())
-  phase              String   // Contoh: "Verifikasi Lapangan", "Pembersihan Dimulai"
-  description        String   @db.Text
-  progressPhotoUrl   String?  @map("progress_photo_url")
-  createdAt          DateTime @default(now()) @map("created_at")
-  reportStatus     ReportStatus  @default(PENDING) @map("report_status")
+  id               Int          @id @default(autoincrement())
+  phase            String // Contoh: "Verifikasi Lapangan", "Pembersihan Dimulai"
+  description      String       @db.Text
+  progressPhotoUrl String?      @map("progress_photo_url")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  reportStatus     ReportStatus @default(PENDING) @map("report_status")
 
   // Foreign Key untuk relasi dengan Report
-  reportId           Int      @map("report_id")
-  report             Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId Int    @map("report_id")
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
   // Foreign Key untuk relasi dengan User (petugas yang mengupdate)
-  userId             Int      @map("user_id")
-  user               User     @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
 
   @@map("report_progress")
 }
 
 // Enum untuk status laporan utama
+
 enum ReportStatus {
-  PENDING      // Menunggu Tindakan
-  IN_PROGRESS  // Dalam Proses
-  COMPLETED    // Selesai
-  FAKE_REPORT  // Laporan Palsu
+  PENDING // Menunggu Tindakan
+  IN_PROGRESS // Dalam Proses
+  COMPLETED // Selesai
+  FAKE_REPORT // Laporan Palsu
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                Int
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
 }

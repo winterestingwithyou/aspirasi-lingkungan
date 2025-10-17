@@ -1,4 +1,3 @@
-// src/components/LoginModalProvider.tsx
 import { createContext, useContext, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 type Ctx = { open: () => void };

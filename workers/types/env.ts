@@ -15,4 +15,7 @@ export type Env = {
   GMAIL_CLIENT_SECRET: string;
   GMAIL_REFRESH_TOKEN: string;
   GMAIL_SENDER_EMAIL: string;
+
+  BETTER_AUTH_SECRET: string;
+  BETTER_AUTH_URL: string;
 };
