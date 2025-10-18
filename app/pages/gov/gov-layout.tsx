@@ -1,12 +1,31 @@
-import { type PropsWithChildren, useState } from 'react';
+import { type PropsWithChildren, useCallback, useState } from 'react';
 import { Button, Col, Container, Offcanvas } from 'react-bootstrap';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
+import { useAuth } from '~/context/auth-context';
 
 export default function GovLayout({ children }: PropsWithChildren) {
-  const [showSidebar, setShowSidebar] = useState(false);
+  const { client, refreshSession } = useAuth();
+  const navigate = useNavigate();
 
-  const handleCloseSidebar = () => setShowSidebar(false);
-  const handleShowSidebar = () => setShowSidebar(true);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleCloseSidebar = useCallback(() => setShowSidebar(false), []);
+  const handleShowSidebar = useCallback(() => setShowSidebar(true), []);
+
+  const handleLogout = useCallback(async () => {
+    setIsLoggingOut(true);
+    try {
+      await client.signOut();
+      await refreshSession();
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to log out user', error);
+    } finally {
+      setIsLoggingOut(false);
+      handleCloseSidebar();
+    }
+  }, [client, handleCloseSidebar, navigate, refreshSession]);
 
   // Ekstrak konten sidebar ke dalam variabel agar bisa digunakan kembali
   const sidebarContent = (
@@ -14,34 +33,60 @@ export default function GovLayout({ children }: PropsWithChildren) {
       <h4 className="mb-4">Menu</h4>
       <ul className="dashboard-menu">
         <li>
-          <NavLink to="/gov" end className="nav-link-aside" onClick={handleCloseSidebar}>
+          <NavLink
+            to="/gov"
+            end
+            className="nav-link-aside"
+            onClick={handleCloseSidebar}
+          >
             <i className="bi bi-speedometer2" /> Dashboard
           </NavLink>
         </li>
         <li>
-          <NavLink to="/gov/laporan" className="nav-link-aside" onClick={handleCloseSidebar}>
+          <NavLink
+            to="/gov/laporan"
+            className="nav-link-aside"
+            onClick={handleCloseSidebar}
+          >
             <i className="bi bi-file-earmark-text" /> Laporan
           </NavLink>
         </li>
         <li>
-          <NavLink to="/gov/jenis-masalah" className="nav-link-aside" onClick={handleCloseSidebar}>
+          <NavLink
+            to="/gov/jenis-masalah"
+            className="nav-link-aside"
+            onClick={handleCloseSidebar}
+          >
             <i className="bi bi-tags" /> Jenis Masalah
           </NavLink>
         </li>
         <li>
-          <NavLink to="/gov/profil" className="nav-link-aside" onClick={handleCloseSidebar}>
+          <NavLink
+            to="/gov/profil"
+            className="nav-link-aside"
+            onClick={handleCloseSidebar}
+          >
             <i className="bi bi-person-circle" /> Profil
           </NavLink>
         </li>
         <li>
-          <NavLink to="/gov/pengaturan" className="nav-link-aside" onClick={handleCloseSidebar}>
+          <NavLink
+            to="/gov/pengaturan"
+            className="nav-link-aside"
+            onClick={handleCloseSidebar}
+          >
             <i className="bi bi-gear" /> Pengaturan
           </NavLink>
         </li>
         <li>
-          <a className="nav-link-aside" href="/">
+          <Button
+            type="button"
+            className="nav-link-aside"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+          >
             <i className="bi bi-box-arrow-right" /> Log Out
-          </a>
+          </Button>
         </li>
       </ul>
     </div>
@@ -74,7 +119,12 @@ export default function GovLayout({ children }: PropsWithChildren) {
           </div>
 
           {/* Sidebar Offcanvas untuk Tampilan Mobile */}
-          <Offcanvas show={showSidebar} onHide={handleCloseSidebar} placement="start" className="offcanvas-half">
+          <Offcanvas
+            show={showSidebar}
+            onHide={handleCloseSidebar}
+            placement="start"
+            className="offcanvas-half"
+          >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title className="d-flex align-items-center">
                 <div

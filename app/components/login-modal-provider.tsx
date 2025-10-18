@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { Alert, Button, Form, Modal, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import { AuthProvider, useAuth } from '~/context/auth-context';
+import { useAuth } from '~/context/auth-context';
 
 type LoginContextValue = {
   open: () => void;
@@ -29,11 +29,7 @@ export default function LoginModalProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AuthProvider>
-      <LoginModalProviderInner>{children}</LoginModalProviderInner>
-    </AuthProvider>
-  );
+  return <LoginModalProviderInner>{children}</LoginModalProviderInner>;
 }
 
 function LoginModalProviderInner({ children }: { children: React.ReactNode }) {
