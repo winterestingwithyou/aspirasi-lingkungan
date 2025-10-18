@@ -10,7 +10,7 @@ INSERT INTO "account" (
   id, "accountId", "providerId", "userId", password, "createdAt", "updatedAt"
 )
 SELECT
-  'cred_' || u.id, u.email, 'credential', u.id, u.password, NOW(), NOW()
+  'cred_' || u.id, u.id, 'credential', u.id, u.password, NOW(), NOW()
 FROM "users" u
 LEFT JOIN "account" a
   ON a."userId"  = u.id AND a."providerId" = 'credential'

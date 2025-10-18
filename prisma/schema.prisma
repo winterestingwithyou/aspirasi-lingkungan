@@ -36,6 +36,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  displayUsername String?
+
   @@map("users")
 }
 
@@ -111,7 +113,7 @@ enum ReportStatus {
 }
 
 model Session {
-  id        String   @id
+  id        String   @id @default(cuid())
   expiresAt DateTime
   token     String
   createdAt DateTime @default(now())
@@ -126,7 +128,7 @@ model Session {
 }
 
 model Account {
-  id                    String    @id
+  id                    String    @id @default(cuid())
   accountId             String
   providerId            String
   userId                Int
@@ -146,7 +148,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id
+  id         String   @id @default(cuid())
   identifier String
   value      String
   expiresAt  DateTime
