@@ -22,7 +22,7 @@ model User {
   id                Int      @id @default(autoincrement())
   username          String   @unique
   email             String   @unique
-  profilePictureUrl String?  @map("profile_picture_url")
+  image             String?  @map("profile_picture_url")
   departmentName    String   @map("department_name")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -32,7 +32,6 @@ model User {
 
   name          String    @map("full_name")
   emailVerified Boolean   @default(false)
-  image         String?
   sessions      Session[]
   accounts      Account[]
 

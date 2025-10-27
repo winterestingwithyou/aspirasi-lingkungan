@@ -57,7 +57,7 @@ async function main() {
       password: await hashPassword('password123'),
       name: 'Budi Santoso',
       departmentName: 'Dinas Lingkungan Hidup dan Kebersihan',
-      profilePictureUrl: 'https://i.pravatar.cc/150?u=dlhk',
+      image: 'https://i.pravatar.cc/150?u=dlhk',
     },
   });
 
@@ -68,7 +68,7 @@ async function main() {
       password: await hashPassword('password123'),
       name: 'Siti Aminah',
       departmentName: 'Dinas Pekerjaan Umum dan Penataan Ruang',
-      profilePictureUrl: 'https://i.pravatar.cc/150?u=pupr',
+      image: 'https://i.pravatar.cc/150?u=pupr',
     },
   });
 
