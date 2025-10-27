@@ -145,7 +145,7 @@ export async function getReportProgressDetail(
             id: true,
             username: true,
             email: true,
-            fullName: true,
+            name: true,
             departmentName: true,
           },
         },

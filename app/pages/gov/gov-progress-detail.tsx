@@ -21,7 +21,7 @@ type LoaderData = {
     id: number;
     username: string;
     email: string;
-    fullName: string;
+    name: string;
     departmentName: string;
   } | null;
 };
@@ -107,7 +107,7 @@ export default function GovProgressDetail() {
               {data.user ? (
                 <dl className="row mb-0">
                   <dt className="col-sm-4">Nama</dt>
-                  <dd className="col-sm-8">{data.user.fullName}</dd>
+                  <dd className="col-sm-8">{data.user.name}</dd>
                   <dt className="col-sm-4">Username</dt>
                   <dd className="col-sm-8">@{data.user.username}</dd>
                   <dt className="col-sm-4">Email</dt>
