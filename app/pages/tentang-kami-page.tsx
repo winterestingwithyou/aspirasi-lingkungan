@@ -70,8 +70,7 @@ const developers = [
     prodi: 'Manajemen Informatika',
     univ: 'Universitas Sriwijaya',
     role: 'Front-End Developer',
-    description:
-      'Optimis itu harus, tapi jangan lupa untuk menyediakan ruang ikhlas',
+    description: 'No pressure, no diamonds',
   },
   {
     photo: '/adam.jpg',
